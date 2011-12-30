@@ -3,14 +3,54 @@ package mesquite.treecomp.common;
 import java.io.IOException;
 
 import mesquite.lib.MesquiteTree;
+import mesquite.lib.Taxa;
+import mesquite.lib.Tree;
 
 public class TreeConverter {
+	private interface ITreeCreator<TreeType> {
+		TreeType createFrom(String repr);
+	}
+	
+	private static class MesquiteTreeBuilder implements ITreeCreator<mesquite.lib.Tree> {
+		private Taxa taxa;
+		
+		public MesquiteTreeBuilder() {
+			this.taxa = new Taxa(0);
+		}
+		
+		public MesquiteTreeBuilder(Taxa taxa) {
+			this.taxa = taxa;
+		}
+
+		public Tree createFrom(String repr) {
+			MesquiteTree t = new MesquiteTree(taxa);
+			t.setPermitTaxaBlockEnlargement(true);
+			t.readTree(repr);
+			return t;
+		}
+	}
+	
+	private static class PalTreeBuilder implements ITreeCreator<PalFacade.Tree> {
+		public mesquite.treecomp.common.PalFacade.Tree createFrom(String s) {
+			PalFacade.Tree result = null;
+			if (s != null) 
+				try {
+					result = PalFacade.readTree(s);			
+				} catch (IOException e) {}
+			return result;		
+		}		
+	}
+	
 	public static <InTreeType> mesquite.lib.Tree getMesquiteFrom(InTreeType inTree) {
-		return (mesquite.lib.Tree) convert(inTree, TreeType.Mesquite);
+		return convert(inTree, new MesquiteTreeBuilder());
+	}
+	
+	public static <InTreeType> mesquite.lib.Tree getMesquiteFrom(InTreeType inTree, Taxa t) {
+		return convert(inTree, new MesquiteTreeBuilder(t));
 	}
 	
 	public static <InTreeType> PalFacade.Tree getPalFrom(InTreeType inTree) {
-		return (PalFacade.Tree) convert(inTree, TreeType.Pal);
+		return convert(inTree, new PalTreeBuilder());
 	}
 	
 	public static String getStringFrom(mesquite.lib.Tree tree) {
@@ -21,7 +61,7 @@ public class TreeConverter {
 		return tree.toString();
 	}
 	
-	public static <InTreeType> Object convert(InTreeType tree, TreeType outType) {
+	private static <InTreeType, OutTreeType> OutTreeType convert(InTreeType tree, ITreeCreator<OutTreeType> builder) {
 		String repr = "";
 		if (tree instanceof String)
 			repr = (String)tree;
@@ -32,34 +72,6 @@ public class TreeConverter {
 		else
 			throw new RuntimeException("Don't know what to do with a tree structure class: " + tree.getClass().getName());
 		
-		switch (outType) {
-		case Mesquite:
-			return parseMesquiteFrom(repr);
-		case Pal:
-			return parsePalFrom(repr);
-		case StringRepresentation:
-			return repr;
-		default:
-			throw new RuntimeException("Unsupported tree type: " + outType);
-		}
-	}
-	
-	private static mesquite.lib.Tree parseMesquiteFrom(String s) {
-		return new MesquiteTree(null, s);
-	}
-	
-	public static PalFacade.Tree parsePalFrom(String s) {
-		PalFacade.Tree result = null;
-		if (s != null) 
-			try {
-				result = PalFacade.readTree(s);			
-			} catch (IOException e) {}
-		return result;		
-	}
-	
-	private enum TreeType {
-		StringRepresentation,
-		Mesquite,
-		Pal
+		return builder.createFrom(repr);
 	}
 }

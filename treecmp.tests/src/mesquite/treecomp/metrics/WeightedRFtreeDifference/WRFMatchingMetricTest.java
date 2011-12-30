@@ -1,17 +1,18 @@
-package treecmp.r;
+package mesquite.treecomp.metrics.WeightedRFtreeDifference;
 
 import junit.framework.Assert;
 
+import mesquite.treecomp.metrics.MetricTestHelper;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class WRFMatchingMetricTest {
-	WRFSplitUMetric metric;
+	MetricTestHelper metric;
 	
 	@Before
 	public void setUp() throws Exception {
-		metric = new WRFSplitUMetric();
+		metric = new MetricTestHelper(new WeightedRFtreeDifference());
 	}
 
 	@Test

@@ -24,35 +24,34 @@ public class PalFacade {
 		}
 	}
 	
-	public static void setModulePath(String newPath) {
-		if (newPath == null)
-			throw new IllegalArgumentException("newPath must not be null");
-		if (!newPath.equals(path))
-			synchronized (PalFacade.class) {
-				path = newPath;
-			}
-	}
-	private static String path; 
-	
 	private static JarClassLoader getLoader() {
 		if (loader == null)
 			synchronized (PalFacade.class) {
 				if (loader==null) {
-					try {						
-						ClassPathHacker.addFile(path+"../../../../lib/jcl-core-2.2.2.jar");
-						ClassPathHacker.addFile(path+"../../../../lib/log4j-1.2.16.jar");
+					String jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
+					String log4jPath = resolveResource("lib/log4j-1.2.16.jar");
+					String treecmp4GuiPath = resolveResource("lib/treecmp4Gui.jar");
+					String palPath = resolveResource("lib/pal-1.5.1.jar");
+					
+					try {
+						ClassPathHacker.addFile(jclPath);
+						ClassPathHacker.addFile(log4jPath);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 
 					loader = new JarClassLoader();					
-					loader.add(path+"../../../../lib/treecmp4Gui.jar");
-					loader.add(path+"../../../../lib/pal-1.5.1.jar");
+					loader.add(treecmp4GuiPath);
+					loader.add(palPath);
 				}
 			}
 		return loader;
 	}
 	private static JarClassLoader loader;
+	
+	private static String resolveResource(String name) {
+		return PalFacade.class.getClassLoader().getResource(name).getFile();
+	}
 	
 	private static Method getReadTreeMethod() {
 		if (readTreeMethod == null)
@@ -124,8 +123,7 @@ public class PalFacade {
 			}
 		}
 		
-		public double getDistance(Tree t1, Tree t2) {
-			
+		public double getDistance(Tree t1, Tree t2) {			
 			try {
 				return (Double)getDistanceMethod.invoke(metricObject, t1.treeObj, t2.treeObj);
 			} catch (RuntimeException e) {

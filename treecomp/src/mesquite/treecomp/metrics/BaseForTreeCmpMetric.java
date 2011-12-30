@@ -28,7 +28,6 @@ public abstract class BaseForTreeCmpMetric extends NumberFor2Trees {
 
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
-		PalFacade.setModulePath(getModuleInfo().getDirectoryPath());
 		return true;
 	}
 	

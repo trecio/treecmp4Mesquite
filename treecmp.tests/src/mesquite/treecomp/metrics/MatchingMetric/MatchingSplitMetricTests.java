@@ -1,16 +1,18 @@
-package treecmp.r;
+package mesquite.treecomp.metrics.MatchingMetric;
 
 import junit.framework.Assert;
+
+import mesquite.treecomp.metrics.MetricTestHelper;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class MatchingSplitMetricTests {
-	private MatchingSplitUMetric metric;
+	private MetricTestHelper metric;
 
 	@Before
 	public void setUp() {
-		metric = new MatchingSplitUMetric();
+		metric = new MetricTestHelper(new MatchingMetric());
 	}
 	
 	@Test

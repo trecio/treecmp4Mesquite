@@ -1,17 +1,19 @@
-package treecmp.r;
+package mesquite.treecomp.metrics.TripletQuartetMetric;
 
 
 import junit.framework.Assert;
+
+import mesquite.treecomp.metrics.MetricTestHelper;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class QuartetMetricTestCase {
-	QuartetUMetric metric;
+	MetricTestHelper metric;
 
 	@Before
 	public void setUp() throws Exception {
-		metric = new QuartetUMetric();
+		metric = new MetricTestHelper(new TripletQuartetMetric());
 	}
 	
 	@Test

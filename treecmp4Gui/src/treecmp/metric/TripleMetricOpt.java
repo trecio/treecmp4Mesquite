@@ -5,8 +5,14 @@
 package treecmp.metric;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import pal.misc.IdGroup;
+import pal.misc.Identifier;
+import pal.misc.SimpleIdGroup;
 import pal.tree.Node;
 import pal.tree.Tree;
 import pal.tree.TreeUtils;
@@ -41,54 +47,6 @@ public class TripleMetricOpt extends BaseMetric implements Metric {
     }
 
     /**
-     * Opisuje ilosc przejsc i -> j, w jednym wierszu dwoch macierzy
-     * np. i = 2, j = 3, count = 4
-     *      oznacza, ze 2 w jednej macierzy zamienilo sie w 3, 4 razy
-     */
-    private class GenerationalPattern {
-
-        int i, j, Count;
-
-        public GenerationalPattern(int i, int j) {
-            this.i = i;
-            this.j = j;
-            Count = 1;
-        }
-
-        /**
-         * Rowne, gdy i i j sa identyczne
-         * @param obj
-         * @return
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final GenerationalPattern other = (GenerationalPattern) obj;
-
-            return (this.i == other.i) && (this.j == other.j);
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 17 * hash + this.i;
-            hash = 17 * hash + this.j;
-            return hash;
-        }
-
-        /*@Override
-        public String toString()
-        {
-        return "("+i+", "+j+") => "+count;
-        }*/
-    }
-
-    /**
      * Lista przejsc pozycji z jednej macierzy w druga.
      * Ignorowane sa przjscia o ilosci mniejszej od 2
      *
@@ -99,31 +57,70 @@ public class TripleMetricOpt extends BaseMetric implements Metric {
      */
     private List<Integer> getGenerationalsPatterns(int[] generational1, int[] generational2, int un) {
 
-        List<Integer> result = new ArrayList<Integer>();
-        List<GenerationalPattern> data = new ArrayList<GenerationalPattern>();
-
-        // wszystkie mozliwe przejscia generational1[i] -> generational2[i],
-        // poprzez wszystkie mozliwe i
-        for (int i = 0; i < generational1.length; i++) {
-            if (i != un) {
-                GenerationalPattern m = new GenerationalPattern(generational1[i], generational2[i]);
-                if (data.contains(m)) {
-                    int index = data.indexOf(m);
-                    data.get(index).Count++;    // juz istnieje, wiec zwiekszamy ilosc wzorca
-                } else {
-                    data.add(m);    // dodajemy nowy, poniewaz jeszcze taki wzorzec nie istnieje
-                }
-            }
-        }
-
-        for (int i = 0; i < data.size(); i++) {
-            GenerationalPattern m = data.get(i);
-            if (m.Count > 1) {
-                result.add(m.Count);
-            }
-        }
-
+    	final int length = generational1.length;
+    	Map<Pair, Integer> genMatrixHelper = new HashMap<Pair, Integer>();
+        for (int i=0; i<length; i++)
+        	if (i != un) {
+        		Pair patternPair = new Pair(generational1[i], generational2[i]);
+        		if (!genMatrixHelper.containsKey(patternPair)) {
+        			genMatrixHelper.put(patternPair, 1);
+        		} else {
+        			genMatrixHelper.put(patternPair, genMatrixHelper.get(patternPair)+1);
+        		}
+        	}
+        
+        List<Integer> result = new ArrayList<Integer>();        
+        for (Integer i: genMatrixHelper.values())
+        	if (i > 1)
+        		result.add(i);
         return result;
+    }
+    
+    private class Pair {
+    	private int first;
+		private int second;
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + first;
+			result = prime * result + second;
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return "Pair [first=" + first + ", second=" + second + "]";
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Pair other = (Pair) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (first != other.first)
+				return false;
+			if (second != other.second)
+				return false;
+			return true;
+		}
+
+		public Pair(int first, int second) {
+    		this.first = first;
+    		this.second = second; 
+    	}
+
+		private TripleMetricOpt getOuterType() {
+			return TripleMetricOpt.this;
+		}
     }
 
     /**
@@ -134,15 +131,20 @@ public class TripleMetricOpt extends BaseMetric implements Metric {
     private int[][] getSymmetricGenerationalMatrices(Tree tree) {
 
         // utworzenie tablicy
-        IdGroup id1 = TreeUtils.getLeafIdGroup(tree);        
-        int count = id1.getIdCount();
+        IdGroup leafs = TreeUtils.getLeafIdGroup(tree);
+        final int count = leafs.getIdCount();
+        
+        String[] leafIdentifiers = Identifier.getNames(leafs);
+        Arrays.sort(leafIdentifiers);
+        IdGroup orderedIds = new SimpleIdGroup(leafIdentifiers);
+        
         int[][] result = new int[count][count];
 
         for (int i = 0; i < count; i++) {
-            Node nodeI = TreeUtils.getNodeByName(tree.getRoot(), id1.getIdentifier(i).getName());
+            Node nodeI = TreeUtils.getNodeByName(tree.getRoot(), leafIdentifiers[i]);
             for (int j = i + 1; j < count; j++) {
-                Node nodeJ = TreeUtils.getNodeByName(tree.getRoot(), id1.getIdentifier(j).getName());
-                compute(nodeI, nodeJ, result, id1);    // obliczania dla dwoch lisci
+                Node nodeJ = TreeUtils.getNodeByName(tree.getRoot(), leafIdentifiers[j]);
+                compute(nodeI, nodeJ, result, orderedIds);    // obliczania dla dwoch lisci
             }
         }
 

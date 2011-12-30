@@ -1,17 +1,19 @@
-package treecmp.r;
+package mesquite.treecomp.metrics;
 
 import junit.framework.Assert;
+
+import mesquite.treefarm.Correlation2Trees.Correlation2Trees;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class PatristicDistanceTests {
 
-	private PatristicDistancesCorrelationRMetric metric;
+	private MetricTestHelper metric;
 
 	@Before
 	public void setUp() {
-		metric = new PatristicDistancesCorrelationRMetric();
+		metric = new MetricTestHelper(new Correlation2Trees());
 	}
 	
 	@Test
