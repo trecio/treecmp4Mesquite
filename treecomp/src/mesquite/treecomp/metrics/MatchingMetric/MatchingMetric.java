@@ -16,7 +16,7 @@ public class MatchingMetric extends BaseForTreeCmpMetric {
 			mesquite.treecomp.common.PalFacade.Tree t1,
 			mesquite.treecomp.common.PalFacade.Tree t2, MesquiteNumber number,
 			MesquiteString string) {
-		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.bpmetric.MatchingClusterOptMetric");
+		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.MatchingClusterMetric");
 		
 		double distance = metric.getDistance(t1, t2);
 
@@ -30,7 +30,7 @@ public class MatchingMetric extends BaseForTreeCmpMetric {
 			mesquite.treecomp.common.PalFacade.Tree t1,
 			mesquite.treecomp.common.PalFacade.Tree t2, MesquiteNumber number,
 			MesquiteString string) {
-		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.bpmetric.MatchingSplitOptMetric");
+		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.MatchingSplitMetric");
 		
 		double distance = metric.getDistance(t1, t2);
 

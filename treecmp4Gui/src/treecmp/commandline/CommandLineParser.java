@@ -1,528 +1,366 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/** This file is part of TreeCmp, a tool for comparing phylogenetic trees
+    using the Matching Split distance and other metrics.
+    Copyright (C) 2011,  Damian Bogdanowicz
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package treecmp.commandline;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
-import org.apache.commons.cli2.Group;
-import org.apache.commons.cli2.Argument;
-import org.apache.commons.cli2.CommandLine;
-import org.apache.commons.cli2.Option;
-import org.apache.commons.cli2.builder.ArgumentBuilder;
-import org.apache.commons.cli2.builder.DefaultOptionBuilder;
-import org.apache.commons.cli2.builder.GroupBuilder;
-import org.apache.commons.cli2.commandline.Parser;
-import org.apache.commons.cli2.util.HelpFormatter;
-import org.apache.commons.cli2.validation.FileValidator;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import treecmp.config.*;
 import treecmp.metric.Metric;
-import treecmp.validators.FileValidatorEx;
-import treecmp.validators.NumberValidatorEx;
 import treecmp.command.*;
-import treecmp.statistic.Statistic;
 
-/**
- *
- * @author Damian
- */
 public class CommandLineParser {
-public static Command run (String args[])
-{
-    GroupBuilder gBuilder = new GroupBuilder();
-    GroupBuilder gBuilder1 = new GroupBuilder();
-    GroupBuilder gBuilder2 = new GroupBuilder();
-    ArgumentBuilder aBuilder = new ArgumentBuilder();
-    DefaultOptionBuilder oBuilder = new DefaultOptionBuilder();
 
-
-    NumberValidatorEx nvSize=NumberValidatorEx.getIntegerInstance();
-    nvSize.setMinimum(2);
-
-    FileValidator ivFile=FileValidatorEx.getExistingFileInstance();
-    ivFile.setReadable(true);
-
-  /* Option oW = oBuilder
-           .withArgument(aSize)
-           .withShortName("W").create();
-           //withChildren(aSize).withShortName("debug").create();
-*/
-  /* DefaultOption oW=
-           new DefaultOption(
-            "",
-            "",
-            false,
-            "W",
-            "Print standard greeting",
-            null,
-            null,
-            true,
-            aSize,
-            null,
-            'W');
-*/
-
-    Option oS = oBuilder
-        .withShortName("s")
-        .withDescription("-Pair comparison mode.  Each two neighbouring trees are compared.")
-        .create();
-    
-    Option oSeq = oBuilder
-        .withShortName("seq")
-        .withDescription("-Sequential comparison mode.")
-        .create();
-
-    Argument aWindowSize = aBuilder
-        .withName("size")
-        .withMinimum(1)
-        .withMaximum(1)
-        .withValidator(nvSize)
-        .create();
-
-
-    Option oW = oBuilder
-        .withShortName("w")
-        .withArgument(aWindowSize)
-        .withDescription("-Window comparison mode.")
-        .create();
-
-  /*  Option oT = oBuilder
-        .withShortName("t")
-        .create();
-*/
-/*    Option oSUM = oBuilder
-        .withShortName("sum")
-        .create();
-*/
-  /*  Option oSTAT = oBuilder
-        .withShortName("stat")
-        .create();
-*/
-    Option oM = oBuilder
-        .withShortName("m")
-        .withDescription("-Matrix comparison mode. Each two trees are compared.")
-        .create();
-
-    Option oSum = oBuilder
-        .withShortName("sum")
-        .withDescription("-sum.")
-        .create();
-
-    Option oSM = oBuilder
-        .withShortName("sm")
-        .withDescription("-single matrix.")
-        .create();
-
-    Option oHist = oBuilder
-        .withShortName("hist")
-        .withDescription("-hostogram for single metric in matrix mode.")
-        .create();
-
-    Option oHist2 = oBuilder
-        .withShortName("hist2")
-        .withDescription("-hostogram for single metric in window 2 mode.")
-        .create();
-
-     Option oFM = oBuilder
-        .withShortName("fm")
-        .withDescription("-full matrix comparison.")
-        .create();
-    
-   Argument aTreeListFile = aBuilder
-        .withName("listOfTrees")
-        .withMinimum(1)
-        .withMaximum(1)
-       .withValidator(ivFile)
-        .create();
-
-   Option oCons = oBuilder
-        .withShortName("cons")
-        .withArgument(aTreeListFile)
-        .withDescription("-Finds consensus trees for single metric.")
-        .create();
-
-
-
-    Option oDEBUG = oBuilder
-        .withShortName("debug")
-        .create();
-
-
-    Group gType1 = gBuilder
-        .withOption(oW)
-        .withOption(oS)
-      //  .withOption(oT)
-  //      .withOption(oSUM)
-    //    .withOption(oSTAT)
-        .withOption(oM)
-       // .withOption(oDEBUG)
-        .withOption(oSum)
-        .withOption(oSM)
-        .withOption(oFM)
-        .withOption(oHist)
-        .withOption(oHist2)
-        .withOption(oCons)
-        .withMaximum(1)
-        .withMinimum(1)
-        .withDescription("-Commands that can be run in pair mode. Only one command can be active.")
-        .create();
-
-    Group gType2 = gBuilder
-        .withOption(oSeq)
-        .withMaximum(1)
-        .withMinimum(1)
-        .withDescription("-Commands that can be run in sequence mode. Only one command can be active.")
-        .create();
-
-
-    //
-    Argument aInputFile = aBuilder
-        .withName("inputfile")
-        .withMinimum(1)
-        .withMaximum(1)
-       .withValidator(ivFile)
-        .create();
-
-    Option oI = oBuilder
-        .withShortName("i")
-       // .withChildren(gType)
-        .withArgument(aInputFile)
-        .withDescription("-Defines an input file.")
-        .withRequired(true)
-        .create();
-
-    Argument aStepSize = aBuilder
-        .withName("stepsize")
-        .withMinimum(1)
-        .withMaximum(1)
-       .withValidator(nvSize)
-        .create();
-
-    Option oStep = oBuilder
-        .withShortName("j")
-        .withArgument(aStepSize)
-        .withDescription("-Defines size of step (jump) in reading input data. Min. value:2.")
-        .create();
-
-    Option oCorrelation = oBuilder
-        .withShortName("c")
-        .withDescription("-Calculate corrleation.")
-        .create();
-
-
-
-    Argument aOutputFile = aBuilder
-        .withName("outputfile")
-        .withMinimum(1)
-        .withMaximum(1)
-        .create();
-
-
-    Option oO = oBuilder
-        .withShortName("o")
-        .withArgument(aOutputFile)
-        .withDescription("-Defines an output file.")
-        .withRequired(true)
-        .create();
-
-
-    Option oHelp = oBuilder
-        .withShortName("h")
-        .withShortName("?")
-        .withLongName("help")
-        .withDescription("-Prints help.")
-        .create();
-
-DefinedMetricsSet DMSet=DefinedMetricsSet.getDefinedMetricsSet();
-
-Vector<Metric> DMetrics=DMSet.getDefinedMetrics();
-
-ListIterator<Metric> itDM=DMetrics.listIterator();
-
-GroupBuilder gMBuilder = new GroupBuilder();
-gMBuilder.reset();
-while(itDM.hasNext())
-{
-    Metric m=itDM.next();
-    Option opt=oBuilder
-        .withLongName(m.getCommandLineName())
-        .withDescription(m.getDescription())
-        .create();
-
-    gMBuilder.withOption(opt);
-
-}
-Group gMetric = gMBuilder
-        .withMinimum(1)
-        .create();
-//statistics group
-DefinedStatisticsSet DSSet=DefinedStatisticsSet.getDefinedStatisticsSet();
-
-Vector<Statistic> DStatistics=DSSet.getDefinedStatistics();
-
-ListIterator<Statistic> itSM=DStatistics.listIterator();
-
-GroupBuilder gSBuilder = new GroupBuilder();
-gSBuilder.reset();
-while(itSM.hasNext())
-{
-    Statistic s=itSM.next();
-    Option opt=oBuilder
-        .withLongName(s.getCommandLineName())
-        .withDescription(s.getDescription())
-        .create();
-
-    gSBuilder.withOption(opt);
-
-}
-Group gStatistic = gSBuilder
-        .withMinimum(1)
-        .create();
-
-
-
-   /* HelpFormatter formatter2=new HelpFormatter();
-
-   formatter2.setGroup(gMetric);
-   formatter2.getFullUsageSettings().add(DisplaySetting.DISPLAY_GROUP_OUTER);
-   formatter2.getFullUsageSettings().add(DisplaySetting.DISPLAY_OPTIONAL);
-
-   formatter2.printUsage();
-*/
-/*
-Option oBS=oBuilder
-        .withLongName("bs")
-        .create();
-
-Option oNodal=oBuilder
-        .withLongName("nodal")
-        .create();
-
-Option oRF=oBuilder
-        .withLongName("rf")
-        .create();
-
-Option oQuartet=oBuilder
-        .withLongName("qt")
-        .create();
-
-Group gMetric = gBuilder
-        .withOption(oBS)
-        .withOption(oNodal)
-        .withOption(oRF)
-        .withOption(oQuartet)
-        .withMinimum(1)
-        .create();
-*/
-
-Option oMetric = oBuilder
-        .withShortName("d")
-        .withChildren(gMetric)
-        .withDescription("-Defines a set of metrics which will be used in the analysis.")
-        .withRequired(true)
-        .create();
-
-Option oStatistic = oBuilder
-        .withShortName("st")
-        .withChildren(gStatistic)
-        .withDescription("-Defines a set of statitics which will be used in the analysis.")
-        .withRequired(true)
-        .create();
-
- 
-
-       Group gOptions1=gBuilder1
-           .withOption(gType1)
-            .withOption(oI)
-            .withOption(oStep)
-            .withOption(oCorrelation)
-            .withOption(oMetric)
-            .withOption(oO)
-            .withOption(oHelp)
-            .create();
-
-       Group gOptions2=gBuilder2
-           .withOption(gType2)
-            .withOption(oI)
-            .withOption(oStep)
-            .withOption(oCorrelation)
-            .withOption(oStatistic)
-            .withOption(oO)
-            .withOption(oHelp)
-            .create();
-
-       Group gOptions=gBuilder
-           .withOption(gOptions1)
-         /*  .withOption(gOptions2)*/
-           .withMinimum(1)
-           .withMaximum(1)
-           .create();
-
-
-/*
-    Option oCmd = oBuilder
-        .withChildren(gType)
-        .withShortName("debug")
-        .create();
-*/
-
-  /*  Group gOptions = gBuilder
-        .withOption(oCmd)
-        .create();
-*/
-
-    /*
-      commands.put("-s", new RunSCommand(0,"-s"));
-    commands.put("-m", new RunMCommand(0,"-m"));
-    commands.put("-t", new RunTCommand(0,"-t"));
-    commands.put("-w", new RunWCommand(1,"-w"));
-    commands.put("-stat", new RunStatCommand(0,"-stat"));
-    commands.put("-sum", new RunStatCommand(0,"-sum"));
-    commands.put("-debug", new RunDebugCommand(0,"-debug"));
-    commands.put("-h", new RunHCommand(0,"-h")); 
-      
-         
-     
-     */
-/*
-    Group gCmd=gBuilder
-            .withOption(gType)
-            .withOption(oI)
-            .withOption(oO)
-            .create();
-  */
-
-    //getting version from manifest file
-    String version=CommandLineParser.class.getPackage().getImplementationVersion();
-    if(version==null) version="";
-
-    HelpFormatter formatter=new HelpFormatter("| ","   ", " |",78);
-    formatter.setShellCommand("java -jar treecmp.jar");
-    formatter.setHeader("TreeCmp "+version+" Application Help");
-    formatter.setFooter("Copyright @Damian Bogdanowicz");
-    formatter.setDivider("|----------------------------------------------------------------------------|");
-   formatter.setGroup(gOptions);
-   // formatter.printHelp( "ant", gOptions );
-    //formatter.
-/*
-   formatter.getFullUsageSettings().add(DisplaySetting.DISPLAY_GROUP_NAME);
-formatter.getFullUsageSettings().add(DisplaySetting.DISPLAY_GROUP_ARGUMENT);
-//formatter.getFullUsageSettings().remove(DisplaySetting.DISPLAY_GROUP_EXPANDED);
-formatter.getFullUsageSettings().add(DisplaySetting.DISPLAY_GROUP_OUTER);
-//formatter.getFullUsageSettings().remove(DisplaySetting.DISPLAY_GROUP_OUTER);
-formatter.getFullUsageSettings().add(DisplaySetting.DISPLAY_OPTIONAL);
-formatter.getLineUsageSettings().add(DisplaySetting.DISPLAY_GROUP_OUTER);
-formatter.printUsage();
-
-    formatter.printWrapped("ssss");
-*/
-    Parser parser = new Parser();
-    //PosixParser();
-    parser.setGroup(gOptions1);
-    parser.setHelpOption(oHelp);
-    parser.setHelpFormatter(formatter);
-
-
-    CommandLine commandLine = parser.parseAndHelp(args);
-
-    if(commandLine != null) {
-    // process these values
-
-
-        //set IO settings
-        String inputFileName=(String)commandLine.getValue(oI);
-        String outputFileName=(String)commandLine.getValue(oO);
-        IOSettings IOset=IOSettings.getIOSettings();
-
-        IOset.setInputFile(inputFileName);
-        IOset.setOutputFile(outputFileName);
-
-        if(commandLine.hasOption(oStep))
-        {         
-            String sStep=(String)commandLine.getValue(oStep); 
-            int iStep=Integer.parseInt(sStep);            
-            IOset.setIStep(iStep);
-        }
-
-        //correlation settings
-        if(commandLine.hasOption(oCorrelation)){
-            IOset.setCalcCorrelation(true);
-        }
-
-
-        //set active metrics
-        ActiveMetricsSet AMSet=ActiveMetricsSet.getActiveMetricsSet();
+    private final static String S_DESC = "- Overlapping pair comparison mode. Every two neighboring trees are compared";
+    private final static String W_DESC = "- Window comparison mode. Every two trees within a window are compared.";
+    private final static String M_DESC = "- Matrix comparison mode. Every two trees in the input file are compared.";
+    private final static String R_DESC = "- Single tree to all tree mode. Each tree in the input file is compared to the single referenced tree.";
+    private final static String I_DESC = "- Input file.";
+    private final static String O_DESC = "- Output file.";
+    private final static String P_DESC = "- Prune compared trees if needed (trees can have different leaf sets).";
+    private final static String SS_DESC = "- Report scaled values.";
+    private final static String II_DESC = "- Include summary section in the output file.";
+    private final static String A_DESC = "- Generate alignment files (only for MS and MC metrics). Cannot be used with -O option.";
+    private final static String OO_DESC = "- Use MS/MC metrics optimized for similar trees. Cannot be used with -A option.";
+    private final static String F_DESC = "- Use MS/MC metrics for trees with free leaf set. ";
+    private final static String CMD_ERROR = "Error. There is a problem with parsing the command line. See the usage below.\n";
+
+
+    private final static String D_DESC = "- Allow to specify distances (from 1 up to 8):\n"+
+                                        "Metrics for unrooted trees:\n" +
+                                        " ms - the Matching Split metric,\n"+
+                                        " rf - the Robinson-Foulds metric,\n"+
+                                        " pd - the Path Difference metric,\n"+
+                                        " qt - the Quartet metric,\n"+
+                                        "Metrics for rooted trees:\n" +
+                                        " mc - the Matching Cluster metric,\n"+
+                                        " rc - the Robinson-Foulds metric based on clusters,\n" +
+                                        " ns - the Nodal Splitted metric with L2 norm,\n"+
+                                        " tt - the Triples metric.\n"+
+                                        "Example: -d ms rf\n";
+
+    private final static String OPTS_HEADER = "Active options:\n";
+    private final static String OPTS_TYPE = "Type of the analysis: ";
+    private final static String OPTS_METRICS = "Metrics:\n";
+    private final static String OPTS_INPUT = "Input file: ";
+    private final static String OPTS_OUTPUT = "Output file: ";
+    private final static String OPTS_CUSTOM = "Additional options:\n";
+
+
+    //private final static String HEADER = "";
+    //private final static String FOOTER = "ssd";
+    private final static String CMD_LINE_SYNTAX = "java -jar TreeCmp.jar -s|-w <size>|-m|-r <refTreeFile>"
+            +" -d <metrics> -i <inputFile> -o <outputFile> [-S] [-P] [-I] [-A|-O]\n"
+            + "Options order is important.";
+
+    public static Command run(String args[]) {
+        Command cmd = null;
+        DefinedMetricsSet DMSet = DefinedMetricsSet.getDefinedMetricsSet();
+        List<Metric> DMetrics = DMSet.getDefinedMetrics();
+
+        Option oS = new Option("s", S_DESC);
+        Option oW = new Option("w", W_DESC);
+        oW.setArgName("size");
+        oW.setArgs(1);
+        Option oM = new Option("m", M_DESC);
+        Option oR = new Option("r", R_DESC);
+        oR.setArgName("refTreeFile");
+        oR.setArgs(1);
+
+        OptionGroup cmdOpts = new OptionGroup();
+        cmdOpts.addOption(oS);
+        cmdOpts.addOption(oW);
+        cmdOpts.addOption(oM);
+        cmdOpts.addOption(oR);
         
-        DMSet=DefinedMetricsSet.getDefinedMetricsSet();
-        DMetrics=DMSet.getDefinedMetrics();
-        itDM=DMetrics.listIterator();
+        cmdOpts.setRequired(true);
+        //set metric option
+        Option oD = new Option("d", D_DESC);
+        oD.setArgName("metics");
+        oD.setValueSeparator(' ');
+        oD.setArgs(DMetrics.size());
+        oD.setRequired(true);
+        
+        Option oI = new Option("i", I_DESC);
+        oI.setArgName("inputfile");
+        oI.setArgs(1);
+        oI.setRequired(true);
 
-        while(itDM.hasNext()){
-            Metric m=itDM.next();
-            if(commandLine.hasOption("--"+m.getCommandLineName())){
-                AMSet.addMetric(m);
+        Option oO = new Option("o", O_DESC);
+        oO.setArgs(1);
+        oO.setArgName("outputfile");
+        oO.setRequired(true);
+
+        Option oP = new Option("P", P_DESC);
+        Option oSS = new Option("S", SS_DESC);
+        Option oII = new Option("I", II_DESC);
+
+        Option oOO = new Option("O", OO_DESC);
+        Option oF = new Option("F", F_DESC);
+        Option oA = new Option("A", A_DESC);
+        OptionGroup customMOpts = new OptionGroup();
+        customMOpts.addOption(oOO);
+        customMOpts.addOption(oA);
+       // customMOpts.addOption(oF);
+        
+        Options opts = new Options();
+
+        opts.addOptionGroup(cmdOpts);
+        opts.addOption(oD);
+        opts.addOption(oI);
+        opts.addOption(oO);
+        opts.addOption(oP);
+        opts.addOption(oSS);
+        opts.addOption(oII);
+        opts.addOptionGroup(customMOpts);
+
+
+        //getting version from manifest file
+        String version = CommandLineParser.class.getPackage().getImplementationVersion();
+        if (version == null) {
+            version = "";
+        }
+        //String HEADER="TreeCmp version "+version;
+        //String FOOTER = "TreeCmp version "+version;
+        String FOOTER = "";
+        String HEADER=" ";
+        String APP_NAME="TreeCmp version "+version+"\n";
+        GnuParser parser = new GnuParser();
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.setOptionComparator(new OptOrder());
+
+        System.out.println(APP_NAME);
+        if(args.length==0){
+            formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
+            return null;                    
+        }
+
+
+
+        try {
+            //parser.checkRequiredOptions();
+
+            CommandLine commandLine = parser.parse(opts, args);
+            if (commandLine != null) {
+                // process these values
+                //set IO settings
+                String inputFileName = (String) commandLine.getOptionValue(oI.getOpt());
+                String outputFileName = (String) commandLine.getOptionValue(oO.getOpt());
+                String [] metrics= commandLine.getOptionValues(oD.getOpt());
+
+
+                if(inputFileName == null){
+                    System.out.println("Error: input file not specified!");
+                    formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
+
+                    return null;
+                }
+                if(outputFileName == null){
+                    System.out.println("Error: output file not specified!");
+                    formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
+                    return null;
+                }
+
+                //commandLine.
+                IOSettings IOset = IOSettings.getIOSettings();
+                IOset.setInputFile(inputFileName);
+                IOset.setOutputFile(outputFileName);
+
+                //custom additinal options
+                ArrayList<Option> custOpts = new ArrayList<Option>();
+
+
+                if (commandLine.hasOption(oP.getOpt())) {
+                    IOset.setPruneTrees(true);
+                    custOpts.add(oP);
+                }
+                if (commandLine.hasOption(oSS.getOpt())) {
+                    IOset.setRandomComparison(true);
+                    custOpts.add(oSS);
+                }
+                if (commandLine.hasOption(oA.getOpt())) {
+                    IOset.setGenAlignments(true);
+                    custOpts.add(oA);
+                }
+                if (commandLine.hasOption(oOO.getOpt())) {
+                    IOset.setOptMsMcByRf(true);
+                    custOpts.add(oOO);
+                }
+                if (commandLine.hasOption(oII.getOpt())) {
+                    IOset.setGenSummary(true);
+                    custOpts.add(oII);
+                }
+                if (commandLine.hasOption(oF.getOpt())) {
+                    IOset.setUseMsMcFreeLeafSet(true);
+                    //additioanly set prune trees
+                    IOset.setPruneTrees(true);
+                    custOpts.add(oF);
+                }
+
+                Collections.sort(custOpts, new OptOrder());
+                /*
+                if(commandLine.hasOption(oStep))
+                {
+                String sStep=(String)commandLine.getValue(oStep);
+                int iStep=Integer.parseInt(sStep);
+                IOset.setIStep(iStep);
+                }
+                 */
+                //set active metrics
+                ActiveMetricsSet AMSet = ActiveMetricsSet.getActiveMetricsSet();
+                DMSet = DefinedMetricsSet.getDefinedMetricsSet();
+                DMetrics = DMSet.getDefinedMetrics();
+
+                for(int i=0;i<metrics.length;i++){
+
+                    ListIterator<Metric> itDM = DMetrics.listIterator();
+                    Metric found=null;
+                    while (itDM.hasNext()) {
+                        Metric m = itDM.next();
+                        if(m.getCommandLineName().equals(metrics[i])){
+                            found = m;
+                        }
+                    }
+                    if (found != null){
+                        AMSet.addMetric(found);
+                    }else{
+                        System.out.print("Error: ");
+                        System.out.println("Metric: "+metrics[i]+" is unknown\n.");
+                        formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
+                        return null;
+                    }
+
+                }
+
+                //set active command
+                String analysisType="";
+
+                if (commandLine.hasOption(oW.getOpt())) {
+                    String sWindowSize = (String) commandLine.getOptionValue(oW.getOpt());
+                    //String sWindowSize2 = (String) commandLine.getOptionValue();
+                    int iWindowSize = Integer.parseInt(sWindowSize);
+                    cmd = new RunWCommand(1, "-w", iWindowSize);
+                    analysisType="window comparison mode (-w) with window size: "+iWindowSize;
+                }else if (commandLine.hasOption(oM.getOpt())) {
+                    cmd = new RunMCommand(0, "-m");
+                    analysisType="matrix comparison mode (-m)";
+                }else if (commandLine.hasOption(oS.getOpt())) {
+                    cmd = new RunSCommand(0, "-s");
+                    analysisType="overlapping pair comparison mode (-s)";
+                }else if (commandLine.hasOption(oR.getOpt())) {
+                    String sRefTreeFile = (String) commandLine.getOptionValue(oR.getOpt());
+                    cmd = new RunRCommand(0, "-r",sRefTreeFile);
+                    analysisType=" one-to-all comparison mode (-r)";
+                }else{
+                    System.out.println("Error: type of the analysis not specified correctly!");
+                    formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
+                    return null;
+                }
+
+                printOptionsInEffect(analysisType,AMSet,inputFileName,outputFileName, custOpts);
+
+                return cmd;
+            } else {
+                //Error during parsing command line
+                return null;
             }
-        }
+        } catch (ParseException ex) {
+            System.out.println(CMD_ERROR);
+            //System.out.println(ex.getMessage());
+           
+            formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
 
-         //set active statistics
-        ActiveStatisticsSet ASSet=ActiveStatisticsSet.getActiveStatisticsSet();
-
-        DSSet=DefinedStatisticsSet.getDefinedStatisticsSet();
-        DStatistics=DSSet.getDefinedStatistics();
-        itSM=DStatistics.listIterator();
-
-        while(itSM.hasNext()){
-            Statistic s=itSM.next();
-            if(commandLine.hasOption("--"+s.getCommandLineName())){
-                ASSet.addStatistic(s);
-            }
-        }
+        } catch (NumberFormatException ex){
+              System.out.print("Error: ");
+              System.out.println("window size should be an integer.\n");
+            formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
 
 
-        //set active command
-        Command cmd=null;
-        if (commandLine.hasOption(oW)) {
-            String sWindowSize = (String) commandLine.getValue(oW);
-            int iWindowSize = Integer.parseInt(sWindowSize);
-            cmd = new RunWCommand(1, "-w", iWindowSize);
         }
-        if (commandLine.hasOption(oM)) {
-            cmd = new RunMCommand(0, "-m");
-        }
-        if (commandLine.hasOption(oS)) {
-            cmd = new RunSCommand(0, "-s");
-        }
-        if (commandLine.hasOption(oSum)) {
-            cmd = new RunSumCommand(0, "-sum");
-        }
-        if (commandLine.hasOption(oSM)) {
-            cmd = new RunSMCommand(0, "-sm");
-        }
-        if (commandLine.hasOption(oHist)) {
-            cmd = new RunHistCommand(0, "-hist");
-        }
-        if (commandLine.hasOption(oHist2)) {
-            cmd = new RunHist2Command(0, "-hist2");
-        }
-        if (commandLine.hasOption(oCons)) {
-            String inputListOfTrees = (String) commandLine.getValue(oCons);
-            cmd = new RunConsCommand(1, "-cons", inputListOfTrees);
-        }
-       if (commandLine.hasOption(oFM)) {
-            cmd = new RunFMCommand(0, "-fm");
-        }
-       if (commandLine.hasOption(oSeq)) {
-            cmd = new RunSeqCommand(0, "-seq");
-        }
-
         return cmd;
-       
-    }else
-    {
-        //Error during parsing command line
-        return null;
+    }
+    private static void printOptionsInEffect(String analysisType,ActiveMetricsSet AMSet,String inputFileName,String outputFileName, List<Option> custOpts){
+        System.out.print(OPTS_HEADER);
+        System.out.print(OPTS_TYPE+analysisType+"\n");
+        System.out.print(OPTS_METRICS);
+        Metric[] metrics=AMSet.getActiveMetricsTable();
+        int nr;
+        Metric m;
+        for(int i=0;i<metrics.length;i++){
+            m=metrics[i];
+            nr=i+1;
+            System.out.print("  "+nr+". "+m.getName()+" ("+m.getCommandLineName()+")\n");
+        }
+   
+        System.out.print(OPTS_INPUT+inputFileName+"\n");
+        System.out.print(OPTS_OUTPUT+outputFileName+"\n");
+        if (!custOpts.isEmpty()){
+            System.out.print(OPTS_CUSTOM);
+            for (Option opt: custOpts){
+                String optMsg = opt.getOpt() +" " + opt.getDescription()+"\n";
+                 System.out.print(optMsg);
+            }
+        }
+        System.out.print("-----\n");
+
+
     }
 }
+
+class OptOrder implements Comparator {
+
+    private LinkedHashMap<String, Integer> order = new LinkedHashMap<String, Integer>();
+
+    public OptOrder() {
+        order.put("s", new Integer(1));
+        order.put("w", new Integer(2));
+        order.put("m", new Integer(3));
+        order.put("r", new Integer(4));
+        order.put("d", new Integer(5));
+        order.put("i", new Integer(6));
+        order.put("o", new Integer(7));
+        order.put("S", new Integer(8));
+        order.put("P", new Integer(9));
+        order.put("I", new Integer(10));
+        order.put("A", new Integer(11));
+        order.put("O", new Integer(12));
+        order.put("F", new Integer(13));
+    }
+
+    public int compare(Object o1, Object o2) {
+        Option opt1 = (Option) o1;
+        Option opt2 = (Option) o2;
+        Integer n1 = (Integer) order.get(opt1.getOpt());
+        Integer n2 = (Integer) order.get(opt2.getOpt());
+        if (n1 != null || n2 != null) {
+            return n1 - n2;
+        } else {
+            return 0;
+        }
+    }
 }

@@ -114,7 +114,7 @@ public class WeightedRFtreeDifference extends BaseForTreeCmpMetric {
 			mesquite.treecomp.common.PalFacade.Tree t1,
 			mesquite.treecomp.common.PalFacade.Tree t2, MesquiteNumber number,
 			MesquiteString string) {
-		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.bpmetric.WRFMetric");
+		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.WRFMetric");
 		double distance = metric.getDistance(t1, t2);
 		number.setValue(distance);
 		if (string != null)

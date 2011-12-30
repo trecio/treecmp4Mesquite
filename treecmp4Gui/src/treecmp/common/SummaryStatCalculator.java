@@ -1,18 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/** This file is part of TreeCmp, a tool for comparing phylogenetic trees
+    using the Matching Split distance and other metrics.
+    Copyright (C) 2011,  Damian Bogdanowicz
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package treecmp.common;
 
-import treecmp.ResultWriter;
+import treecmp.io.ResultWriter;
 import treecmp.config.IOSettings;
 import treecmp.metric.Metric;
 
-/**
- *
- * @author Damian
- */
+
 public class SummaryStatCalculator {
 
 
@@ -23,8 +32,6 @@ public class SummaryStatCalculator {
     private double min;
     private double max;
 
-
-
     public SummaryStatCalculator() {
 
         this.count=0;
@@ -32,8 +39,7 @@ public class SummaryStatCalculator {
         this.sq_sum=0.0;
 
         this.min=Double.MAX_VALUE;
-        this.max=-Double.MIN_VALUE;
-
+        this.max=-Double.MAX_VALUE;
     }
 
 
@@ -137,45 +143,42 @@ public class SummaryStatCalculator {
     }
 
 
-     public static void printSummary(ResultWriter out,SummaryStatCalculator[] sStatCalc)
-     {
-         int size=sStatCalc.length;
-         String separator=IOSettings.getIOSettings().getSSep();
-         String line="";
+    public static void printSummary(ResultWriter out, SummaryStatCalculator[] sStatCalc) {
 
-         line="---------";
-         out.setText(line);
-         out.write();
-         line="Summary:";
+        if (IOSettings.getIOSettings().isGenSummary()) {
+            int size = sStatCalc.length;
+            String separator = IOSettings.getIOSettings().getSSep();
+            String line = "";
 
-         out.setText(line);
-         out.write();
-
-         //name-avg-std-min-max-count
-         line="Name"+separator;
-         line+="Avg"+separator;
-         line+="Std"+separator;
-         line+="Min"+separator;
-         line+="Max"+separator;
-         line+="Count";
-
-         out.setText(line);
-         out.write();
-
-         for(int i=0;i<size;i++)
-         {
-            line=sStatCalc[i].getName()+separator;
-            line+=sStatCalc[i].getAvg()+separator;
-            line+=sStatCalc[i].getStd()+separator;
-            line+=sStatCalc[i].getMin()+separator;
-            line+=sStatCalc[i].getMax()+separator;
-            line+=sStatCalc[i].getCount();
+            line = "---------";
             out.setText(line);
             out.write();
-         }
+            line = "Summary:";
 
+            out.setText(line);
+            out.write();
 
-     }
-  
+            //name-avg-std-min-max-count
+            line = "Name" + separator;
+            line += "Avg" + separator;
+            line += "Std" + separator;
+            line += "Min" + separator;
+            line += "Max" + separator;
+            line += "Count";
 
+            out.setText(line);
+            out.write();
+
+            for (int i = 0; i < size; i++) {
+                line = sStatCalc[i].getName() + separator;
+                line += sStatCalc[i].getAvg() + separator;
+                line += sStatCalc[i].getStd() + separator;
+                line += sStatCalc[i].getMin() + separator;
+                line += sStatCalc[i].getMax() + separator;
+                line += sStatCalc[i].getCount();
+                out.setText(line);
+                out.write();
+            }
+        }
+    }
 }

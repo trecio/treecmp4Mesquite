@@ -1,145 +1,112 @@
-/*
- * Main.java
- *
- * Created on 8 marzec 2007, 19:28
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+/** This file is part of TreeCmp, a tool for comparing phylogenetic trees
+    using the Matching Split distance and other metrics.
+    Copyright (C) 2011,  Damian Bogdanowicz
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package treecmp;
 
-
-import treecmp.common.TimeDate;
-import java.io.File;
-import java.util.Hashtable;
-import treecmp.command.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import treecmp.common.TreeCmpException;
+import treecmp.io.ResultWriter;
+import treecmp.io.TreeReader;
+import treecmp.command.Command;
 import treecmp.commandline.CommandLineParser;
-import treecmp.config.*;
+import treecmp.common.TimeDate;
+import treecmp.config.ActiveMetricsSet;
+import treecmp.config.ConfigSettings;
+import treecmp.config.IOSettings;
+import treecmp.config.PersistentInfo;
+import treecmp.metric.Metric;
 
-
-
-/**
- *
- * @author VOX
- */
 public class Main {
-
-    /** Creates a new instance of Main */
-
-
-    public Main() {
-    }
 
     /**
      * @param args the command line arguments
      */
-  
-    //public final String runtimePath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-
     public static void main(String[] args) {
+      
+       String runtimePathTemp =Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       String runtimePath = runtimePathTemp;
+        try {
+            runtimePath = URLDecoder.decode(runtimePathTemp, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        //networkx test
-        
-   //     NetworkxTest.test();
-        //
-
-       String runtimePath =Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       // String runtimePath =Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
        String conf="";
+       String dataDir="";
 
        String version=Main.class.getPackage().getImplementationVersion();
 
        if(version==null){
-           conf=runtimePath+"../"+PersistentInfo.configFile;
-           
-       }else{
-           String tempPath=runtimePath.substring(0,runtimePath.lastIndexOf("/")+1);
-           conf=tempPath+PersistentInfo.configFile;
-       } 
-       //System.out.println(conf);
-       File confXmlFile=new File(conf);
-        
-        ConfigSettings config=ConfigSettings.getConfig();
-                      
-        config.readConfigFromFile(confXmlFile);
+           conf = runtimePath + "../" + PersistentInfo.configFile;
+           dataDir = runtimePath + "../" + PersistentInfo.dataPath;
 
+       }else{
+           String tempPath = runtimePath.substring(0,runtimePath.lastIndexOf("/")+1);
+           conf = tempPath + PersistentInfo.configFile;
+           dataDir = tempPath + PersistentInfo.dataPath;
+       }
+
+        ConfigSettings.initConfig(conf, dataDir);
         Command cmd=CommandLineParser.run(args);
 
         if(cmd!=null)
         {
+            IOSettings settings =IOSettings.getIOSettings();
+            //init data if needed
+            if (settings.isRandomComparison()){
+                System.out.println(TimeDate.now()+": Start of reading random statistics.");
+                for (Metric m: ActiveMetricsSet.getActiveMetricsSet().getActiveMetrics()){
+                    m.initData();
+                }
+                System.out.println(TimeDate.now()+": End of reading random statistics.");
+            }
 
-            TreeReader reader = new TreeReader(IOSettings.getIOSettings().getInputFile());
+            TreeReader reader = new TreeReader(settings.getInputFile());
             //scanning all content of the input file
-            reader.open();
-
-            System.out.println(TimeDate.now()+": Start of scanning input file: "+IOSettings.getIOSettings().getInputFile());
-            int numberOfTrees=reader.scan();
-            reader.close();
-            System.out.println(TimeDate.now()+": End of scanning input file: "+IOSettings.getIOSettings().getInputFile());
-            System.out.println(TimeDate.now()+": "+numberOfTrees+" valid trees found in file: "+IOSettings.getIOSettings().getInputFile());
-
-
-            reader.setStep(IOSettings.getIOSettings().getIStep());
-            cmd.setReader(reader);
             
+            if(reader.open()==-1){
+                //an error occured during reading the input file
+                return;
+            }
+                
+            System.out.println(TimeDate.now()+": Start of scanning input file: " + settings.getInputFile());
+            int numberOfTrees = reader.scan();
+            reader.close();
+            System.out.println(TimeDate.now()+": End of scanning input file: " + settings.getInputFile());
+            System.out.println(TimeDate.now()+": "+numberOfTrees+" valid trees found in file: "+settings.getInputFile());
+
+            reader.setStep(settings.getIStep());
+            cmd.setReader(reader);
+
             ResultWriter out = new ResultWriter();
             out.isWriteToFile(true);
-            out.setFileName(IOSettings.getIOSettings().getOutputFile());
+            out.setFileName(settings.getOutputFile());
             cmd.setOut(out);
-
-            cmd.run();
-            
+            try {
+                cmd.run();
+            } catch (TreeCmpException ex) {
+                System.out.println(ex.getError());
+            }
 
         }
-
-        //parseAndRunCommand(args);
-        
-   
     }
-
-
-private static void parseAndRunCommand(String[] args)
-{
-    Hashtable<String,Command> commands=new Hashtable<String,Command>(10);
-    
-    commands.put("-s", new RunSCommand(0,"-s"));
-    commands.put("-m", new RunMCommand(0,"-m"));
-    commands.put("-t", new RunTCommand(0,"-t"));
-    commands.put("-w", new RunWCommand(1,"-w"));
-    commands.put("-stat", new RunStatCommand(0,"-stat"));
-    commands.put("-sum", new RunSumCommand(0,"-sum"));
-    commands.put("-debug", new RunDebugCommand(0,"-debug"));
-    commands.put("-h", new RunHistCommand(0,"-h"));
-    commands.put("-fm", new RunFMCommand(0,"-fm"));
-    commands.put("-seq", new RunSeqCommand(0,"-seq"));
-
-    String commanLineOption=args[0];
-    Command commandToRun;
-    
-    commandToRun =commands.get(commanLineOption);
-            
-    if(commandToRun!=null)
-    {
-        //running command
-        
-        if(commandToRun.init(args))
-            commandToRun.run();
-        else
-        {
-            
-           System.out.println("Error during intialization command arguments!!!"); 
-        }
-        
-    }else
-    {
-        System.out.println("Syntax 1: start.bat -w windowSize inputFile [outputFile]");
-        System.out.println("Syntax 2: start.bat [-s|-m|-fm|-stst|-t] inputFile [outputFile]");
-
-    }
-    
-
-}
-    
-    
-    
 
 }

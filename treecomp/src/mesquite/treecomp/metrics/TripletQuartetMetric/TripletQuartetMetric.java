@@ -16,7 +16,7 @@ public class TripletQuartetMetric extends BaseForTreeCmpMetric {
 			mesquite.treecomp.common.PalFacade.Tree t1,
 			mesquite.treecomp.common.PalFacade.Tree t2, MesquiteNumber number,
 			MesquiteString string) {
-		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.TripleMetricOpt");
+		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.TripletMetric");
 		
 		double distance = metric.getDistance(t1, t2);
 
@@ -30,7 +30,7 @@ public class TripletQuartetMetric extends BaseForTreeCmpMetric {
 			mesquite.treecomp.common.PalFacade.Tree t1,
 			mesquite.treecomp.common.PalFacade.Tree t2, MesquiteNumber number,
 			MesquiteString string) {
-		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.QuartetMetric");
+		PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.QuartetMetricLong");
 		
 		double distance = metric.getDistance(t1, t2);
 
