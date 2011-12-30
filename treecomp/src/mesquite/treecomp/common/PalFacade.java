@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 import mesquite.trunk.ClassPathHacker;
 
@@ -28,14 +29,14 @@ public class PalFacade {
 		if (loader == null)
 			synchronized (PalFacade.class) {
 				if (loader==null) {
-					String jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
-					String log4jPath = resolveResource("lib/log4j-1.2.16.jar");
-					String treecmp4GuiPath = resolveResource("lib/treecmp4Gui.jar");
-					String palPath = resolveResource("lib/pal-1.5.1.jar");
+					URL jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
+					URL log4jPath = resolveResource("lib/log4j-1.2.16.jar");
+					URL treecmp4GuiPath = resolveResource("lib/treecmp4Gui.jar");
+					URL palPath = resolveResource("lib/pal-1.5.1.jar");
 					
 					try {
-						ClassPathHacker.addFile(jclPath);
-						ClassPathHacker.addFile(log4jPath);
+						ClassPathHacker.addURL(jclPath);
+						ClassPathHacker.addURL(log4jPath);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
@@ -49,8 +50,8 @@ public class PalFacade {
 	}
 	private static JarClassLoader loader;
 	
-	private static String resolveResource(String name) {
-		return PalFacade.class.getClassLoader().getResource(name).getFile();
+	private static URL resolveResource(String name) {
+		return PalFacade.class.getClassLoader().getResource(name);
 	}
 	
 	private static Method getReadTreeMethod() {
