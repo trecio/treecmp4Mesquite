@@ -73,9 +73,9 @@ public class QuartetMetricTestCase {
 	
 	@Test
 	public void TreesWith29Leafs() {
-		String t1 = "(((Ceud,(Pdep,Pang)),(Alum,Asuu)),(((((Cosb,(Tleo,(Crud1,(((Agal,((Pens,Pstr),Aphy1)),Crad),Orob)))),Tcat1),Tcan),(Azip,((Asim,Pdec1),Hbid))),((Racu,Cosc1),(Tvit,(Atyp,((Abre,Apeg1),(Tcfc,Pcra)))))),Hadu1);";
-		String t2 = "((((Ceud,(Pdep,Pang)),(Alum,Asuu)),(((Asim,Pdec1),Azip),Hbid)),((((((Cosb,(Tleo,(((((Pens,Pstr),(Orob,Aphy1)),Agal),Crud1),Crad))),Tcat1),Tcan),Racu),Cosc1),(((Tvit,(Atyp,(Abre,Apeg1))),Tcfc),Pcra)),Hadu1);";
+		String t1 = "(Asuu,((Azip,Hbid),Racu),Hadu1);";
+		String t2 = "((Asuu,(Azip,Hbid)),Racu,Hadu1);";
 		
-		Assert.assertEquals(4688., metric.getDistance(t1, t2));
+		Assert.assertEquals(2., metric.getDistance(t1, t2));
 	}
 }
