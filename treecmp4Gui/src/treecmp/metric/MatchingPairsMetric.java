@@ -56,7 +56,7 @@ public class MatchingPairsMetric extends BaseMetric implements Metric {
 			final int[] howManyTimesIsLcaInT2 = new int[size];
 
 			for (int i=0; i<lcaInT1.length; i++)
-				for (int j=0; j<lcaInT2.length; j++) {
+				for (int j=i+1; j<lcaInT2.length; j++) {
 					final int lcaInT1Id = lcaInT1[i][j];
 					final int lcaInT2Id = lcaInT2[i][j];
 					
@@ -84,16 +84,16 @@ public class MatchingPairsMetric extends BaseMetric implements Metric {
 				Arrays.fill(result[i], -1);
 			}
 			
-			final Map<Node, ArrayList<Leaf>> clades = new HashMap<Node, ArrayList<Leaf>>();
+			final Map<Node, ArrayList<Node>> clades = new HashMap<Node, ArrayList<Node>>();
 			
 			int lcaId = 0;
 			for (final Node node : nodes) {
 				final int childCount = node.getChildCount();
-				if (!(node instanceof Leaf)) {
-					List<ArrayList<Leaf>> childClades = new ArrayList<ArrayList<Leaf>>(childCount);
+				if (childCount > 0) {
+					List<ArrayList<Node>> childClades = new ArrayList<ArrayList<Node>>(childCount);
 					int allChildCount = 0;
 					for (int i=0; i<node.getChildCount(); i++) {
-						ArrayList<Leaf> childClade = clades.get(node.getChild(i));
+						ArrayList<Node> childClade = clades.get(node.getChild(i));
 						clades.put(node.getChild(i), null);
 						childClades.add(childClade);
 						allChildCount += childClade.size();
@@ -102,11 +102,11 @@ public class MatchingPairsMetric extends BaseMetric implements Metric {
 					setupLcaForPairsOfLeafs(ids, result, lcaId, childClades);
 					lcaId++;
 					
-					final ArrayList<Leaf> clade = flattenToFirstList(childClades, allChildCount);
+					final ArrayList<Node> clade = flattenToFirstList(childClades, allChildCount);
 					clades.put(node, clade);
 				} else {
-					ArrayList<Leaf> clade = new ArrayList<Leaf>();
-					clade.add((Leaf)node);
+					ArrayList<Node> clade = new ArrayList<Node>();
+					clade.add(node);
 					clades.put(node, clade);
 				}
 			}
@@ -115,15 +115,15 @@ public class MatchingPairsMetric extends BaseMetric implements Metric {
 		}
 
 		private void setupLcaForPairsOfLeafs(IdGroup ids, int[][] result,
-				int lcaId, List<ArrayList<Leaf>> childClades) {
+				int lcaId, List<ArrayList<Node>> childClades) {
 			for (int i=0; i<childClades.size(); i++) {
-				final List<Leaf> firstChildClade = childClades.get(i);
-				for (int j=0; j<childClades.size(); j++) {
-					final List<Leaf> secondChildClade = childClades.get(j);
-					for (final Leaf leafFromFirstChildClade : firstChildClade) {
-						final int idOfLeafFromFirstChildClade = ids.whichIdNumber(leafFromFirstChildClade.toString());
-						for (final Leaf leafFromSecondChildClade : secondChildClade) {
-							final int idOfLeafFromSecondChildClade = ids.whichIdNumber(leafFromSecondChildClade.toString());
+				final List<Node> firstChildClade = childClades.get(i);
+				for (int j=i+1; j<childClades.size(); j++) {
+					final List<Node> secondChildClade = childClades.get(j);
+					for (final Node leafFromFirstChildClade : firstChildClade) {
+						final int idOfLeafFromFirstChildClade = ids.whichIdNumber(leafFromFirstChildClade.getIdentifier().getName());
+						for (final Node leafFromSecondChildClade : secondChildClade) {
+							final int idOfLeafFromSecondChildClade = ids.whichIdNumber(leafFromSecondChildClade.getIdentifier().getName());
 							result[idOfLeafFromFirstChildClade][idOfLeafFromSecondChildClade]
 									= result[idOfLeafFromSecondChildClade][idOfLeafFromFirstChildClade]
 											= lcaId;
