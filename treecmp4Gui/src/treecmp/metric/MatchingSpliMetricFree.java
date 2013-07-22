@@ -43,6 +43,7 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
         IdGroup idGroup2 = TreeUtils.getLeafIdGroup(t2);
         IdGroup idGroup = TreeCmpUtils.mergeIdGroups(idGroup1, idGroup2);
         cIntM = TreeCmpUtils.calcClustIntersectMatrix(t1, t2, idGroup);
+        int totL = idGroup.getIdCount();
 
         int intSize1 = t1.getInternalNodeCount();
         int intSize2 = t2.getInternalNodeCount();
@@ -53,8 +54,9 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
         int totSize2 = intSize2 + extSize2;
 
         //we do not want to use root
-        int size = Math.max(totSize1, totSize2) - 1;
-  
+        int sizeIt = Math.max(totSize1, totSize2);
+        int size = sizeIt - 1;
+
         assigncost = new short[size][size];
         rowsol = new int[size];
         colsol = new int[size];
@@ -86,7 +88,10 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
         short cost = 0;
         boolean isLeafN1, isLeafN2;
         Node n1 = null, n2 = null;
-        for (int i = 0; i < totSize1; i++) {
+
+        int ii, jj;
+        ii = 0;
+        for (int i = 0; i < sizeIt; i++) {
             if (i < totSize1) {
 
                 n1 = nodeT1[i];
@@ -103,7 +108,8 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
                 }
                 bCsize = extSize1 - aCsize;
             }
-            for (int j = 0; j < totSize1; j++) {
+            jj = 0;
+            for (int j = 0; j < sizeIt; j++) {
                 if (j < totSize2) {
                     n2 = nodeT2[j];
                     if (n2.isRoot()) {
@@ -128,7 +134,7 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
                     acInterSize = cIntM.getInterSize(n1, n2);
                     bcInterSize = r1cInterSize - acInterSize;
                     adInterSize = ar2InterSize - acInterSize;
-                    bdInterSize = extSum - acInterSize - bcInterSize - adInterSize;
+                    bdInterSize = rootsInterSize - acInterSize - bcInterSize - adInterSize;
                     max = Math.max(acInterSize + bdInterSize, adInterSize + bcInterSize);
                     cost = (short) (extSum - (max << 1));
 
@@ -139,8 +145,10 @@ public class MatchingSpliMetricFree extends BaseMetric implements Metric {
                     cost = (short) Math.min(extSum + cCsize - dCsize, extSum + dCsize - cCsize);
                 }
 
-                assigncost[i][j] = cost;
+                assigncost[ii][jj] = cost;
+                jj++;
             }
+            ii++;
         }
 
         metric = LapSolver.lapShort(size, assigncost, rowsol, colsol, u, v);
