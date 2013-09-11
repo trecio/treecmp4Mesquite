@@ -28,10 +28,10 @@ public class PalFacade {
 		if (loader == null)
 			synchronized (PalFacade.class) {
 				if (loader==null) {
-					URL jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
-					URL log4jPath = resolveResource("lib/log4j-1.2.16.jar");
-					URL treecmp4GuiPath = resolveResource("lib/treecmp4Gui.jar");
-					URL palPath = resolveResource("lib/pal-1.5.1.jar");
+					final URL jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
+					final URL log4jPath = resolveResource("lib/log4j-1.2.16.jar");
+					final URL treecmp4GuiPath = resolveResource("lib/treecmp4Gui.jar");
+					final URL palPath = resolveResource("lib/pal-1.5.1.jar");
 					
 					try {
 						ClassPathHacker.addURL(jclPath);
@@ -58,7 +58,7 @@ public class PalFacade {
 			synchronized (PalFacade.class) {
 				if (readTreeMethod == null) {
 					try {
-						Class<?> treeToolClass = getLoader().loadClass("pal.tree.TreeTool");
+						final Class<?> treeToolClass = getLoader().loadClass("pal.tree.TreeTool");
 						readTreeMethod = treeToolClass.getMethod("readTree", Reader.class);
 					} catch (Exception e) {
 						//this should not happen
@@ -70,7 +70,7 @@ public class PalFacade {
 	}
 	private static Method readTreeMethod;
 	
-	static Class<?> getPalTreeClass() {
+	private static Class<?> getPalTreeClass() {
 		if (palTreeClass == null)
 			synchronized (PalFacade.class) {
 				if (palTreeClass == null) {
@@ -89,13 +89,12 @@ public class PalFacade {
 	public static class Tree {
 		public Tree(Object treeObj) {
 			this.treeObj = treeObj;
-			if (toStringMethod == null)
-				try {
-					toStringMethod = treeObj.getClass().getMethod("toString");
-				} catch (Exception e) {
-					//this should not happen
-					throw new RuntimeException(e);
-				}
+			try {
+				toStringMethod = treeObj.getClass().getMethod("toString");
+			} catch (Exception e) {
+				//this should not happen
+				throw new RuntimeException(e);
+			}
 		}
 		
 		@Override
@@ -108,14 +107,15 @@ public class PalFacade {
 			}
 		}
 
-		private Method toStringMethod;
-		private Object treeObj;
+		private final Method toStringMethod;
+		private final Object treeObj;
 	}
 	
 	public static class TreeCmpMetric {
 		public TreeCmpMetric(String className) {
 			try {
-				metricObject = getLoader().loadClass(className).getConstructor().newInstance();
+				final Class<?> metricClass = getLoader().loadClass(className); 
+				metricObject = metricClass.getConstructor().newInstance();
 				getDistanceMethod = metricObject.getClass().getMethod("getDistance", getPalTreeClass(), getPalTreeClass());
 			} catch (Exception e) {
 				//this should not happen
@@ -126,15 +126,13 @@ public class PalFacade {
 		public double getDistance(Tree t1, Tree t2) {			
 			try {
 				return (Double)getDistanceMethod.invoke(metricObject, t1.treeObj, t2.treeObj);
-			} catch (RuntimeException e) {
-				throw e;
 			} catch (Exception e) {
 				//this should not happen
 				throw new RuntimeException(e);
 			}			 
 		}
 		
-		private Method getDistanceMethod;
-		private Object metricObject;
+		private final Method getDistanceMethod;
+		private final Object metricObject;
 	}
 }

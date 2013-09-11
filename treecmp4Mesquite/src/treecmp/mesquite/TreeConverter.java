@@ -12,7 +12,7 @@ public class TreeConverter {
 	}
 	
 	private static class MesquiteTreeBuilder implements ITreeCreator<mesquite.lib.Tree> {
-		private Taxa taxa;
+		private final Taxa taxa;
 		
 		public MesquiteTreeBuilder() {
 			this.taxa = new Taxa(0);
@@ -23,7 +23,7 @@ public class TreeConverter {
 		}
 
 		public Tree createFrom(String repr) {
-			MesquiteTree t = new MesquiteTree(taxa);
+			final MesquiteTree t = new MesquiteTree(taxa);
 			t.setPermitTaxaBlockEnlargement(true);
 			t.readTree(repr);
 			return t;
@@ -32,12 +32,14 @@ public class TreeConverter {
 	
 	private static class PalTreeBuilder implements ITreeCreator<PalFacade.Tree> {
 		public PalFacade.Tree createFrom(String s) {
-			PalFacade.Tree result = null;
-			if (s != null) 
-				try {
-					result = PalFacade.readTree(s);			
-				} catch (IOException e) {}
-			return result;		
+			if (s == null) {
+				return null;
+			} 
+			try {
+				return PalFacade.readTree(s);			
+			} catch (IOException e) {
+				return null;
+			}		
 		}		
 	}
 	

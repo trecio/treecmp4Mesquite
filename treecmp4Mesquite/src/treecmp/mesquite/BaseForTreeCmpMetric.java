@@ -10,8 +10,8 @@ public abstract class BaseForTreeCmpMetric extends NumberFor2Trees {
 	public void calculateNumber(Tree t1, Tree t2, MesquiteNumber result,
 			MesquiteString resultString) {
 
-		PalFacade.Tree palT1 = TreeConverter.getPalFrom(t1);
-		PalFacade.Tree palT2 = TreeConverter.getPalFrom(t2);
+		final PalFacade.Tree palT1 = TreeConverter.getPalFrom(t1);
+		final PalFacade.Tree palT2 = TreeConverter.getPalFrom(t2);
 		
 		if (isTreeRooted(t1) && isTreeRooted(t2))
 			getDistanceForRootedTree(palT1, palT2, result, resultString);			
