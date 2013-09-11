@@ -1,10 +1,10 @@
-package treecmp.mesquite.NodalL1Metric;
+package mesquite.treecmp.NodalL1Metric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import treecmp.mesquite.BaseForUnrootedTreeCmpMetric;
-import treecmp.mesquite.PalFacade;
-import treecmp.mesquite.PalFacade.Tree;
+import mesquite.treecmp.BaseForUnrootedTreeCmpMetric;
+import mesquite.treecmp.PalFacade;
+import mesquite.treecmp.PalFacade.Tree;
 
 public class NodalL1Metric extends BaseForUnrootedTreeCmpMetric {
 
@@ -23,7 +23,7 @@ public class NodalL1Metric extends BaseForUnrootedTreeCmpMetric {
 
 	@Override
 	public String getName() {
-		return "Nodal L1-norm Tree Distance (unrooted) [TREECMP]";
+		return "Nodal L1-norm Tree Distance (Unrooted) [TREECMP]";
 	}
 
 }

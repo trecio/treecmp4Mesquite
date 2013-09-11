@@ -1,11 +1,11 @@
-package treecmp.mesquite;
+package mesquite.treecmp;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
 import mesquite.lib.Tree;
-import mesquite.lib.duties.NumberFor2Trees;
+import mesquite.lib.duties.DistanceBetween2Trees;
 
-public abstract class BaseForUnrootedTreeCmpMetric extends NumberFor2Trees {	
+public abstract class BaseForUnrootedTreeCmpMetric extends DistanceBetween2Trees {	
 
 	public void calculateNumber(Tree t1, Tree t2, MesquiteNumber result,
 			MesquiteString resultString) {

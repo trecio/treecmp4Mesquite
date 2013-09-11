@@ -1,11 +1,11 @@
-package treecmp.mesquite;
+package mesquite.treecmp;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
 import mesquite.lib.Tree;
-import mesquite.lib.duties.NumberFor2Trees;
+import mesquite.lib.duties.DistanceBetween2Trees;
 
-public abstract class BaseForRootedTreeCmpMetric extends NumberFor2Trees {
+public abstract class BaseForRootedTreeCmpMetric extends DistanceBetween2Trees {
 
 	@Override
 	public void initialize(Tree t1, Tree t2) {
@@ -26,8 +26,8 @@ public abstract class BaseForRootedTreeCmpMetric extends NumberFor2Trees {
 		getDistance(palT1, palT2, result, resultString);
 	}
 
-	protected abstract void getDistance(treecmp.mesquite.PalFacade.Tree palT1,
-			treecmp.mesquite.PalFacade.Tree palT2, MesquiteNumber result,
+	protected abstract void getDistance(PalFacade.Tree palT1,
+			PalFacade.Tree palT2, MesquiteNumber result,
 			MesquiteString resultString);
 
 	@Override

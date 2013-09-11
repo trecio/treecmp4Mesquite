@@ -1,10 +1,10 @@
-package treecmp.mesquite.TripletMetric;
+package mesquite.treecmp.TripletMetric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import treecmp.mesquite.BaseForRootedTreeCmpMetric;
-import treecmp.mesquite.PalFacade;
-import treecmp.mesquite.PalFacade.Tree;
+import mesquite.treecmp.BaseForRootedTreeCmpMetric;
+import mesquite.treecmp.PalFacade;
+import mesquite.treecmp.PalFacade.Tree;
 
 public class TripletMetric extends BaseForRootedTreeCmpMetric {
 
@@ -22,7 +22,7 @@ public class TripletMetric extends BaseForRootedTreeCmpMetric {
 
 	@Override
 	public String getName() {
-		return "Triplet Tree Distance (rooted) [TREECMP]";
+		return "Triplet Tree Distance (Rooted) [TREECMP]";
 	}
 
 }

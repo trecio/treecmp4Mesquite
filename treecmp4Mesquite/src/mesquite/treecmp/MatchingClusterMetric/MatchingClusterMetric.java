@@ -1,10 +1,10 @@
-package treecmp.mesquite.MatchingClusterMetric;
+package mesquite.treecmp.MatchingClusterMetric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import treecmp.mesquite.BaseForRootedTreeCmpMetric;
-import treecmp.mesquite.PalFacade;
-import treecmp.mesquite.PalFacade.Tree;
+import mesquite.treecmp.BaseForRootedTreeCmpMetric;
+import mesquite.treecmp.PalFacade;
+import mesquite.treecmp.PalFacade.Tree;
 
 public class MatchingClusterMetric extends BaseForRootedTreeCmpMetric {
 

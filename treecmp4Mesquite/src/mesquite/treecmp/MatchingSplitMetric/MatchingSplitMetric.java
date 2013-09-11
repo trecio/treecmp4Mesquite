@@ -1,10 +1,10 @@
-package treecmp.mesquite.MatchingSplitMetric;
+package mesquite.treecmp.MatchingSplitMetric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import treecmp.mesquite.BaseForUnrootedTreeCmpMetric;
-import treecmp.mesquite.PalFacade;
-import treecmp.mesquite.PalFacade.Tree;
+import mesquite.treecmp.BaseForUnrootedTreeCmpMetric;
+import mesquite.treecmp.PalFacade;
+import mesquite.treecmp.PalFacade.Tree;
 
 public class MatchingSplitMetric extends BaseForUnrootedTreeCmpMetric {
 

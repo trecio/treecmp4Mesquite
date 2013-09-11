@@ -1,10 +1,10 @@
-package treecmp.mesquite.QuartetMetric;
+package mesquite.treecmp.QuartetMetric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import treecmp.mesquite.BaseForUnrootedTreeCmpMetric;
-import treecmp.mesquite.PalFacade;
-import treecmp.mesquite.PalFacade.Tree;
+import mesquite.treecmp.BaseForUnrootedTreeCmpMetric;
+import mesquite.treecmp.PalFacade;
+import mesquite.treecmp.PalFacade.Tree;
 
 public class QuartedMetric extends BaseForUnrootedTreeCmpMetric {
 
@@ -23,7 +23,7 @@ public class QuartedMetric extends BaseForUnrootedTreeCmpMetric {
 
 	@Override
 	public String getName() {
-		return "Quartet Tree Distance (unrooted) [TREECMP]";
+		return "Quartet Tree Distance (Unrooted) [TREECMP]";
 	}
 
 }
