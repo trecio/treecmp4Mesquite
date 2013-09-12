@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1250" standalone="no"?>
 <jardesc>
-    <jar path="treecomp/resources/lib/treecmp4Gui.jar"/>
+    <jar path="treecmp4Mesquite/resources/lib/treecmp4Gui.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/treecmp4Gui/exportJar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
