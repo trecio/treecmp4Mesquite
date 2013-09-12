@@ -6,7 +6,7 @@ import mesquite.treecmp.BaseForUnrootedTreeCmpMetric;
 import mesquite.treecmp.PalFacade;
 import mesquite.treecmp.PalFacade.Tree;
 
-public class QuartedMetric extends BaseForUnrootedTreeCmpMetric {
+public class QuartetMetric extends BaseForUnrootedTreeCmpMetric {
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber number,
