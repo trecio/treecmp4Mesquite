@@ -46,7 +46,7 @@ public class LapSolver {
     static final int BIG=100000000;
     static final long BIG_LONG=Long.MAX_VALUE;
     
-	static final double EPS = 1e-6;
+	static final double EPS = 1e-8;
 	static final double ONE_EPS = 1 + EPS;
     
     public static int lap(int dim,
@@ -423,7 +423,8 @@ public class LapSolver {
 				}
 
 				i0 = colsol[j1];
-				if (ONE_EPS * umin < usubmin)
+				if (ONE_EPS * umin < usubmin
+						&& EPS + umin < usubmin)
 					// change the reduction of the minimum column to increase
 					// the minimum
 					// reduced cost in the row to the subminimum.
@@ -441,7 +442,8 @@ public class LapSolver {
 				colsol[j1] = i;
 
 				if (i0 >= 0) // minimum column j1 assigned earlier.
-					if (ONE_EPS * umin < usubmin)
+					if (ONE_EPS * umin < usubmin
+							&& EPS + umin < usubmin)
 						// put in current k, and go back to that k.
 						// continue augmenting path i - j1 with i0.
 						free[--k] = i0;
