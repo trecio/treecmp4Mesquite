@@ -42,20 +42,27 @@ public class TreeConverter {
 			}		
 		}		
 	}
-	
+
 	public static <InTreeType> mesquite.lib.Tree getMesquiteFrom(InTreeType inTree) {
-		return convert(inTree, new MesquiteTreeBuilder());
+		return convert(inTree, new MesquiteTreeBuilder(), false);
 	}
 	
 	public static <InTreeType> mesquite.lib.Tree getMesquiteFrom(InTreeType inTree, Taxa t) {
-		return convert(inTree, new MesquiteTreeBuilder(t));
+		return convert(inTree, new MesquiteTreeBuilder(t), false);
 	}
 	
-	public static <InTreeType> PalFacade.Tree getPalFrom(InTreeType inTree) {
-		return convert(inTree, new PalTreeBuilder());
+	public static <InTreeType> PalFacade.Tree getPalFrom(InTreeType inTree, boolean requiresBranchLengths) {
+		return convert(inTree, new PalTreeBuilder(), requiresBranchLengths);
 	}
 	
-	public static String getStringFrom(mesquite.lib.Tree tree) {
+	public static String getStringFrom(mesquite.lib.Tree tree, boolean requiresBranchLengths) {
+		final double DEFAULT_BRANCH_LENGTH = 1.0;
+		
+		if (requiresBranchLengths) {
+			final MesquiteTree clonedTree = tree.cloneTree();
+			clonedTree.setAllUnassignedBranchLengths(DEFAULT_BRANCH_LENGTH, false);
+			tree = clonedTree;
+		}
 		return tree.writeTreeSimpleByNames();
 	}
 
@@ -63,12 +70,12 @@ public class TreeConverter {
 		return tree.toString();
 	}
 	
-	private static <InTreeType, OutTreeType> OutTreeType convert(InTreeType tree, ITreeCreator<OutTreeType> builder) {
+	private static <InTreeType, OutTreeType> OutTreeType convert(InTreeType tree, ITreeCreator<OutTreeType> builder, boolean requiresBranchLengths) {
 		String repr = "";
 		if (tree instanceof String) {
 			repr = (String)tree;
 		} else if (tree instanceof mesquite.lib.Tree) {
-			repr = getStringFrom((mesquite.lib.Tree) tree);
+			repr = getStringFrom((mesquite.lib.Tree) tree, requiresBranchLengths);
 		} else if (tree instanceof PalFacade.Tree) {
 			repr = getStringFrom((PalFacade.Tree) tree);		
 		} else {
