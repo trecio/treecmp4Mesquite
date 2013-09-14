@@ -18,7 +18,7 @@ public class MAST extends DistanceBetween2Trees {
     /* Leaves is the intersection of Leaves of the two trees */
     private int[] Leaves;
     /* LeavesCache is used to cache all visited trees' leaves */
-    private Map<int[], boolean[]> LeavesCache;
+    private Map<int[], boolean[]> LeavesCache;	//TODO fix this - it makes no sense to check map for an int array (references are never the same)
 
     private RootedTriples R;
     private FanTriples F;
@@ -44,7 +44,7 @@ public class MAST extends DistanceBetween2Trees {
         col = 0;
 		*/
 
-        LeavesCache = new HashMap<int[], boolean[]>(100, 05f);
+        LeavesCache = new Hashtable<int[], boolean[]>(100, 05f);
         LCACache = new HashMap<Tree, LCATable>(100, 0.5f);
         return true;
     }
@@ -136,7 +136,7 @@ public class MAST extends DistanceBetween2Trees {
             taxa2Ref = new HashMap<Integer, Integer>(2 * TotalTaxon);
             for (int i = 1; /* zero is reserved */ i < TotalTaxon; i++) {
                 Taxon taxon = taxa.getTaxon(i - 1);
-                taxa2Ref.put(taxon.number, i);
+                taxa2Ref.put(taxon.getNumber(), i);
             }
         }
 

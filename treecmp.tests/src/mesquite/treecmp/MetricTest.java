@@ -9,6 +9,7 @@ import mesquite.lib.duties.DistanceBetween2Trees;
 public abstract class MetricTest<TMetric extends DistanceBetween2Trees> {
 	@Before public void createSut() {
 		metric = createMetric();
+		metric.startJob(null, null, false);
 	}
 	
 	private TMetric metric;
