@@ -11,23 +11,19 @@ import java.util.*;
  * Date: 2012-06-15
  */
 public class MAST extends DistanceBetween2Trees {
-    /**
-     * TaxonRefference remembers all taxon numbers of a "Taxa",
-     * it serves as a global linear reference system for the set of taxon.
-     */
-    private int[] TaxonRefference;
+    private int TaxonReferenceLength = -1;
     /* taxa2Ref is used to find the refernce number for a given taxa */
-    private Hashtable taxa2Ref;
+    private Map<Integer, Integer> taxa2Ref;
 
     /* Leaves is the intersection of Leaves of the two trees */
     private int[] Leaves;
     /* LeavesCache is used to cache all visited trees' leaves */
-    private Hashtable LeavesCache;
+    private Map<int[], boolean[]> LeavesCache;
 
     private RootedTriples R;
     private FanTriples F;
     private int[][] MastTable;
-    private Hashtable LCACache;
+    private Map<Tree, LCATable> LCACache;
 
     /* using array to represent set A and C, 
      * this is much faster than using hash set or other set-like data containers
@@ -48,8 +44,8 @@ public class MAST extends DistanceBetween2Trees {
         col = 0;
 		*/
 
-        LeavesCache = new Hashtable(100, 05f);
-        LCACache = new Hashtable(100, 0.5f);
+        LeavesCache = new HashMap<int[], boolean[]>(100, 05f);
+        LCACache = new HashMap<Tree, LCATable>(100, 0.5f);
         return true;
     }
 
@@ -126,22 +122,21 @@ public class MAST extends DistanceBetween2Trees {
             return;
         }
 
-        Object tmpObj;
+        boolean[] tmpObj;
         int[] tmpLeaves;
 	// using boolean array to represent sets of leaves
         boolean[] LeafSet1,LeafSet2;
-        int TotalTaxon;
+        final Taxa taxa = t1.getTaxa();
+        int TotalTaxon = taxa.getNumTaxa() + 1; 
 
 	/* compute the Taxon reference system */
-        if (TaxonRefference == null) {
-            Taxa taxa = t1.getTaxa();
-            TaxonRefference = new int[taxa.getNumTaxa() + 1]; // zero is reserved
-            TotalTaxon = TaxonRefference.length;
-            taxa2Ref = new Hashtable(2 * TotalTaxon);
-            for (int i = 1; /* zero is reserved */ i < TaxonRefference.length; i++) {
+        if (TaxonReferenceLength == -1) {
+            TaxonReferenceLength = TotalTaxon; 
+            TotalTaxon = TaxonReferenceLength;		// zero is reserved
+            taxa2Ref = new HashMap<Integer, Integer>(2 * TotalTaxon);
+            for (int i = 1; /* zero is reserved */ i < TotalTaxon; i++) {
                 Taxon taxon = taxa.getTaxon(i - 1);
-                TaxonRefference[i] = taxon.number;
-                taxa2Ref.put(new Integer(TaxonRefference[i]), new Integer(i));
+                taxa2Ref.put(taxon.number, i);
             }
         }
 
@@ -154,21 +149,21 @@ public class MAST extends DistanceBetween2Trees {
 
         /* LeafSet1 and LeafSet2's index range is 1 to (TaxonRefference.length-1) */
         if ((tmpObj = LeavesCache.get(taxaOfTree1)) != null) {
-            LeafSet1 = (boolean[]) tmpObj;
+            LeafSet1 = tmpObj;
         } else {
-            LeafSet1 = new boolean[TaxonRefference.length];
+            LeafSet1 = new boolean[TotalTaxon];
             for (int i = 0; i < taxaOfTree1.length; i++) {
-                LeafSet1[((Integer) taxa2Ref.get(new Integer(taxaOfTree1[i]))).intValue()] = true; //mark the reference index of taxa from tree one
+                LeafSet1[taxa2Ref.get(taxaOfTree1[i])] = true; //mark the reference index of taxa from tree one
             }
             LeavesCache.put(taxaOfTree1, LeafSet1);
         }
 
         if ((tmpObj = LeavesCache.get(taxaOfTree2)) != null) {
-            LeafSet2 = (boolean[]) tmpObj;
+            LeafSet2 = tmpObj;
         } else {
-            LeafSet2 = new boolean[TaxonRefference.length];
+            LeafSet2 = new boolean[TotalTaxon];
             for (int i = 0; i < taxaOfTree2.length; i++) {
-                LeafSet2[((Integer) taxa2Ref.get(new Integer(taxaOfTree2[i]))).intValue()] = true;
+                LeafSet2[taxa2Ref.get(taxaOfTree2[i])] = true;
             }
             LeavesCache.put(taxaOfTree2, LeafSet2);
         }
@@ -193,17 +188,17 @@ public class MAST extends DistanceBetween2Trees {
         }
         tmpLeaves = null;
 
-        Triples triples = new Triples(t1, t2, taxa2Ref, TaxonRefference.length);
+        Triples triples = new Triples(t1, t2, taxa2Ref, TotalTaxon);
         R = new RootedTriples(triples);
         F = new FanTriples(triples);
 
 	// allocate heap space for Set A and C
         if (Set_A == null) {
-            Set_A = new int[TaxonRefference.length][][];
-            Set_C = new int[TaxonRefference.length][][];
-            for (int i = 1; i < TaxonRefference.length; i++) {
-                Set_A[i] = new int[TaxonRefference.length][];
-                Set_C[i] = new int[TaxonRefference.length][];
+            Set_A = new int[TotalTaxon][][];
+            Set_C = new int[TotalTaxon][][];
+            for (int i = 1; i < TotalTaxon; i++) {
+                Set_A[i] = new int[TotalTaxon][];
+                Set_C[i] = new int[TotalTaxon][];
             }
         }
         int len = Leaves.length;
@@ -233,9 +228,9 @@ public class MAST extends DistanceBetween2Trees {
             }
         }
 
-        MastTable = new int[TaxonRefference.length][];
-        for (int i = 1; i < TaxonRefference.length; i++) {
-            MastTable[i] = new int[TaxonRefference.length];
+        MastTable = new int[TotalTaxon][];
+        for (int i = 1; i < TotalTaxon; i++) {
+            MastTable[i] = new int[TotalTaxon];
         }
         int mast = 0,u = 0;
         if (Leaves.length - 1 >= 3) {
@@ -554,11 +549,11 @@ public class MAST extends DistanceBetween2Trees {
      * Taxon Number TaxonRefference
      * @return  LCATable
      */
-    public LCATable getInstance(Tree t, Hashtable taxa2Ref, int maxLen) {
+    public LCATable getInstance(Tree t, Map<Integer, Integer> taxa2Ref, int maxLen) {
         LCATable r;
-        Object o;
+        LCATable o;
         if ((o = LCACache.get(t)) != null) {
-            r = (LCATable) o;
+            r = o;
         } else {
             r = new LCATable(t, taxa2Ref, maxLen);
             LCACache.put(t, r);
@@ -580,7 +575,7 @@ public class MAST extends DistanceBetween2Trees {
          * @param taxa2Ref TaxonRefference
          * @param maxTaxon maxTaxon-1
          */
-        public Triples(Tree tree1, Tree tree2, Hashtable taxa2Ref, int maxTaxon) {
+        public Triples(Tree tree1, Tree tree2, Map<Integer, Integer> taxa2Ref, int maxTaxon) {
             t1 = getInstance(tree1, taxa2Ref, maxTaxon);
             t2 = getInstance(tree2, taxa2Ref, maxTaxon);
             /*Reserve zero*/
@@ -629,7 +624,7 @@ public class MAST extends DistanceBetween2Trees {
 
         private int index;
         private int[] treeleaves;
-        private Hashtable taxa2Ref;
+        private Map<Integer, Integer> taxa2Ref;
 
         /**
          * @param t
@@ -637,7 +632,7 @@ public class MAST extends DistanceBetween2Trees {
          * Taxon Number TaxonRefference
          * @param maxLen: maxLen-1
          */
-        private LCATable(Tree t, Hashtable taxa2Ref, int maxLen) {
+        private LCATable(Tree t, Map<Integer, Integer> taxa2Ref, int maxLen) {
             table = new int[maxLen][];
             for (int i = 1; i < maxLen; i++) {
                 table[i] = new int[maxLen];
@@ -692,8 +687,8 @@ public class MAST extends DistanceBetween2Trees {
          */
         private void setLCA(int a, int b, int value) {
             /*first map Node number to Taxon number, then map Taxon number to Index in TaxonRefference array*/
-            int a1 = ((Integer) taxa2Ref.get(new Integer(tree.taxonNumberOfNode(treeleaves[a])))).intValue();
-            int b1 = ((Integer) taxa2Ref.get(new Integer(tree.taxonNumberOfNode(treeleaves[b])))).intValue();
+            int a1 = taxa2Ref.get(tree.taxonNumberOfNode(treeleaves[a])).intValue();
+            int b1 = taxa2Ref.get(tree.taxonNumberOfNode(treeleaves[b])).intValue();
             table[a1][b1] = value;
             table[b1][a1] = value;
         }
