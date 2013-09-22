@@ -1,4 +1,4 @@
-package mesquite.treecmp;
+package mesquite.treecmp.metrics;
 
 import java.io.IOException;
 

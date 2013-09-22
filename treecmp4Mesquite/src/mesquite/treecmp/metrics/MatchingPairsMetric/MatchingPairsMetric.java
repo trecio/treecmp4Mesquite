@@ -2,9 +2,9 @@ package mesquite.treecmp.metrics.MatchingPairsMetric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import mesquite.treecmp.BaseForRootedTreeCmpMetric;
-import mesquite.treecmp.PalFacade;
-import mesquite.treecmp.PalFacade.Tree;
+import mesquite.treecmp.metrics.BaseForRootedTreeCmpMetric;
+import mesquite.treecmp.metrics.PalFacade;
+import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class MatchingPairsMetric extends BaseForRootedTreeCmpMetric {
 

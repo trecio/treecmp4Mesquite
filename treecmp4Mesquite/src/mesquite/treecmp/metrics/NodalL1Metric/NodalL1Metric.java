@@ -2,9 +2,9 @@ package mesquite.treecmp.metrics.NodalL1Metric;
 
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
-import mesquite.treecmp.BaseForUnrootedTreeCmpMetric;
-import mesquite.treecmp.PalFacade;
-import mesquite.treecmp.PalFacade.Tree;
+import mesquite.treecmp.metrics.BaseForUnrootedTreeCmpMetric;
+import mesquite.treecmp.metrics.PalFacade;
+import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class NodalL1Metric extends BaseForUnrootedTreeCmpMetric {
 

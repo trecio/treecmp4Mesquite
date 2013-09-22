@@ -2,10 +2,7 @@ package mesquite.treecmp.TreeDistancesExport;
 
 import java.awt.FileDialog;
 
-import org.apache.commons.lang.StringUtils;
-
 import mesquite.lib.ColorTheme;
-import mesquite.lib.ExporterDialog;
 import mesquite.lib.MesquiteFile;
 import mesquite.lib.MesquiteFileDialog;
 import mesquite.lib.MesquiteNumber;
@@ -17,7 +14,6 @@ import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.FileAssistantT;
-import mesquite.lib.duties.FileCoordinator;
 import mesquite.lib.duties.TreeSourceDefinite;
 
 public class TreeDistancesExport extends FileAssistantT {
