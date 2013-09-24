@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import mesquite.treecmp.MetricTest;
+import mesquite.treecmp.metrics.MetricTest;
 import mesquite.treecmp.metrics.MAST.MAST;
 
 public class MASTTests extends MetricTest<MAST> {

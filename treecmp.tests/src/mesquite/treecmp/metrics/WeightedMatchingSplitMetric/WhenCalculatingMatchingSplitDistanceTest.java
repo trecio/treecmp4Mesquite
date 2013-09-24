@@ -1,7 +1,7 @@
 package mesquite.treecmp.metrics.WeightedMatchingSplitMetric;
 
 import static org.junit.Assert.assertEquals;
-import mesquite.treecmp.MetricTest;
+import mesquite.treecmp.metrics.MetricTest;
 import mesquite.treecmp.metrics.WeightedMatchingSplitMetric.WeightedMatchingSplitMetric;
 
 import org.junit.Test;

@@ -2,7 +2,7 @@ package mesquite.treecmp.metrics.QuartetMetric;
 
 
 import junit.framework.Assert;
-import mesquite.treecmp.MetricTest;
+import mesquite.treecmp.metrics.MetricTest;
 import mesquite.treecmp.metrics.QuartetMetric.QuartetMetric;
 
 import org.junit.Test;

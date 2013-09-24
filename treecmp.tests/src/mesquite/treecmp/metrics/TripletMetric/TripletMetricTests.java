@@ -1,7 +1,7 @@
 package mesquite.treecmp.metrics.TripletMetric;
 
 import junit.framework.Assert;
-import mesquite.treecmp.MetricTest;
+import mesquite.treecmp.metrics.MetricTest;
 import mesquite.treecmp.metrics.TripletMetric.TripletMetric;
 
 import org.junit.Test;

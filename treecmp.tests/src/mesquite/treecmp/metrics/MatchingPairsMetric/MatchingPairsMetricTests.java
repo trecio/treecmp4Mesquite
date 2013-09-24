@@ -1,7 +1,7 @@
 package mesquite.treecmp.metrics.MatchingPairsMetric;
 
 import junit.framework.Assert;
-import mesquite.treecmp.MetricTest;
+import mesquite.treecmp.metrics.MetricTest;
 import mesquite.treecmp.metrics.MatchingPairsMetric.MatchingPairsMetric;
 
 import org.junit.Test;
