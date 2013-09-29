@@ -1,6 +1,5 @@
 package mesquite.treecmp.clustering.ClusterAssignment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +11,12 @@ import mesquite.lib.MesquiteString;
 import mesquite.lib.Snapshot;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.NumberForTree;
 import mesquite.lib.duties.TreeSourceDefinite;
 import mesquite.treeSetViz.TreeSetVisualization.TreeSetVisualization;
+import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 
 public class ClusterAssignment extends NumberForTree {
@@ -75,16 +76,12 @@ public class ClusterAssignment extends NumberForTree {
 	
 	private void calculateClusters(GroupsForTreeVector groupBuilder, TreeSourceDefinite treeSource, Taxa taxa,
 			DistanceBetween2Trees distance) {
-		final int numberOfTrees = treeSource.getNumberOfTrees(taxa); 
-		final List<Tree> trees = new ArrayList<Tree>(numberOfTrees);
-		for (int i=0; i<numberOfTrees; i++) {
-			trees.add(treeSource.getTree(taxa, i));
-		}
+		final Trees trees = Utils.getTrees(treeSource,  taxa);
 		
 		final List<Integer> clusters = groupBuilder.calculateClusters(trees, distance);
 		clusterAssignment.clear();
 		for (int i=0; i<trees.size(); i++) {
-			clusterAssignment.put(trees.get(i), clusters.get(i));
+			clusterAssignment.put(trees.getTree(i), clusters.get(i));
 		}
 	}
 

@@ -11,6 +11,7 @@ import mesquite.lib.MesquiteString;
 import mesquite.lib.Snapshot;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.NumberForTree;
 import mesquite.lib.duties.TreeSourceDefinite;
@@ -75,12 +76,12 @@ public class ClusterAssignmentTreeColoring extends NumberForTree {
 	
 	private void calculateClusters(GroupsForTreeVector groupBuilder, TreeSourceDefinite treeSource, Taxa taxa,
 			DistanceBetween2Trees distance) {
-		final List<Tree> trees = Utils.getTrees(treeSource, taxa);
+		final Trees trees = Utils.getTrees(treeSource, taxa);
 		
 		final List<Integer> clusters = groupBuilder.calculateClusters(trees, distance);
 		clusterAssignment.clear();
 		for (int i=0; i<trees.size(); i++) {
-			clusterAssignment.put(trees.get(i), clusters.get(i));
+			clusterAssignment.put(trees.getTree(i), clusters.get(i));
 		}
 	}
 

@@ -3,14 +3,14 @@ package mesquite.treecmp.clustering.OneTreeInCluster;
 import java.util.ArrayList;
 import java.util.List;
 
-import mesquite.lib.Tree;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 
 public class OneTreeInCluster extends GroupsForTreeVector {
 
 	@Override
-	public List<Integer> calculateClusters(List<Tree> trees,
+	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
 		final List<Integer> assignments = new ArrayList<Integer>(trees.size());
 		for (int i=0; i<trees.size(); i++) {

@@ -1,7 +1,6 @@
 package mesquite.treecmp.TreeDistancesExport;
 
 import java.awt.FileDialog;
-import java.util.List;
 
 import mesquite.lib.ColorTheme;
 import mesquite.lib.MesquiteFile;
@@ -10,7 +9,7 @@ import mesquite.lib.MesquiteProject;
 import mesquite.lib.ProgressIndicator;
 import mesquite.lib.StringUtil;
 import mesquite.lib.Taxa;
-import mesquite.lib.Tree;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.FileAssistantT;
 import mesquite.lib.duties.TreeSourceDefinite;
@@ -65,7 +64,7 @@ public class TreeDistancesExport extends FileAssistantT {
 
 	private double[][] calculateTreeDistances(MesquiteProject project, TreeSourceDefinite treeSource,
 			Taxa taxa, DistanceBetween2Trees distance) {
-		final List<Tree> trees = Utils.getTrees(treeSource, taxa);
+		final Trees trees = Utils.getTrees(treeSource, taxa);
 		ProgressIndicator progressMeter = new ProgressIndicator(project, "Calculating Tree Differences");
 
 		return Utils.calculateDistanceMatrix(distance, trees, progressMeter);

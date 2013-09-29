@@ -1,6 +1,7 @@
 package mesquite.treecmp;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import mesquite.lib.MesquiteNumber;
@@ -8,22 +9,23 @@ import mesquite.lib.MesquiteString;
 import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
+import mesquite.lib.TreeVector;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.TreeSourceDefinite;
 
 public abstract class Utils {
 
-	public static List<Tree> getTrees(TreeSourceDefinite treeSource, Taxa taxa) {
-		final int numberOfTrees = treeSource.getNumberOfTrees(taxa);
-		final List<Tree> trees = new ArrayList<Tree>(numberOfTrees);
-		for (int i=0; i<trees.size(); i++) {
-			trees.add(treeSource.getTree(taxa, i));
+	public static Trees getTrees(TreeSourceDefinite treeSource, Taxa taxa) {
+		final TreeVector trees = new TreeVector(taxa);
+		for (int i=0; i<treeSource.getNumberOfTrees(taxa); i++) {
+			trees.addElement(treeSource.getTree(taxa, i), false);
 		}
 		return trees;
 	}
 
 	public static double[][] calculateDistanceMatrix(DistanceBetween2Trees distance,
-			final List<Tree> trees, ProgressIndicator progressMeter) {
+			final Trees trees, ProgressIndicator progressMeter) {
 		final int numberOfTrees = trees.size();
 		final int numberOfPairs = (numberOfTrees * numberOfTrees - numberOfTrees) / 2;
 		final int percentChange = numberOfPairs / 100;
@@ -39,9 +41,9 @@ public abstract class Utils {
 		progressMeter.start();
 		int totalPairsCalculated = 0;
 		for (int i=0; i<numberOfTrees; i++) {
-			final Tree tree1 = trees.get(i);
+			final Tree tree1 = trees.getTree(i);
 			for (int j=i+1; j<numberOfTrees; j++, totalPairsCalculated++) {
-				final Tree tree2 = trees.get(j);
+				final Tree tree2 = trees.getTree(j);
 				distance.calculateNumber(tree1, tree2, result, resultString);
 				distances[i][j] = distances[j][i] = result.getDoubleValue();
 				
@@ -57,6 +59,20 @@ public abstract class Utils {
 		progressMeter.goAway();
 		
 		return distances;
+	}
+
+	public static List<Integer> convertToAssignments(
+			int n, Collection<Collection<Integer>> partitioning) {
+		final Integer[] results = new Integer[n];
+		int partitionNumber = 1;
+		for (final Collection<Integer> partition : partitioning) {
+			for (final Integer idx : partition) {
+				results[idx] = partitionNumber;
+			}
+			partitionNumber++;
+		}
+		
+		return Arrays.asList(results);
 	}
 
 }

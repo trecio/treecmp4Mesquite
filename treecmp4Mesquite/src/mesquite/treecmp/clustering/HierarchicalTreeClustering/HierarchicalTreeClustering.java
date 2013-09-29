@@ -1,7 +1,6 @@
 package mesquite.treecmp.clustering.HierarchicalTreeClustering;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -9,22 +8,22 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import org.pr.clustering.hierarchical.Cluster;
-import org.pr.clustering.hierarchical.Hierarchical;
-import org.pr.clustering.hierarchical.LinkageCriterion;
-
 import mesquite.lib.ProgressIndicator;
-import mesquite.lib.Tree;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
+
+import org.pr.clustering.hierarchical.Cluster;
+import org.pr.clustering.hierarchical.Hierarchical;
+import org.pr.clustering.hierarchical.LinkageCriterion;
 
 public class HierarchicalTreeClustering extends GroupsForTreeVector {
 	private final LinkageCriterion linkageCriterion = LinkageCriterion.COMPLETE;
 	private final int numberOfClusters = 5;
 
 	@Override
-	public List<Integer> calculateClusters(List<Tree> trees,
+	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
 		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Calculating Tree Differences");
 		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, progressMeter);
@@ -32,21 +31,7 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector {
 		final Hierarchical clusteringAlgorithm = new Hierarchical(distances, linkageCriterion);
 		clusteringAlgorithm.partition();
 		final Collection<Collection<Integer>> partitioning = getResultFromRootCluster(clusteringAlgorithm.getRootCluster());
-		return convertToAssignments(trees.size(), partitioning);
-	}
-
-	private List<Integer> convertToAssignments(
-			int n, Collection<Collection<Integer>> partitioning) {
-		final Integer[] results = new Integer[n];
-		int partitionNumber = 1;
-		for (final Collection<Integer> partition : partitioning) {
-			for (final Integer idx : partition) {
-				results[idx] = partitionNumber;
-			}
-			partitionNumber++;
-		}
-		
-		return Arrays.asList(results);
+		return Utils.convertToAssignments(trees.size(), partitioning);
 	}
 
 	@Override
