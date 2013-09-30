@@ -68,7 +68,6 @@ public class ClusteringAlgorithmSelecionView extends Dialog {
 		
 		Panel centerPanel = new Panel();
 		centerPanel.setLayout(new GridLayout(0, 1));
-		
 		Panel numberOfClustersPanel = new Panel();
 		Label label = new Label("Number of clusters:");
 		numberOfClustersText = new TextField(10);

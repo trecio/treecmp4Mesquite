@@ -65,8 +65,11 @@ public class ClusterAssignmentTreeColoring extends NumberForTree {
 		
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		
-		calculateClusters(groupBuilder, treeSource, taxa, distance);
-		return true;
+		if (groupBuilder != null) {
+			calculateClusters(groupBuilder, treeSource, taxa, distance);
+			return true;
+		} 
+		return false;
 	}
 
 	@Override

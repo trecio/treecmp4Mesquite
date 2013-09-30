@@ -14,7 +14,7 @@ import mesquite.lib.duties.Consenser;
 import mesquite.lib.duties.NumberFor2Trees;
 import mesquite.treecmp.clustering.AbstractKCentroidMeans;
 
-public class KMeans extends AbstractKCentroidMeans<Tree> {
+class KMeans extends AbstractKCentroidMeans<Tree> {
 
 	public KMeans(Trees trees, NumberFor2Trees metric) {
 		this.metric = metric;

@@ -6,7 +6,7 @@ import java.util.List;
 
 import mesquite.treecmp.clustering.AbstractKCentroidMeans;
 
-public class KCentroids extends AbstractKCentroidMeans<Integer> {
+class KCentroids extends AbstractKCentroidMeans<Integer> {
 	public KCentroids(double[][] matrix) {
 		this.distances = matrix;
 	}

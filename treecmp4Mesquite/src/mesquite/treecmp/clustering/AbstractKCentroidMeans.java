@@ -5,23 +5,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractKCentroidMeans<TreeType> {
-	public AbstractKCentroidMeans() {
-		iterations = Integer.MAX_VALUE;
-		numberOfClusters = DEFAULT_NUMBER_OF_CLUSTERS;
-	}
-	
-	public Collection<Collection<Integer>> computeClusters() {
+public abstract class AbstractKCentroidMeans<TreeType> {	
+	public Collection<Collection<Integer>> computeClusters(int numberOfClusters, int numberOfIterations) {
 		List<Collection<Integer>> associations = new ArrayList<Collection<Integer>>();
 		
-		List<TreeType> means = new ArrayList<TreeType>(getNumberOfClusters());
+		List<TreeType> means = new ArrayList<TreeType>(numberOfClusters);
 		
-		int[] randomIndices = drawNNumbers(getNumberOfClusters(), getNumberOfTrees()); 
-		for (int i=0; i<getNumberOfClusters(); i++)
+		int[] randomIndices = drawNNumbers(numberOfClusters, getNumberOfTrees()); 
+		for (int i=0; i<numberOfClusters; i++)
 			means.add(getTree(randomIndices[i]));
 		double error = computeAssociations(means, associations), newError;
 
-		int iterations_left = getIterations();
+		int iterations_left = numberOfIterations;
 		do {
 			List<TreeType> newCenters = computeCentres(associations);
 			
@@ -42,29 +37,7 @@ public abstract class AbstractKCentroidMeans<TreeType> {
 		
 		return associations;
 	}
-	
-	public final int DEFAULT_NUMBER_OF_CLUSTERS = 5;
-	
-	private int iterations;	
-	public int getIterations() {
-		return iterations;
-	}
-
-	public void setIterations(int iterations) {
-		this.iterations = iterations;
-	}
-	
-	private int numberOfClusters;
-	public void setNumberOfClusters(int number) {
-		if (number > 0)
-			numberOfClusters = number;
-		else
-			numberOfClusters = DEFAULT_NUMBER_OF_CLUSTERS;
-	}	
-	public int getNumberOfClusters() {
-		return numberOfClusters;
-	}
-	
+			
 	protected double computeAssociations(List<TreeType> centers,
 			List<Collection<Integer>> associations) {
 		associations.clear();
