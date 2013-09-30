@@ -9,13 +9,13 @@ import mesquite.lib.ExtensibleDialog;
 import mesquite.lib.IntegerField;
 import mesquite.lib.MesquiteInteger;
 
-class AglomerativeClusteringOptionsDialog extends ExtensibleDialog {
+class AgglomerativeClusteringOptionsDialog extends ExtensibleDialog {
 	private static final String DIALOG_TITLE = "Clustering options";
 	
 	private final IntegerField numberOfClustersField;
 	private final Choice linkageMethodField;
 
-	public AglomerativeClusteringOptionsDialog(Object parent, MesquiteInteger buttonPressed) {
+	public AgglomerativeClusteringOptionsDialog(Object parent, MesquiteInteger buttonPressed) {
 		super(parent, DIALOG_TITLE, buttonPressed);
 		
 		numberOfClustersField = addIntegerField("Number of clusters", Default.NUMBER_OF_CLUSTERS, 10);

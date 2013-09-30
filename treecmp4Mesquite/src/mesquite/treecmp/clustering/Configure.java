@@ -4,13 +4,13 @@ import mesquite.lib.MesquiteInteger;
 import mesquite.lib.MesquiteThread;
 
 public class Configure {
-	public static boolean aglomerativeClusteringAlgorithm(AglomerativeClustering algorithm, Object parentWindow) {
+	public static boolean aglomerativeClusteringAlgorithm(AgglomerativeClustering algorithm, Object parentWindow) {
 		if (!MesquiteThread.isScripting()) {
-			final MesquiteInteger buttonPressed = new MesquiteInteger(AglomerativeClusteringOptionsDialog.defaultCANCEL);
-			final AglomerativeClusteringOptionsDialog optionsDialog = new AglomerativeClusteringOptionsDialog(parentWindow, buttonPressed);
+			final MesquiteInteger buttonPressed = new MesquiteInteger(AgglomerativeClusteringOptionsDialog.defaultCANCEL);
+			final AgglomerativeClusteringOptionsDialog optionsDialog = new AgglomerativeClusteringOptionsDialog(parentWindow, buttonPressed);
 			try {
 				optionsDialog.completeAndShowDialog(true);
-				if (buttonPressed.getValue() == AglomerativeClusteringOptionsDialog.defaultOK) {
+				if (buttonPressed.getValue() == AgglomerativeClusteringOptionsDialog.defaultOK) {
 					algorithm.configure(optionsDialog.getNumbeOfClusters(), optionsDialog.getLinkageCriterion());
 					return true;
 				}

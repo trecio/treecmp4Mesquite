@@ -12,7 +12,7 @@ import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
-import mesquite.treecmp.clustering.AglomerativeClustering;
+import mesquite.treecmp.clustering.AgglomerativeClustering;
 import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 
@@ -20,7 +20,7 @@ import org.pr.clustering.hierarchical.Cluster;
 import org.pr.clustering.hierarchical.Hierarchical;
 import org.pr.clustering.hierarchical.LinkageCriterion;
 
-public class HierarchicalTreeClustering extends GroupsForTreeVector implements AglomerativeClustering {
+public class HierarchicalTreeClustering extends GroupsForTreeVector implements AgglomerativeClustering {
 	private LinkageCriterion linkageCriterion;
 	private int numberOfClusters;
 
