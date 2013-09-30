@@ -12,15 +12,17 @@ import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
+import mesquite.treecmp.clustering.AglomerativeClustering;
+import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 
 import org.pr.clustering.hierarchical.Cluster;
 import org.pr.clustering.hierarchical.Hierarchical;
 import org.pr.clustering.hierarchical.LinkageCriterion;
 
-public class HierarchicalTreeClustering extends GroupsForTreeVector {
-	private final LinkageCriterion linkageCriterion = LinkageCriterion.COMPLETE;
-	private final int numberOfClusters = 5;
+public class HierarchicalTreeClustering extends GroupsForTreeVector implements AglomerativeClustering {
+	private LinkageCriterion linkageCriterion;
+	private int numberOfClusters;
 
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
@@ -37,7 +39,7 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector {
 	@Override
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
-		return true;
+		return Configure.aglomerativeClusteringAlgorithm(this, containerOfModule());
 	}
 
 	@Override
@@ -84,5 +86,10 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector {
 			result.add(cluster.patternIndexes);
 		
 		return result;
+	}
+
+	public void configure(int numbeOfClusters, LinkageCriterion linkageCriterion) {
+		this.numberOfClusters = numbeOfClusters;
+		this.linkageCriterion = linkageCriterion;
 	}
 }
