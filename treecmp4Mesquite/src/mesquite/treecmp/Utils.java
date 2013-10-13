@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import mesquite.lib.EmployerEmployee;
+import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteString;
 import mesquite.lib.ProgressIndicator;
@@ -75,4 +77,13 @@ public abstract class Utils {
 		return Arrays.asList(results);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T extends MesquiteModule> T findColleagueOrHireNew(
+			EmployerEmployee me, Class<T> dutyClass,
+			String explanation) {
+		final T foundEmployee = (T) me.findNearestColleagueWithDuty(dutyClass);
+		return foundEmployee != null
+				? foundEmployee
+				: (T) me.hireEmployee(dutyClass, explanation);
+	}
 }
