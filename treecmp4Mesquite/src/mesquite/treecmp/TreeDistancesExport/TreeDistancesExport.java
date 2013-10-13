@@ -21,13 +21,13 @@ public class TreeDistancesExport extends FileAssistantT {
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
 		final MesquiteProject project = employer.getProject(); 
-		final Taxa taxa = project.chooseTaxa(containerOfModule(), "Choose the block of taxa:");
-		final TreeSourceDefinite treeSource = (TreeSourceDefinite) hireEmployee(TreeSourceDefinite.class, "Choose the source trees:");
+		final Taxa taxa = Utils.getOrChooseTaxa(this);
+		final TreeSourceDefinite treeSource = Utils.findColleagueOrHireNew(this, TreeSourceDefinite.class, "Choose the source trees:");
 		if (treeSource == null) {
 			return sorry("No trees has been chosen.");
 		}
 			
-		final DistanceBetween2Trees distance = (DistanceBetween2Trees) hireEmployee(DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
+		final DistanceBetween2Trees distance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
 		if (distance == null) {
 			return sorry("No tree distance measure has been chosen.");
 		}

@@ -18,6 +18,11 @@ public class TreeClustering extends MesquiteModule {
 	private final Map<Tree, Integer> clusterAssignment = new HashMap<Tree, Integer>();
 
 	@Override
+	public boolean canHireMoreThanOnce() {
+		return false;
+	}
+
+	@Override
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
 		final TreeSourceDefinite treeSource = Utils.findColleagueOrHireNew(this, TreeSourceDefinite.class, "Choose the source trees:");
@@ -31,14 +36,7 @@ public class TreeClustering extends MesquiteModule {
 		}
 		
 
-		final Taxa taxa;		
-		final MesquiteProject project = employer.getProject();
-		//TODO Accept projects with more than one set of taxa. I have a method to get taxa directly from TSV yet.
-		if (project.getTaxas().size() == 1) {
-			taxa = project.getTaxa(0);
-		} else {
-			return sorry("Only projects with one set of taxa are supported.");
-		}
+		final Taxa taxa = Utils.getOrChooseTaxa(this);
 		
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		

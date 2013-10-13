@@ -29,7 +29,7 @@ public class ClusterAssignmentTreeColoring extends NumberForTree {
 		}
 		
 		return true;
-	}
+	}	
 
 	@Override
 	public String getName() {

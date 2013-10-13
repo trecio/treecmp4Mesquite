@@ -7,6 +7,7 @@ import java.util.List;
 import mesquite.lib.EmployerEmployee;
 import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteNumber;
+import mesquite.lib.MesquiteProject;
 import mesquite.lib.MesquiteString;
 import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Taxa;
@@ -85,5 +86,13 @@ public abstract class Utils {
 		return foundEmployee != null
 				? foundEmployee
 				: (T) me.hireEmployee(dutyClass, explanation);
+	}
+
+	public static Taxa getOrChooseTaxa(MesquiteModule me) {
+		final MesquiteProject project = me.getProject();
+		if (project.getTaxas().size() == 1) {
+			return project.getTaxa(0);
+		}
+		return project.chooseTaxa(me.containerOfModule(), "Choose the block of taxa:");
 	}
 }
