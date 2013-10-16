@@ -2,9 +2,10 @@ package mesquite.treecmp.clustering;
 
 import mesquite.lib.MesquiteInteger;
 import mesquite.lib.MesquiteThread;
+import mesquite.lib.MesquiteWindow;
 
 public class Configure {
-	public static boolean aglomerativeClusteringAlgorithm(AgglomerativeClustering algorithm, Object parentWindow) {
+	public static boolean aglomerativeClusteringAlgorithm(AgglomerativeClustering algorithm, MesquiteWindow parentWindow) {
 		if (!MesquiteThread.isScripting()) {
 			final MesquiteInteger buttonPressed = new MesquiteInteger(AgglomerativeClusteringOptionsDialog.defaultCANCEL);
 			final AgglomerativeClusteringOptionsDialog optionsDialog = new AgglomerativeClusteringOptionsDialog(parentWindow, buttonPressed);
@@ -21,7 +22,7 @@ public class Configure {
 		return false;
 	}
 	
-	public static boolean iterativeClusteringAlgorithm(IterativeClustering algorithm, Object parentWindow) {
+	public static boolean iterativeClusteringAlgorithm(IterativeClustering algorithm, MesquiteWindow parentWindow) {
 		if (!MesquiteThread.isScripting()) {
 			final MesquiteInteger buttonPressed = new MesquiteInteger(IterativeClusteringOptionsDialog.defaultCANCEL);
 			final IterativeClusteringOptionsDialog optionsDialog = new IterativeClusteringOptionsDialog(parentWindow, buttonPressed);

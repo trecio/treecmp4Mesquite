@@ -17,7 +17,8 @@ import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.TreeSourceDefinite;
 
-public abstract class Utils {
+public final class Utils {
+	private Utils() {}
 
 	public static Trees getTrees(TreeSourceDefinite treeSource, Taxa taxa) {
 		final TreeVector trees = new TreeVector(taxa);
