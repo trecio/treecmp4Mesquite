@@ -2,8 +2,9 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 
 import mesquite.lists.lib.ListModule;
 import mesquite.lists.lib.ListWindow;
+import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
 
-public class ClusterParametersWindow extends ListWindow {
+class ClusterParametersWindow extends ListWindow {
 	final private ListModule listModule;
 
 	public ClusterParametersWindow(ListModule ownerModule) {
@@ -13,22 +14,18 @@ public class ClusterParametersWindow extends ListWindow {
 
 	@Override
 	public void resetTitle() {
-		// TODO Auto-generated method stub
-		
+		setTitle("Cluster parameters");
 	}
 
 	@Override
 	public void setRowName(int row, String name) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public String getRowName(int row) {
+	public String getRowName(int i) {
 		if (listModule != null) {
-			final ClustersParameters parameters = (ClustersParameters) listModule.getMainObject();
-			final ClusterParameters cluster = parameters.cluster[row];
-			return "Cluster " + row + ", size: " + cluster.size;
+			final Row[] rows = (Row[]) listModule.getMainObject();
+			return rows[i].name;
 		} else {
 			return null;
 		}

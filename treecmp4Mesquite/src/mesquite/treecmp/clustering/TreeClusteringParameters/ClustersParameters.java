@@ -1,11 +1,11 @@
 package mesquite.treecmp.clustering.TreeClusteringParameters;
 
 public class ClustersParameters {
-	public final double minDistanceBetween;
+	public final double separation;
 	public final ClusterParameters[] cluster;
 	
-	public ClustersParameters(double minDistanceBetween, ClusterParameters[] cluster) {
-		this.minDistanceBetween = minDistanceBetween;
+	public ClustersParameters(double separation, ClusterParameters[] cluster) {
+		this.separation = separation;
 		this.cluster = cluster;
 	}
 }

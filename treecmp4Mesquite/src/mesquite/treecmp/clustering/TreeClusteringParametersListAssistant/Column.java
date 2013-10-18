@@ -1,12 +1,15 @@
 package mesquite.treecmp.clustering.TreeClusteringParametersListAssistant;
 
-
-public class Column<T> {
+public class Column {
 	public final String title;
-	public final FieldAccessor<T> valueAccessor;
+	public final String field;
 
-	public Column(String title, String field, Class<T> clazz) {
+	public Column(String title, String field) {
 		this.title = title;
-		this.valueAccessor = new FieldAccessor<T>(field, clazz);
+		this.field = field;
+	}
+
+	public String getString(Row row) {
+		return row.get(field); 
 	}
 }

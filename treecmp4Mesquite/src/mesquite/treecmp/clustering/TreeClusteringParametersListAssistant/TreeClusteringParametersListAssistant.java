@@ -2,21 +2,19 @@ package mesquite.treecmp.clustering.TreeClusteringParametersListAssistant;
 
 import mesquite.lib.table.MesquiteTable;
 import mesquite.lists.lib.ListAssistant;
-import mesquite.treecmp.clustering.TreeClusteringParameters.ClusterParameters;
-import mesquite.treecmp.clustering.TreeClusteringParameters.ClustersParameters;
 
 public class TreeClusteringParametersListAssistant extends ListAssistant {
-	private ClustersParameters clustersParameters;
-	private Column<ClusterParameters> columnModel;
+	private Row[] rows;
+	private Column columnModel;
 
 	@Override
 	public void setTableAndObject(MesquiteTable table, Object object) {
-		clustersParameters = (ClustersParameters)object;
+		rows = (Row[]) object;
 	}
 
 	@Override
 	public String getStringForRow(int i) {
-		return columnModel.valueAccessor.get(clustersParameters.cluster[i]).toString();
+		return columnModel.getString(rows[i]);
 	}
 
 	@Override
@@ -47,7 +45,7 @@ public class TreeClusteringParametersListAssistant extends ListAssistant {
 		return true;
 	}
 
-	public void setColumnModel(Column<ClusterParameters> column) {
+	public void setColumnModel(Column column) {
 		columnModel = column;
 	}
 }
