@@ -51,10 +51,11 @@ public final class TreeClustering extends MesquiteModule {
 			return sorry("No trees has been chosen.");
 		}
 
-		distance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
-		if (distance == null) {
+		final DistanceBetween2Trees hiredDistance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
+		if (hiredDistance == null) {
 			return sorry("No tree distance measure has been chosen.");
-		}		
+		}
+		distance = new CachedDistanceBetween2Trees(hiredDistance);
 
 		taxa = Utils.getOrChooseTaxa(this);		
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
