@@ -6,6 +6,7 @@ import java.util.List;
 
 import mesquite.consensus.StrictConsensusTree.StrictConsensusTree;
 import mesquite.lib.MesquiteNumber;
+import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
 import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
@@ -15,13 +16,17 @@ import mesquite.lib.duties.DistanceBetween2Trees;
 public final class TreeClusteringParametersCalculator {
 	private TreeClusteringParametersCalculator() {}
 
-	public static ClustersParameters getParameters(Collection<TreeVector> clusters, DistanceBetween2Trees distance) {
+	public static ClustersParameters getParameters(Collection<TreeVector> clusters, DistanceBetween2Trees distance, Taxa taxa) {
 		final double minDistanceBetween = getMinDistanceBetweenClusters(clusters, distance);
-		final List<ClusterParameters> parameters = new ArrayList<ClusterParameters>(clusters.size());
-		for (final Trees cluster : clusters) {
+	 	final List<ClusterParameters> parameters = new ArrayList<ClusterParameters>(clusters.size());
+	 	final TreeVector allTrees = new TreeVector(taxa);
+		for (final TreeVector cluster : clusters) {
 			parameters.add(getClusterParameters(cluster, distance));
+			allTrees.addElements(cluster, false);
+			
 		}
-		return new ClustersParameters(minDistanceBetween, parameters.toArray(new ClusterParameters[0]));
+		final ClusterParameters allTreeParameters = getClusterParameters(allTrees, distance);
+		return new ClustersParameters(minDistanceBetween, parameters.toArray(new ClusterParameters[0]), allTreeParameters);
 	}
 	
 	private static double getBoundingBallSize(Tree tree) {

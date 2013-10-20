@@ -18,7 +18,6 @@ import org.junit.Test;
 public class WhenCalculatingParametersForSingleClusterTest {
 	private static final double FURTHERST_DISTANCE_BETWEEN_TREES = 100;
 	private ClustersParameters parameters;
-	private TreeClusteringParameters sut;
 
 	@Before public void because() {
 		final String[] cluster1Description = new String[] {
@@ -33,7 +32,7 @@ public class WhenCalculatingParametersForSingleClusterTest {
 		DistanceBetween2Trees distance = new MockTreeDistance()
 			.between(cluster1.getTree(0), cluster1.getTree(1), FURTHERST_DISTANCE_BETWEEN_TREES);
 		
-		parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance);
+		parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance, cluster1.getTaxa());
 	}
 
 	@Test public void itShouldReturnCorrectClusterDiameter() {

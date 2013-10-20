@@ -3,6 +3,9 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 import java.util.Arrays;
 import java.util.Collection;
 
+import mesquite.lib.ProgressIndicator;
+import mesquite.lib.ProgressPanel;
+import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lists.lib.ListAssistant;
@@ -79,8 +82,9 @@ public final class TreeClusteringParameters extends ListModule {
 			boolean hiredByName) {
 		final TreeClustering treeClustering = (TreeClustering) findNearestColleagueWithDuty(TreeClustering.class);
 		final Collection<TreeVector> clusters = treeClustering.getClusters();
-		DistanceBetween2Trees distance = treeClustering.getDistance();
-		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance);
+		final DistanceBetween2Trees distance = treeClustering.getDistance();
+		final Taxa taxa = treeClustering.getTaxa();
+		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance, taxa);
 		rows = buildRows(parameters);
 		final ClusterParametersWindow window = new ClusterParametersWindow(this);
 		
@@ -94,46 +98,53 @@ public final class TreeClusteringParameters extends ListModule {
 		return true;
 	}
 
+	@Override
+	public String getName() {
+		return "Tree clustering parameters";
+	}
+	
 	private Row[] buildRows(ClustersParameters parameters) {
-		final int EXTRA_ROWS = 2;
+		final int EXTRA_ROWS = 4;
 		final int NUMBER_OF_CLUSTERS = parameters.cluster.length; 
 		final Row[] rows = new Row[NUMBER_OF_CLUSTERS+EXTRA_ROWS];
 		double maxDiameter = 0;
 		double minDensity = Double.MAX_VALUE;
 		double minSpecificity = Double.MAX_VALUE;
 		
-		for (int i=0; i<parameters.cluster.length; i++) {
+		int i;
+		
+		for (i=0; i<parameters.cluster.length; i++) {
 			final ClusterParameters clusterParameters = parameters.cluster[i];
-			final Row row = new Row("Cluster " + i + ":");
 
 			maxDiameter = Math.max(maxDiameter, clusterParameters.diameter);
 			minDensity = Math.min(minDensity, clusterParameters.density);
 			minSpecificity = Math.min(minSpecificity, clusterParameters.specificity);
 
-			row.set(densityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.density));
-			row.set(diameterColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.diameter));
-			row.set(sizeColumn.field, Integer.toString(clusterParameters.size));
-			row.set(specificityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.specificity));			
-			rows[i] = row;
+			rows[i] = createRow("Cluster " + i + ":", clusterParameters);
 		}
 		
 		final Row minValuesRow = new Row("Minimum: ");
 		minValuesRow.set(densityColumn.field, String.format(DOUBLE_FORMAT, minDensity));
 		minValuesRow.set(separation.field, String.format(DOUBLE_FORMAT, parameters.separation));
 		minValuesRow.set(specificityColumn.field, String.format(DOUBLE_FORMAT, minSpecificity));
-		rows[NUMBER_OF_CLUSTERS] = minValuesRow;
+		rows[i++] = minValuesRow;
 		
 		final Row maxValuesRow = new Row("Maximum: ");
 		maxValuesRow.set(diameterColumn.field, String.format(DOUBLE_FORMAT, maxDiameter));
-		rows[NUMBER_OF_CLUSTERS+1] = maxValuesRow;
+		rows[i++] = maxValuesRow;
+		
+		rows[i++] = new Row("");
+		rows[i++] = createRow("All trees:", parameters.allTrees);
 		
 		return rows;
 	}
 
-	@Override
-	public String getName() {
-		return "Tree clustering parameters";
-	}
-	
-	
+	private Row createRow(String name, final ClusterParameters clusterParameters) {
+		final Row row = new Row(name);
+		row.set(densityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.density));
+		row.set(diameterColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.diameter));
+		row.set(sizeColumn.field, Integer.toString(clusterParameters.size));
+		row.set(specificityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.specificity));
+		return row;
+	}	
 }

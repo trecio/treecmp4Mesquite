@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import mesquite.lib.CommandChecker;
-import mesquite.lib.Listened;
 import mesquite.lib.MesquiteCommand;
 import mesquite.lib.MesquiteListener;
 import mesquite.lib.MesquiteModule;
@@ -46,13 +45,13 @@ public final class TreeClustering extends MesquiteModule {
 	 		final Parser parser = new Parser(arguments);
 	 		final int clusterNumber = Integer.parseInt(parser.getTokenNumber(2));
 	 		updateMesquiteSelection(clusterNumber);
-	 		return true;
+	 		return Boolean.TRUE;
 		} else if (checker.compare(getClass(), null, null, commandName, showClusterMetrics.getName())) {
 			final TreeClusteringParameters parameters = (TreeClusteringParameters) hireEmployee(TreeClusteringParameters.class, "Select tree clustering parameters calculator.");
 			if (parameters == null) {
 				return sorry("Oops, something went wrong. Please reinstall treecmp package.");
 			}
-			return true;
+			return Boolean.TRUE;
 		} else {
 			return super.doCommand(commandName, arguments, checker);
 		}
@@ -103,6 +102,10 @@ public final class TreeClustering extends MesquiteModule {
 	
 	public DistanceBetween2Trees getDistance() {
 		return distance;
+	}
+
+	public Taxa getTaxa() {
+		return taxa;
 	}
 
 	private void calculateClusters(GroupsForTreeVector groupBuilder, TreeSourceDefinite treeSource, Taxa taxa,
