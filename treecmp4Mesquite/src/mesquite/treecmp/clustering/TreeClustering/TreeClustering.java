@@ -1,13 +1,20 @@
 package mesquite.treecmp.clustering.TreeClustering;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import mesquite.lib.CommandChecker;
+import mesquite.lib.Listened;
 import mesquite.lib.MesquiteCommand;
+import mesquite.lib.MesquiteListener;
 import mesquite.lib.MesquiteModule;
+import mesquite.lib.Notification;
+import mesquite.lib.Parser;
+import mesquite.lib.StringArray;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
 import mesquite.lib.TreeVector;
@@ -21,8 +28,11 @@ import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParame
 public final class TreeClustering extends MesquiteModule {
 	private final Map<Tree, Integer> clusterAssignment = new HashMap<Tree, Integer>();
 	private final MesquiteCommand showClusterMetrics = new MesquiteCommand("showClusterMetrics", this);
+	private final MesquiteCommand createSelectionsFromClusters = new MesquiteCommand("createSelectionsFromClusters", this);
 	private DistanceBetween2Trees distance;
 	private Taxa taxa;
+	private List<TreeVector> clusters;
+	private TreeSourceDefinite treeSource;
 
 	@Override
 	public boolean canHireMoreThanOnce() {
@@ -32,7 +42,12 @@ public final class TreeClustering extends MesquiteModule {
 	@Override
 	public Object doCommand(String commandName, String arguments,
 			CommandChecker checker) {
-		if (checker.compare(getClass(), null, null, commandName, showClusterMetrics.getName())) {
+	 	if (checker.compare(getClass(), null, null, commandName, createSelectionsFromClusters.getName())) {
+	 		final Parser parser = new Parser(arguments);
+	 		final int clusterNumber = Integer.parseInt(parser.getTokenNumber(2));
+	 		updateMesquiteSelection(clusterNumber);
+	 		return true;
+		} else if (checker.compare(getClass(), null, null, commandName, showClusterMetrics.getName())) {
 			final TreeClusteringParameters parameters = (TreeClusteringParameters) hireEmployee(TreeClusteringParameters.class, "Select tree clustering parameters calculator.");
 			if (parameters == null) {
 				return sorry("Oops, something went wrong. Please reinstall treecmp package.");
@@ -46,7 +61,7 @@ public final class TreeClustering extends MesquiteModule {
 	@Override
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
-		final TreeSourceDefinite treeSource = Utils.findColleagueOrHireNew(this, TreeSourceDefinite.class, "Choose the source trees:");
+		treeSource = Utils.findColleagueOrHireNew(this, TreeSourceDefinite.class, "Choose the source trees:");
 		if (treeSource == null) {
 			return sorry("No trees has been chosen.");
 		}
@@ -61,8 +76,8 @@ public final class TreeClustering extends MesquiteModule {
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		
 		if (groupBuilder != null) {
-			initializeMenu();
 			calculateClusters(groupBuilder, treeSource, taxa, distance);
+			initializeMenu();
 			return true;
 		} 
 		return false;
@@ -83,7 +98,7 @@ public final class TreeClustering extends MesquiteModule {
 	}
 	
 	public Collection<TreeVector> getClusters() {
-		return inverse(clusterAssignment, taxa);
+		return Collections.unmodifiableCollection(clusters);
 	}
 	
 	public DistanceBetween2Trees getDistance() {
@@ -94,20 +109,34 @@ public final class TreeClustering extends MesquiteModule {
 			DistanceBetween2Trees distance) {
 		final Trees trees = Utils.getTrees(treeSource, taxa);
 		
-		final List<Integer> clusters = groupBuilder.calculateClusters(trees, distance);
+		final List<Integer> assignments = groupBuilder.calculateClusters(trees, distance);
 		clusterAssignment.clear();
 		for (int i=0; i<trees.size(); i++) {
-			final int clusterNumber = clusters.get(i);
+			final int clusterNumber = assignments.get(i);
 			clusterAssignment.put(trees.getTree(i), clusterNumber);
 		}
+		clusters = inverse(clusterAssignment, taxa);
 	}
 	
 	private void initializeMenu() {
 		addMenuLine();
 		addMenuItem("Show clusters quality metrics", showClusterMetrics);
+		
+		int clusterId = 0;
+		final StringArray clusterNames = new StringArray(getClusters().size());
+		for (final TreeVector cluster : getClusters()) {
+			final String menuText = getClusterLabel(clusterId, cluster);
+			clusterNames.setValue(clusterId, menuText);
+			clusterId++;
+		}
+		addSubmenu(null, "Create selection from", createSelectionsFromClusters, clusterNames);
+	}
+
+	private static String getClusterLabel(int clusterId, final TreeVector cluster) {
+		return "Cluster " + clusterId + " (" + cluster.size() + " elements)";
 	}
 	
-	private static Collection<TreeVector> inverse(
+	private static List<TreeVector> inverse(
 			Map<Tree, Integer> clusterAssignment, Taxa taxa) {
 		final Map<Integer, TreeVector> assignments = new HashMap<Integer, TreeVector>();
 		for (final Map.Entry<Tree, Integer> entry : clusterAssignment.entrySet()) {
@@ -118,6 +147,21 @@ public final class TreeClustering extends MesquiteModule {
 			}
 			cluster.addElement(entry.getKey(), false);
 		}
-		return assignments.values();
+		return new ArrayList<TreeVector>(assignments.values());
+	}
+	
+	private void updateMesquiteSelection(int clusterNumber) {
+		final TreeVector cluster = clusters.get(clusterNumber);
+
+		final TreeVector selectable = (TreeVector) treeSource.getSelectionable();
+		if (selectable != null) {
+			selectable.deselectAll();
+			for (int j=0; j<cluster.size(); j++) {
+				final int index = cluster.getTree(j).getFileIndex();
+				selectable.setSelected(index, true);
+			}
+			selectable.notifyListeners((Object)this, new Notification(MesquiteListener.SELECTION_CHANGED));
+		}
+		
 	}
 }
