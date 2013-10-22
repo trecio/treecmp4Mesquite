@@ -103,34 +103,53 @@ public final class TreeClusteringParameters extends ListModule {
 	}
 	
 	private Row[] buildRows(ClustersParameters parameters) {
-		final int EXTRA_ROWS = 4;
+		final int EXTRA_ROWS = 5;
 		final int NUMBER_OF_CLUSTERS = parameters.cluster.length; 
 		final Row[] rows = new Row[NUMBER_OF_CLUSTERS+EXTRA_ROWS];
+		final int numberOfTrees = parameters.allTrees.size;
+		double maxAvgDistance = 0;
 		double maxDiameter = 0;
 		double minDensity = Double.MAX_VALUE;
 		double minSpecificity = Double.MAX_VALUE;
+		double wtdAvgDistance = 0;
+		double wtdDensity = 0;
+		double wtdDiameter = 0;
+		double wtdSpecificity = 0;
 		
 		int i;
 		
 		for (i=0; i<parameters.cluster.length; i++) {
 			final ClusterParameters clusterParameters = parameters.cluster[i];
 
+			maxAvgDistance = Math.max(maxAvgDistance, clusterParameters.avgDistance);
 			maxDiameter = Math.max(maxDiameter, clusterParameters.diameter);
 			minDensity = Math.min(minDensity, clusterParameters.density);
 			minSpecificity = Math.min(minSpecificity, clusterParameters.specificity);
+			wtdAvgDistance += clusterParameters.avgDistance * clusterParameters.size;
+			wtdDensity += clusterParameters.density * clusterParameters.size;
+			wtdDiameter += clusterParameters.diameter * clusterParameters.size;
+			wtdSpecificity += clusterParameters.specificity * clusterParameters.size;
 
 			rows[i] = createRow("Cluster " + i + ":", clusterParameters);
 		}
 		
 		final Row minValuesRow = new Row("Minimum: ");
-		minValuesRow.set(densityColumn.field, String.format(DOUBLE_FORMAT, minDensity));
-		minValuesRow.set(separation.field, String.format(DOUBLE_FORMAT, parameters.separation));
-		minValuesRow.set(specificityColumn.field, String.format(DOUBLE_FORMAT, minSpecificity));
+		minValuesRow.set(densityColumn.field, formatDouble(minDensity));
+		minValuesRow.set(separation.field, formatDouble(parameters.separation));
+		minValuesRow.set(specificityColumn.field, formatDouble(minSpecificity));
 		rows[i++] = minValuesRow;
 		
 		final Row maxValuesRow = new Row("Maximum: ");
-		maxValuesRow.set(diameterColumn.field, String.format(DOUBLE_FORMAT, maxDiameter));
+		maxValuesRow.set(averageDistanceColumn.field, formatDouble(maxAvgDistance));
+		maxValuesRow.set(diameterColumn.field, formatDouble(maxDiameter));
 		rows[i++] = maxValuesRow;
+		
+		final Row weightedAveragesRow = new Row("Weighted avg: ");
+		weightedAveragesRow.set(averageDistanceColumn.field, formatDouble(wtdAvgDistance / numberOfTrees));
+		weightedAveragesRow.set(diameterColumn.field, formatDouble(wtdDiameter / numberOfTrees));
+		weightedAveragesRow.set(densityColumn.field, formatDouble(wtdDensity / numberOfTrees));
+		weightedAveragesRow.set(specificityColumn.field, formatDouble(wtdSpecificity / numberOfTrees));
+		rows[i++] = weightedAveragesRow;
 		
 		rows[i++] = new Row("");
 		rows[i++] = createRow("All trees:", parameters.allTrees);
