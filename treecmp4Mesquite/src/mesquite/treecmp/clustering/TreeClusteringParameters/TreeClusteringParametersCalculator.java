@@ -61,6 +61,9 @@ public final class TreeClusteringParametersCalculator {
 	private static double getAverageDistance(Trees cluster,
 			DistanceBetween2Trees distance) {
 		final int numberOfTrees = cluster.size();
+		if (numberOfTrees <= 1) {
+			return 0;
+		}
 		final MesquiteNumber number = new MesquiteNumber();
 		double sumOfDistances = 0;
 		for (int i=0; i<numberOfTrees; i++) {

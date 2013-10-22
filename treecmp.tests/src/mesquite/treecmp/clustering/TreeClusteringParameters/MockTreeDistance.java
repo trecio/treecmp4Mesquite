@@ -28,6 +28,8 @@ public class MockTreeDistance extends DistanceBetween2Trees {
 			if (storedDistance.matches(t1, t2)) {
 				result.setValue(storedDistance.value);
 				return;
+			} else {
+				throw new RuntimeException("Unknown pair of trees.");
 			}
 		}
 	}

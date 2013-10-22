@@ -5,12 +5,9 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collection;
 
-import mesquite.lib.Taxa;
-import mesquite.lib.Tree;
 import mesquite.lib.TreeVector;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.clustering.TreeClusteringParameters.ClustersParameters;
-import mesquite.treecmp.metrics.TreeConverter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +22,7 @@ public class WhenCalculatingParametersForSingleClusterTest {
 				"(A, B, (D, (C, E))"
 		};
 
-		final TreeVector cluster1 = asTreeVector(cluster1Description); 
+		final TreeVector cluster1 = Create.treeVector(cluster1Description); 
 		final Collection<TreeVector> clusters = Arrays.asList(
 				cluster1
 			);
@@ -49,15 +46,5 @@ public class WhenCalculatingParametersForSingleClusterTest {
 	
 	@Test public void itShouldReturnCorrectDensity() {
 		assertEquals(2./3, parameters.cluster[0].density, 1e-6);
-	}
-
-	private TreeVector asTreeVector(String... treeDescriptions) {
-		final Taxa taxa = new Taxa(0);
-		final TreeVector treeVector = new TreeVector(taxa);
-		for (final String treeDescription : treeDescriptions) {
-			final Tree tree = TreeConverter.getMesquiteFrom(treeDescription, taxa);
-			treeVector.addElement(tree, false);
-		}
-		return treeVector;
 	}
 }
