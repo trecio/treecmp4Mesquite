@@ -3,8 +3,6 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 import java.util.Arrays;
 import java.util.Collection;
 
-import mesquite.lib.ProgressIndicator;
-import mesquite.lib.ProgressPanel;
 import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
 import mesquite.lib.duties.DistanceBetween2Trees;
@@ -70,12 +68,13 @@ public final class TreeClusteringParameters extends ListModule {
 		return false;
 	}
 	
+	private final Column averageDistanceColumn = new Column("Avg. distance", "avgDistance");
 	private final Column diameterColumn = new Column("Diameter", "diameter");
 	private final Column specificityColumn = new Column("Specificity", "specificity");
 	private final Column densityColumn = new Column("Density", "density");
 	private final Column separation = new Column("Separation", "separation");
 	private final Column sizeColumn = new Column("Size", "size");
-	private final Iterable<Column> columnModel = Arrays.asList(sizeColumn, diameterColumn, specificityColumn, densityColumn, separation);
+	private final Iterable<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn, separation);
 
 	@Override
 	public boolean startJob(String arguments, Object condition,
@@ -141,10 +140,15 @@ public final class TreeClusteringParameters extends ListModule {
 
 	private Row createRow(String name, final ClusterParameters clusterParameters) {
 		final Row row = new Row(name);
-		row.set(densityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.density));
-		row.set(diameterColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.diameter));
+		row.set(averageDistanceColumn.field, formatDouble(clusterParameters.avgDistance));
+		row.set(densityColumn.field, formatDouble(clusterParameters.density));
+		row.set(diameterColumn.field, formatDouble(clusterParameters.diameter));
 		row.set(sizeColumn.field, Integer.toString(clusterParameters.size));
-		row.set(specificityColumn.field, String.format(DOUBLE_FORMAT, clusterParameters.specificity));
+		row.set(specificityColumn.field, formatDouble(clusterParameters.specificity));
 		return row;
-	}	
+	}
+	
+	private static String formatDouble(double value) {
+		return String.format(DOUBLE_FORMAT, value);
+	}
 }

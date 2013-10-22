@@ -34,6 +34,10 @@ public class WhenCalculatingParametersForSingleClusterTest {
 		
 		parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance, cluster1.getTaxa());
 	}
+	
+	@Test public void itShouldReturnCorrectAverageDistanceBetweenTrees() {
+		assertEquals(FURTHERST_DISTANCE_BETWEEN_TREES, parameters.cluster[0].avgDistance, 1e-6);
+	}
 
 	@Test public void itShouldReturnCorrectClusterDiameter() {
 		assertEquals(FURTHERST_DISTANCE_BETWEEN_TREES, parameters.cluster[0].diameter, 1e-6);
