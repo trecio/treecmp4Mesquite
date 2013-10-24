@@ -28,6 +28,8 @@ public class PalFacade {
 		if (loader == null)
 			synchronized (PalFacade.class) {
 				if (loader==null) {
+					final URL adkPath = resolveResource("lib/ADK-1.1.jar");
+					final URL gtpPath = resolveResource("lib/gtp.jar");
 					final URL jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
 					final URL log4jPath = resolveResource("lib/log4j-1.2.16.jar");
 					final URL treecmp4GuiPath = resolveResource("lib/treecmp.jar");
@@ -40,8 +42,10 @@ public class PalFacade {
 						throw new RuntimeException(e);
 					}
 
-					loader = new JarClassLoader();					
+					loader = new JarClassLoader();
 					loader.add(treecmp4GuiPath);
+					loader.add(adkPath);
+					loader.add(gtpPath);
 					loader.add(palPath);
 				}
 			}
