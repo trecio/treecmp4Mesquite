@@ -40,7 +40,13 @@ public class Main {
      */
     public static void main(String[] args) {
       
-       String runtimePathTemp =Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       String runtimePathTemp = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       if (runtimePathTemp.indexOf('+') != -1){
+           System.out.println("Unsupported character in TreeCmp path!\n"
+                   + "Please move TreeCmp application to a location that does not contain plus (+) character.");
+           return;
+       }
+
        String runtimePath = runtimePathTemp;
         try {
             runtimePath = URLDecoder.decode(runtimePathTemp, "UTF-8");
@@ -48,11 +54,11 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-       // String runtimePath =Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+ 
        String conf="";
        String dataDir="";
 
-       String version=Main.class.getPackage().getImplementationVersion();
+       String version = Main.class.getPackage().getImplementationVersion();
 
        if(version==null){
            conf = runtimePath + "../" + PersistentInfo.configFile;
@@ -60,6 +66,7 @@ public class Main {
 
        }else{
            String tempPath = runtimePath.substring(0,runtimePath.lastIndexOf("/")+1);
+
            conf = tempPath + PersistentInfo.configFile;
            dataDir = tempPath + PersistentInfo.dataPath;
        }

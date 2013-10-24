@@ -38,16 +38,20 @@ public class CommandLineParser {
 
     private final static String S_DESC = "- Overlapping pair comparison mode. Every two neighboring trees are compared";
     private final static String W_DESC = "- Window comparison mode. Every two trees within a window are compared.";
+    private final static String W_ARG = "size";
     private final static String M_DESC = "- Matrix comparison mode. Every two trees in the input file are compared.";
-    private final static String R_DESC = "- Single tree to all tree mode. Each tree in the input file is compared to the single referenced tree.";
+    private final static String R_DESC = "- Referential trees to all input trees mode. Each referential tree is compared to each tree in the input file.";
+    private final static String R_ARG = "refTreeFile";
     private final static String I_DESC = "- Input file.";
+    private final static String I_ARG = "inputFile";
     private final static String O_DESC = "- Output file.";
+    private final static String O_ARG = "outputFile";
     private final static String P_DESC = "- Prune compared trees if needed (trees can have different leaf sets).";
-    private final static String SS_DESC = "- Report scaled values.";
+    private final static String SS_DESC = "- Report normalized distances.";
     private final static String II_DESC = "- Include summary section in the output file.";
     private final static String A_DESC = "- Generate alignment files (only for MS and MC metrics). Cannot be used with -O option.";
     private final static String OO_DESC = "- Use MS/MC metrics optimized for similar trees. Cannot be used with -A option.";
-    private final static String F_DESC = "- Use MS/MC metrics for trees with free leaf set. ";
+   // private final static String F_DESC = "- Use MS/MC metrics for trees with free leaf set. ";
     private final static String CMD_ERROR = "Error. There is a problem with parsing the command line. See the usage below.\n";
 
 
@@ -64,6 +68,7 @@ public class CommandLineParser {
                                         " tt - the Triples metric.\n"+
                                         "Example: -d ms rf\n";
 
+    private final static String D_ARG = "metrics";
     private final static String OPTS_HEADER = "Active options:\n";
     private final static String OPTS_TYPE = "Type of the analysis: ";
     private final static String OPTS_METRICS = "Metrics:\n";
@@ -75,7 +80,7 @@ public class CommandLineParser {
     //private final static String HEADER = "";
     //private final static String FOOTER = "ssd";
     private final static String CMD_LINE_SYNTAX = "java -jar TreeCmp.jar -s|-w <size>|-m|-r <refTreeFile>"
-            +" -d <metrics> -i <inputFile> -o <outputFile> [-S] [-P] [-I] [-A|-O]\n"
+            +" -d <metrics> -i <inputFile> -o <outputFile> [-N] [-P] [-I] [-A|-O]\n"
             + "Options order is important.";
 
     public static Command run(String args[]) {
@@ -85,11 +90,11 @@ public class CommandLineParser {
 
         Option oS = new Option("s", S_DESC);
         Option oW = new Option("w", W_DESC);
-        oW.setArgName("size");
+        oW.setArgName(W_ARG);
         oW.setArgs(1);
         Option oM = new Option("m", M_DESC);
         Option oR = new Option("r", R_DESC);
-        oR.setArgName("refTreeFile");
+        oR.setArgName(R_ARG);
         oR.setArgs(1);
 
         OptionGroup cmdOpts = new OptionGroup();
@@ -101,32 +106,32 @@ public class CommandLineParser {
         cmdOpts.setRequired(true);
         //set metric option
         Option oD = new Option("d", D_DESC);
-        oD.setArgName("metics");
+        oD.setArgName(D_ARG);
         oD.setValueSeparator(' ');
         oD.setArgs(DMetrics.size());
         oD.setRequired(true);
         
         Option oI = new Option("i", I_DESC);
-        oI.setArgName("inputfile");
+        oI.setArgName(I_ARG);
         oI.setArgs(1);
         oI.setRequired(true);
 
         Option oO = new Option("o", O_DESC);
         oO.setArgs(1);
-        oO.setArgName("outputfile");
+        oO.setArgName(O_ARG);
         oO.setRequired(true);
 
         Option oP = new Option("P", P_DESC);
-        Option oSS = new Option("S", SS_DESC);
+        Option oSS = new Option("N", SS_DESC);
         Option oII = new Option("I", II_DESC);
 
         Option oOO = new Option("O", OO_DESC);
-        Option oF = new Option("F", F_DESC);
+      //  Option oF = new Option("F", F_DESC);
         Option oA = new Option("A", A_DESC);
         OptionGroup customMOpts = new OptionGroup();
         customMOpts.addOption(oOO);
         customMOpts.addOption(oA);
-       // customMOpts.addOption(oF);
+      //  customMOpts.addOption(oF);
         
         Options opts = new Options();
 
@@ -215,13 +220,14 @@ public class CommandLineParser {
                     IOset.setGenSummary(true);
                     custOpts.add(oII);
                 }
+                /*
                 if (commandLine.hasOption(oF.getOpt())) {
                     IOset.setUseMsMcFreeLeafSet(true);
                     //additioanly set prune trees
                     IOset.setPruneTrees(true);
                     custOpts.add(oF);
                 }
-
+                */
                 Collections.sort(custOpts, new OptOrder());
                 /*
                 if(commandLine.hasOption(oStep))
@@ -275,7 +281,7 @@ public class CommandLineParser {
                 }else if (commandLine.hasOption(oR.getOpt())) {
                     String sRefTreeFile = (String) commandLine.getOptionValue(oR.getOpt());
                     cmd = new RunRCommand(0, "-r",sRefTreeFile);
-                    analysisType=" one-to-all comparison mode (-r)";
+                    analysisType=" ref-to-all comparison mode (-r)";
                 }else{
                     System.out.println("Error: type of the analysis not specified correctly!");
                     formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
@@ -344,12 +350,12 @@ class OptOrder implements Comparator {
         order.put("d", new Integer(5));
         order.put("i", new Integer(6));
         order.put("o", new Integer(7));
-        order.put("S", new Integer(8));
+        order.put("N", new Integer(8));
         order.put("P", new Integer(9));
         order.put("I", new Integer(10));
         order.put("A", new Integer(11));
         order.put("O", new Integer(12));
-        order.put("F", new Integer(13));
+       // order.put("F", new Integer(13));
     }
 
     public int compare(Object o1, Object o2) {

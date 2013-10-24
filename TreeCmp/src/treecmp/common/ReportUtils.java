@@ -33,6 +33,7 @@ public class ReportUtils {
     public final static String T1_COLUMN = "Tree1";
     public final static String T2_COLUMN = "Tree2";
     public final static String T_COLUMN = "Tree";
+    public final static String RT_COLUMN = "RefTree";
     public final static String T1_TAXA= "Tree1_taxa";
     public final static String T2_TAXA= "Tree2_taxa";
     public final static String T_TAXA= "Tree_taxa";
@@ -42,24 +43,21 @@ public class ReportUtils {
     public final static String UNIF_FRAC= "_toUnifAvg";
     public final static String NA_FRAC= "N/A";
     //it t2 ==-1 do not print t2
-    public static String getResultRow(int rowNum, int t1, int t2, StatCalculator[] stats){
+
+     public static String getResultRow(int rowNum, int t1, int t2, StatCalculator[] stats){
 
         StringBuilder sb = new StringBuilder();
         double dist, distToYuleAvg, distToUnifAvg;
         String distStr;
-
-        //we do not need num in ref mode - tree number has the same valuse
-        if (t2 != -1){
-            sb.append(rowNum);
-            sb.append(sep);
-        }
+        
+        sb.append(rowNum);
+        sb.append(sep);
+        
         sb.append(t1);
         
-        //used in reference tree mode
-        if (t2 != -1){
-            sb.append(sep);
-            sb.append(t2);
-        }
+        sb.append(sep);
+        sb.append(t2);
+        
         //to do if prune enabled
         if (pruneTrees && stats.length > 0){
             sb.append(sep);
@@ -95,10 +93,9 @@ public class ReportUtils {
              }
         }
 
-        //sb.append("\n");
         return sb.toString();
     }
-
+    
      public static String getHeaderRow(StatCalculator[] stats){
          
          return getHeaderRow(stats, false);
@@ -113,14 +110,18 @@ public class ReportUtils {
             sb.append(sep);
             sb.append(T1_COLUMN);
         }else{
-            //in ref tree mode Tree header is enough
-            sb.append(T_COLUMN);
+            sb.append(NUM_COLUMN);
+            sb.append(sep);
+            sb.append(RT_COLUMN);
         }
        
         //used in reference tree mode
         if (!ifReefTreeMode){
             sb.append(sep);
             sb.append(T2_COLUMN);
+        } else {
+            sb.append(sep);
+            sb.append(T_COLUMN);
         }
         //to do if prune enabled
         if (pruneTrees && stats.length > 0) {
@@ -129,7 +130,7 @@ public class ReportUtils {
             if (!ifReefTreeMode) {
                 sb.append(T1_TAXA);
             } else {
-                sb.append(T_TAXA);
+                sb.append(RT_TAXA);
             }
 
             sb.append(sep);
@@ -137,7 +138,7 @@ public class ReportUtils {
             if (!ifReefTreeMode) {
                 sb.append(T2_TAXA);
             } else {
-                sb.append(RT_TAXA);
+                sb.append(T_TAXA);
             }
 
             sb.append(sep);

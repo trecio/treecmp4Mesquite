@@ -7,7 +7,7 @@ import mesquite.treecmp.metrics.PalFacade;
 import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class WeightedMatchingSplitMetric extends BaseForUnrootedTreeCmpMetric {
-	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.WeightedMatchingSplitMetric");
+	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.weighted.MatchingSplitWeightMetric");
 
 	public WeightedMatchingSplitMetric() {
 		super(true);

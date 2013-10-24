@@ -7,7 +7,7 @@ import mesquite.treecmp.metrics.PalFacade;
 import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class MatchingSplitMetric extends BaseForUnrootedTreeCmpMetric {
-	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.MatchingSplitMetric");
+	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.topological.MatchingSplitMetric");
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber number,

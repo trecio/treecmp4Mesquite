@@ -81,9 +81,9 @@ public class RunWCommand extends Command {
 
         int nWin = numberOfTreas/winSize;
         int lastWinNum = numberOfTreas%winSize;
-        int maxIt = (winSize*(winSize-1)/2)*nWin+(lastWinNum*(lastWinNum-1)/2);
+        long maxIt = ((long)winSize*((long)winSize-1)/2)*(long)nWin+((long)lastWinNum*((long)lastWinNum-1)/2);
 
-        int counter = 1;
+        long counter = 1;
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxVal(maxIt);
         progress.setPrintInterval(600);
@@ -123,11 +123,11 @@ public class RunWCommand extends Command {
                         }
                         //print row statistic
                         base = num + 1;
-                        row = ReportUtils.getResultRow(counter, base+ i, base + j, metrics);
+                        row = ReportUtils.getResultRow((int)counter, base+ i, base + j, metrics);
                         out.setText(row);
                         out.write();
 
-                        aw.writeAlignments(counter, base+ i, base + j, metrics);
+                        aw.writeAlignments((int)counter, base+ i, base + j, metrics);
 
                         progress.displayProgress(counter);
                         counter++;

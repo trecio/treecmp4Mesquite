@@ -7,7 +7,7 @@ import mesquite.treecmp.metrics.PalFacade;
 import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class MatchingPairsMetric extends BaseForRootedTreeCmpMetric {
-	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.MatchingPairsMetric");
+	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.topological.MatchingPairMetric");
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber result,

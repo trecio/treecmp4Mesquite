@@ -171,9 +171,6 @@ public class SplitDist {
 
         return bsA;
     }
-    
-    @Deprecated
-    ///Use getTreeSplits instead.
     public static BitSet[] getSplits(Tree t, IdGroup idGroup) {
 
         int n = t.getExternalNodeCount();
@@ -211,57 +208,11 @@ public class SplitDist {
         }
 
         // standardize split (i.e. first index is alway true)
-        for(i=0;i<size;i++){
+	for(i=0;i<size;i++){
             if (splits[i].get(0) == false)
                 splits[i].flip(0, n);
 	}
 
         return splits;
     }
-    
-
-	public static Split[] getTreeSplits(Tree t, IdGroup idGroup) {
-		int n = t.getExternalNodeCount();
-		int internal = t.getInternalNodeCount();
-		int size = internal - 1;
-		Split[] splits = new Split[size];
-
-		Node curNode = t.getExternalNode(0);
-
-		int ind = 0;
-		Node child;
-		int childCount = 0;
-		int childInd = 0;
-		int leafId;
-		int i;
-
-		while (!curNode.isRoot()) {
-			if (!curNode.isLeaf()) {
-				BitSet bs = new BitSet(n);
-				ind = curNode.getNumber();
-				childCount = curNode.getChildCount();
-				for (i = 0; i < childCount; i++) {
-					child = curNode.getChild(i);
-					if (child.isLeaf()) {
-						leafId = idGroup
-								.whichIdNumber(child.getIdentifier().getName());
-						bs.set(leafId);
-					} else {
-						childInd = child.getNumber();
-						bs.or(splits[childInd].bitSet);
-					}
-				}
-				splits[ind] = new Split(bs, curNode);
-			}
-			curNode = NodeUtils.postorderSuccessor(curNode);
-		}
-
-		// standardize split (i.e. first index is always true)
-		for (i = 0; i < size; i++) {
-			if (splits[i].bitSet.get(0) == false)
-				splits[i].bitSet.flip(0, n);
-		}
-
-		return splits;
-	}
 }

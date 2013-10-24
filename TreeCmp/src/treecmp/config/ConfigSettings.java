@@ -110,11 +110,16 @@ public class ConfigSettings {
                     m.setYuleFileName(yuleFileName);
                     m.setAlnFileSuffix(alnFileSuffix);
                     if (rooted !=null )
-                        if (rooted.equals("true"))
-                            m.setRooted(true);
-                    if (diff_leaves !=null )
-                        if (diff_leaves.equals("true"))
+                        if (rooted.equals("true")){     
+                            // m.setRooted(true); - not used
+                            //whether metric is designe for rootes tree or not
+                            //should be specified in the particual metric definition itself
+                        }
+                    if (diff_leaves != null) {
+                        if (diff_leaves.equals("true")) {
                             m.setDiffLeafSets(true);
+                        }
+                    }
 
                     DMset.addMetric(m);
                 }

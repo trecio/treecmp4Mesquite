@@ -53,7 +53,8 @@ public class RunMCommand extends Command {
 
         pal.tree.Tree tree1,tree2 ;
         ArrayList<Tree> tree_vec = new ArrayList<Tree>();
-        int k,counter,maxIt;
+        int k;
+        long counter,maxIt;
         double val;
         String row;
 
@@ -78,7 +79,7 @@ public class RunMCommand extends Command {
 
         int N = tree_vec.size();
         counter = 1;
-        maxIt = N*(N-1)/2;
+        maxIt = (long)N*((long)N-1)/2;
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxVal(maxIt);
         progress.setPrintInterval(600);
@@ -93,11 +94,11 @@ public class RunMCommand extends Command {
                     val = metrics[k].getDistance(tree1, tree2);
                     sStatCalc[k].insertValue(val);
                 }   
-                row = ReportUtils.getResultRow(counter, i + 1, j + 1, metrics);
+                row = ReportUtils.getResultRow((int)counter, i + 1, j + 1, metrics);
                 out.setText(row);
                 out.write();
 
-                aw.writeAlignments(counter, i + 1, j + 1, metrics);
+                aw.writeAlignments((int)counter, i + 1, j + 1, metrics);
 
                 progress.displayProgress(counter);
                 counter++;

@@ -33,8 +33,11 @@ import pal.tree.NodeUtils;
 import pal.tree.Tree;
 import pal.tree.TreeTool;
 import pal.tree.TreeUtils;
+import treecmp.random.RandomTreeGenerator;
 
 public class TreeCmpUtils {
+
+    public enum RandomProcessType { YULE, UNIFORM}
 
   public static int[][] calcLcaMatrix(Tree tree, IdGroup idGroup) {
 
@@ -392,7 +395,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
         return R;
     }
 
-     public static long calcResolvedAndEqualTriplets(ClustIntersectInfoMatrix cIM, Node[] postOrderT1, Node[] postOrderT2){
+    public static long calcResolvedAndEqualTriplets(ClustIntersectInfoMatrix cIM, Node[] postOrderT1, Node[] postOrderT2){
                
         int intT1Num = cIM.getT1().getInternalNodeCount();
         int extT1Num = cIM.getT1().getExternalNodeCount();
@@ -497,8 +500,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
          return S;
      }
 
-
-      public static long calcResolvedOnlyInT1(ClustIntersectInfoMatrix cIM, Node[] postOrderT1, Node[] postOrderT2){
+    public static long calcResolvedOnlyInT1(ClustIntersectInfoMatrix cIM, Node[] postOrderT1, Node[] postOrderT2){
 
         int intT1Num = cIM.getT1().getInternalNodeCount();
         int extT1Num = cIM.getT1().getExternalNodeCount();
@@ -538,7 +540,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
          return R;
      }
 
-      private static long r1(Node u, Node v, Map<Triple,Long> gammaMap, ClustIntersectInfoMatrix cIM){
+    private static long r1(Node u, Node v, Map<Triple,Long> gammaMap, ClustIntersectInfoMatrix cIM){
           Node pa_u = u.getParent();
 
           int vNum = v.getNumber();
@@ -581,8 +583,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
           return r1;
       }
 
-
-       private static long gamma(Node u1, Node uk, Node v, ClustIntersectInfoMatrix cIM){
+    private static long gamma(Node u1, Node uk, Node v, ClustIntersectInfoMatrix cIM){
            
            Node u2;
            long sum, u2Negx;
@@ -629,8 +630,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
 
        }
 
-
-     public static long choose2(long n){
+    public static long choose2(long n){
 
          if (n < 2)
              return 0;
@@ -663,7 +663,7 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
         return true;
     }
 
-     public static int getNodeDepth(Node node){
+    public static int getNodeDepth(Node node){
         int depth=0;
 
         if (node.isRoot())
@@ -718,6 +718,104 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
         return g;
     }
 
+    public static IdGroup mergeIdGroups (List<IdGroup> groups){
+         if (groups.isEmpty()){
+             return null;
+         }
+         
+        Set<String> nameSet = new HashSet<String>();
+        for (IdGroup group: groups ){
+            int  gNum = group.getIdCount();
+            for (int i =0; i<gNum;i++){
+                String name = group.getIdentifier(i).getName();
+                if (!nameSet.contains(name)){
+                    nameSet.add(name);
+                }
+            }
+         }
+
+        Identifier[] idTab = new Identifier[nameSet.size()];
+        int i = 0;
+        for(String name: nameSet){
+            idTab[i] = new Identifier(name);
+            i++;
+        }
+        IdGroup g = new SimpleIdGroup(idTab);
+        return g;
+     }
+
+    public static Tree makeBinaryIfNeeded(Tree tree, boolean isRooted){
+        Tree binTree = null;
+        if (isBinary(tree,isRooted)){
+           binTree = tree;
+        } else{
+            //TODO make binary tree
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+        return binTree;
+    }
+
+    public static Tree makeBinary(Tree tree, boolean isRooted, RandomProcessType processType){
+        Tree binTree = tree.getCopy();
+        if (! isRooted){
+         throw new UnsupportedOperationException("Unrooted tree: not implemented yet");
+        }
+
+        if (processType != RandomProcessType.YULE){
+         throw new UnsupportedOperationException("Not Yule process: not implemented yet");
+        }
+
+        List<Node> nonBinNodes = new ArrayList<Node>();
+        int intNodeNum = binTree.getInternalNodeCount();
+        for (int i = 0; i < intNodeNum; i++){
+            Node n = binTree.getInternalNode(i);
+            if (n.getChildCount() > 2){
+                nonBinNodes.add(n);
+            }
+        }
+        for (Node n: nonBinNodes){
+            int childNum = n.getChildCount();
+            Node children[] = new Node [childNum];
+            //remember children of the multifurcated node
+            for (int i = 0; i < childNum; i++){
+               children[i] = n.getChild(i);  
+            }
+            //remove all the children
+            for (Node ch: children){
+                NodeUtils.removeChild(n, ch);
+            }
+                       
+            RandomTreeGenerator randomTreeGenerator = new RandomTreeGenerator(childNum);
+            Tree randTree = randomTreeGenerator.generateYuleTree(true);
+            Node randTreeRoot = randTree.getRoot();
+            Node extNodes[] = new Node[childNum];
+            //remember leaves of random tree
+            for (int j = 0; j < childNum; j++){
+                extNodes[j] = randTree.getExternalNode(j); 
+           } 
+           //remove all the leave and add childrens of analyzed node in these places
+            for (int j = 0; j < childNum; j++){
+                Node extNode = extNodes[j];
+                Node parent = extNode.getParent();
+                NodeUtils.removeChild(parent, extNode);
+                parent.addChild(children[j]);
+            }
+            //add two children of random tree root node to the node
+            Node randChild1 = randTreeRoot.getChild(0);
+            Node randChild2 = randTreeRoot.getChild(1);
+            //first remove the children
+            NodeUtils.removeChild(randTreeRoot, randChild1);
+            NodeUtils.removeChild(randTreeRoot, randChild2);
+            //now add them
+            n.addChild(randChild1);
+            n.addChild(randChild2);
+        }
+        binTree.createNodeList();
+        if (! isBinary(binTree,isRooted)){
+            throw new RuntimeException ("The tree should be binary! Something must have gone wrong!");
+        }
+        return binTree;
+    }
 }
 
 

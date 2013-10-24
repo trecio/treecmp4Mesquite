@@ -7,7 +7,7 @@ import mesquite.treecmp.metrics.PalFacade;
 import mesquite.treecmp.metrics.PalFacade.Tree;
 
 public class QuartetMetric extends BaseForUnrootedTreeCmpMetric {
-	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.QuartetMetricLong");
+	private final PalFacade.TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.topological.QuartetMetricLong");
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber number,

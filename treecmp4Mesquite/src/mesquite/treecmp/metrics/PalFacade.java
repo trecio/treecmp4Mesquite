@@ -31,7 +31,7 @@ public class PalFacade {
 					final URL jclPath = resolveResource("lib/jcl-core-2.2.2.jar");
 					final URL log4jPath = resolveResource("lib/log4j-1.2.16.jar");
 					final URL treecmp4GuiPath = resolveResource("lib/treecmp.jar");
-					final URL palPath = resolveResource("lib/pal-1.5.1.jar");
+					final URL palPath = resolveResource("lib/pal-1.5.1.f1.jar");
 					
 					try {
 						ClassPathHacker.addURL(jclPath);
