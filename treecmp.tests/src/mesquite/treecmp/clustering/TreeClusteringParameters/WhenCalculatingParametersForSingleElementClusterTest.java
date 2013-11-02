@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import mesquite.lib.TreeVector;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 
 import org.junit.Before;
@@ -17,9 +18,10 @@ public class WhenCalculatingParametersForSingleElementClusterTest {
 	@Before public void because() {
 		final String treeDescription = "(A, B, (C, (D, E)))";
 		final TreeVector cluster = Create.treeVector(treeDescription);
+		final Trees allTrees = cluster;
 		final Collection<TreeVector> clusters = Arrays.asList(cluster);
 		final DistanceBetween2Trees distance = new MockTreeDistance();
-		parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance , cluster.getTaxa());
+		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, cluster.getTaxa());
 	}
 	
 	@Test public void itShouldSetZeroAverageDistanceBetweenTrees() {
@@ -28,5 +30,12 @@ public class WhenCalculatingParametersForSingleElementClusterTest {
 	
 	@Test public void itShouldSetZeroClusterDiameter() {
 		assertEquals(0,  parameters.cluster[0].diameter, 1e-6);
+	}
+	
+	@Test public void itShouldSetZeroInformationLoss() {
+		assertEquals(0, parameters.informationLoss.KL, 1e-6);
+		assertEquals(0, parameters.informationLoss.L1, 1e-6);
+		assertEquals(0, parameters.informationLoss.L2, 1e-6);
+		assertEquals(0, parameters.informationLoss.Linf, 1e-6);
 	}
 }

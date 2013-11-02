@@ -11,6 +11,11 @@ public class Row {
 		this.name = name;
 	}
 	
+	public Row(String name, String value) {
+		this.name = name;
+		values.put("", value);
+	}
+
 	public String get(String column) {
 		return values.get(column);
 	}

@@ -4,12 +4,17 @@ public class Column {
 	public final String title;
 	public final String field;
 
-	public Column(String title, String field) {
+	public Column(String title) {
+		this.field = "";
 		this.title = title;
-		this.field = field;
 	}
 
-	public String getString(Row row) {
+	public Column(String title, String field) {
+		this.field = field;
+		this.title = title;
+	}
+
+	public String getString(Row row) {		
 		return row.get(field); 
 	}
 }

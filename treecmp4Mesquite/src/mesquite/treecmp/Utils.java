@@ -88,12 +88,20 @@ public final class Utils {
 				? foundEmployee
 				: (T) me.hireEmployee(dutyClass, explanation);
 	}
-
+	
 	public static Taxa getOrChooseTaxa(MesquiteModule me) {
 		final MesquiteProject project = me.getProject();
 		if (project.getTaxas().size() == 1) {
 			return project.getTaxa(0);
 		}
 		return project.chooseTaxa(me.containerOfModule(), "Choose the block of taxa:");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends MesquiteModule> T hireExactImplementation(
+			EmployerEmployee me,
+			Class<T> implementationClass) {
+		final String employeeName = '#' + implementationClass.getSimpleName();
+		return (T) me.hireNamedEmployee(implementationClass, employeeName);
 	}
 }

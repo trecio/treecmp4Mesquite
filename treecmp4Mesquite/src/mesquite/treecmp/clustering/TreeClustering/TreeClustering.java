@@ -32,6 +32,7 @@ public final class TreeClustering extends MesquiteModule {
 	private Taxa taxa;
 	private List<TreeVector> clusters;
 	private TreeSourceDefinite treeSource;
+	private Trees trees;
 
 	@Override
 	public boolean canHireMoreThanOnce() {
@@ -75,7 +76,8 @@ public final class TreeClustering extends MesquiteModule {
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		
 		if (groupBuilder != null) {
-			calculateClusters(groupBuilder, treeSource, taxa, distance);
+			trees = Utils.getTrees(treeSource, taxa);
+			calculateClusters(groupBuilder, taxa, distance);
 			initializeMenu();
 			return true;
 		} 
@@ -90,6 +92,10 @@ public final class TreeClustering extends MesquiteModule {
 	@Override
 	public String getName() {
 		return "Phylogenetic tree clustering";
+	}
+
+	public Trees allTrees() {
+		return trees;
 	}
 
 	public Integer getClusterNumberFor(Tree tree) {
@@ -107,11 +113,9 @@ public final class TreeClustering extends MesquiteModule {
 	public Taxa getTaxa() {
 		return taxa;
 	}
-
-	private void calculateClusters(GroupsForTreeVector groupBuilder, TreeSourceDefinite treeSource, Taxa taxa,
+	
+	private void calculateClusters(GroupsForTreeVector groupBuilder, Taxa taxa,
 			DistanceBetween2Trees distance) {
-		final Trees trees = Utils.getTrees(treeSource, taxa);
-		
 		final List<Integer> assignments = groupBuilder.calculateClusters(trees, distance);
 		clusterAssignment.clear();
 		for (int i=0; i<trees.size(); i++) {

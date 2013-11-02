@@ -3,11 +3,15 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 import java.util.Arrays;
 import java.util.Collection;
 
+import mesquite.lib.EmployerEmployee;
 import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
+import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lists.lib.ListAssistant;
 import mesquite.lists.lib.ListModule;
+import mesquite.treecmp.Utils;
+import mesquite.treecmp.clustering.SummaryParametersListModule.SummaryParametersListModule;
 import mesquite.treecmp.clustering.TreeClustering.TreeClustering;
 import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Column;
 import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
@@ -76,23 +80,32 @@ public final class TreeClusteringParameters extends ListModule {
 	private final Column sizeColumn = new Column("Size", "size");
 	private final Iterable<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn, separation);
 
+	private Column summaryColumn = new Column("Value");
+
 	@Override
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
 		final TreeClustering treeClustering = (TreeClustering) findNearestColleagueWithDuty(TreeClustering.class);
 		final Collection<TreeVector> clusters = treeClustering.getClusters();
+		final Trees allTrees = treeClustering.allTrees(); 
 		final DistanceBetween2Trees distance = treeClustering.getDistance();
 		final Taxa taxa = treeClustering.getTaxa();
-		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(clusters, distance, taxa);
-		rows = buildRows(parameters);
-		final ClusterParametersWindow window = new ClusterParametersWindow(this);
+		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, taxa);
 		
-		final String assistantName = '#' + TreeClusteringParametersListAssistant.class.getSimpleName();
+		rows = buildRows(parameters);
+		final Row[] summaryRows = buildSummaryRows(parameters);		
+		final SummaryParametersListModule summaryParametersModule = Utils.hireExactImplementation(this, SummaryParametersListModule.class);
+		summaryParametersModule.setMainObject(summaryRows);
+
+		final ClusterParametersWindow window = new ClusterParametersWindow(this, summaryParametersModule);		
 		for (final Column column : columnModel) {
-			final TreeClusteringParametersListAssistant assistant = (TreeClusteringParametersListAssistant) hireNamedEmployee(TreeClusteringParametersListAssistant.class, assistantName);
-			assistant.setColumnModel(column);
+			final TreeClusteringParametersListAssistant assistant = getAssistantForColumn(this, column);
 			window.addListAssistant(assistant);
 		}
+		
+		final TreeClusteringParametersListAssistant assistant = getAssistantForColumn(summaryParametersModule, summaryColumn);
+		window.addSummaryListAssistant(assistant);
+		
 		window.show();
 		return true;
 	}
@@ -157,6 +170,17 @@ public final class TreeClusteringParameters extends ListModule {
 		return rows;
 	}
 
+	private Row[] buildSummaryRows(ClustersParameters parameters) {
+		final Row[] rows = new Row[] {
+			new Row("K-L distance", formatDouble(parameters.informationLoss.KL)),
+			new Row("L1 norm", formatDouble(parameters.informationLoss.L1)),
+			new Row("L2 norm", formatDouble(parameters.informationLoss.L2)),
+			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf))
+		};
+		
+		return rows;
+	}
+
 	private Row createRow(String name, final ClusterParameters clusterParameters) {
 		final Row row = new Row(name);
 		row.set(averageDistanceColumn.field, formatDouble(clusterParameters.avgDistance));
@@ -169,5 +193,13 @@ public final class TreeClusteringParameters extends ListModule {
 	
 	private static String formatDouble(double value) {
 		return String.format(DOUBLE_FORMAT, value);
+	}	
+	
+	private TreeClusteringParametersListAssistant getAssistantForColumn(
+			final EmployerEmployee me,
+			final Column column) {
+		final TreeClusteringParametersListAssistant assistant = Utils.hireExactImplementation(me, TreeClusteringParametersListAssistant.class);
+		assistant.setColumnModel(column);
+		return assistant;
 	}
 }
