@@ -2,6 +2,7 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import mesquite.lib.EmployerEmployee;
 import mesquite.lib.Taxa;
@@ -11,7 +12,6 @@ import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lists.lib.ListAssistant;
 import mesquite.lists.lib.ListModule;
 import mesquite.treecmp.Utils;
-import mesquite.treecmp.clustering.SummaryParametersListModule.SummaryParametersListModule;
 import mesquite.treecmp.clustering.TreeClustering.TreeClustering;
 import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Column;
 import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
@@ -78,7 +78,7 @@ public final class TreeClusteringParameters extends ListModule {
 	private final Column densityColumn = new Column("Density", "density");
 	private final Column separation = new Column("Separation", "separation");
 	private final Column sizeColumn = new Column("Size", "size");
-	private final Iterable<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn, separation);
+	private final List<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn, separation);
 
 	private Column summaryColumn = new Column("Value");
 
@@ -92,20 +92,15 @@ public final class TreeClusteringParameters extends ListModule {
 		final Taxa taxa = treeClustering.getTaxa();
 		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, taxa);
 		
-		rows = buildRows(parameters);
-		final Row[] summaryRows = buildSummaryRows(parameters);		
-		final SummaryParametersListModule summaryParametersModule = Utils.hireExactImplementation(this, SummaryParametersListModule.class);
-		summaryParametersModule.setMainObject(summaryRows);
+		rows = buildRows(parameters).rows;
+		final Table summaryTable = buildSummaryRows(parameters);		
 
-		final ClusterParametersWindow window = new ClusterParametersWindow(this, summaryParametersModule);		
+		final ClusterParametersWindow window = new ClusterParametersWindow(this, summaryTable);		
 		for (final Column column : columnModel) {
 			final TreeClusteringParametersListAssistant assistant = getAssistantForColumn(this, column);
 			window.addListAssistant(assistant);
 		}
-		
-		final TreeClusteringParametersListAssistant assistant = getAssistantForColumn(summaryParametersModule, summaryColumn);
-		window.addSummaryListAssistant(assistant);
-		
+				
 		window.show();
 		return true;
 	}
@@ -115,7 +110,7 @@ public final class TreeClusteringParameters extends ListModule {
 		return "Tree clustering parameters";
 	}
 	
-	private Row[] buildRows(ClustersParameters parameters) {
+	private Table buildRows(ClustersParameters parameters) {
 		final int EXTRA_ROWS = 5;
 		final int NUMBER_OF_CLUSTERS = parameters.cluster.length; 
 		final Row[] rows = new Row[NUMBER_OF_CLUSTERS+EXTRA_ROWS];
@@ -167,10 +162,10 @@ public final class TreeClusteringParameters extends ListModule {
 		rows[i++] = new Row("");
 		rows[i++] = createRow("All trees:", parameters.allTrees);
 		
-		return rows;
+		return new Table(columnModel, rows);
 	}
 
-	private Row[] buildSummaryRows(ClustersParameters parameters) {
+	private Table buildSummaryRows(ClustersParameters parameters) {
 		final Row[] rows = new Row[] {
 			new Row("K-L distance", formatDouble(parameters.informationLoss.KL)),
 			new Row("L1 norm", formatDouble(parameters.informationLoss.L1)),
@@ -178,7 +173,7 @@ public final class TreeClusteringParameters extends ListModule {
 			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf))
 		};
 		
-		return rows;
+		return new Table(Arrays.asList(summaryColumn), rows);
 	}
 
 	private Row createRow(String name, final ClusterParameters clusterParameters) {

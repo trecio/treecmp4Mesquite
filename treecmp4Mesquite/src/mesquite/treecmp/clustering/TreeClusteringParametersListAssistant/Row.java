@@ -6,13 +6,15 @@ import java.util.Map;
 public class Row {
 	private final Map<String, String> values = new IdentityHashMap<String, String>();
 	public final String name;
+	public final String explanation;
 	
 	public Row(String name) {
 		this.name = name;
+		this.explanation = "";
 	}
 	
 	public Row(String name, String value) {
-		this.name = name;
+		this(name);
 		values.put("", value);
 	}
 

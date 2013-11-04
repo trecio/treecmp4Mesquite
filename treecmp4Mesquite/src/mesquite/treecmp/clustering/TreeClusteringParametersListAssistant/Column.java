@@ -3,13 +3,14 @@ package mesquite.treecmp.clustering.TreeClusteringParametersListAssistant;
 public class Column {
 	public final String title;
 	public final String field;
+	public final String explanation;
 
 	public Column(String title) {
-		this.field = "";
-		this.title = title;
+		this(title, "");
 	}
 
 	public Column(String title, String field) {
+		this.explanation = "";
 		this.field = field;
 		this.title = title;
 	}

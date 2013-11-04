@@ -5,25 +5,21 @@ import java.awt.BorderLayout;
 import mesquite.lib.MousePanel;
 import mesquite.lists.lib.ListModule;
 import mesquite.lists.lib.ListWindow;
-import mesquite.treecmp.clustering.SummaryParametersListModule.SummaryParametersListModule;
-import mesquite.treecmp.clustering.SummaryParametersListModule.SummaryParametersWindow;
 import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.TreeClusteringParametersListAssistant;
 
 class ClusterParametersWindow extends ListWindow {
 	final private ListModule listModule;
-	private SummaryParametersWindow summaryTable;
+	private TableView summaryTable;
 
-	public ClusterParametersWindow(ListModule ownerModule, SummaryParametersListModule summaryParametersModule) {
+	public ClusterParametersWindow(ListModule ownerModule, Table summaryParametersTable) {
 		super(ownerModule);
-		listModule = ownerModule;
-		table.setCellDimmed(2, 2, true);		
+		listModule = ownerModule;		
 		
 		MousePanel sidePanel = new MousePanel();
-		summaryTable = new SummaryParametersWindow(summaryParametersModule);
+		summaryTable = new TableView(summaryParametersTable, 100, getHeight(), 50, this);
 		sidePanel.setLayout(new BorderLayout());
-		sidePanel.add("Center", summaryTable.getTable());
-		addSidePanel(sidePanel , 100);
+		sidePanel.add("Center", summaryTable);
+		addSidePanel(sidePanel , 100);		
 	}
 
 	@Override
@@ -43,10 +39,5 @@ class ClusterParametersWindow extends ListWindow {
 		} else {
 			return null;
 		}
-	}
-
-	public void addSummaryListAssistant(
-			TreeClusteringParametersListAssistant assistant) {
-		summaryTable.addListAssistant(assistant);
 	}	
 }
