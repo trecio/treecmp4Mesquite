@@ -34,7 +34,7 @@ public class KCentroidsTreeClustering extends GroupsForTreeVector implements Ite
 
 	@Override
 	public String getName() {
-		return "KCentroids clustering algorithm.";
+		return "KCentroids algorithm.";
 	}
 
 	public void configure(int numberOfClusters, int numberOfIterations) {

@@ -48,7 +48,7 @@ public abstract class AbstractKCentroidMeans<TreeType> {
 		
 		for (int i=0; i<getNumberOfTrees(); i++) {
 			int closestCenterIndex = 0;
-			double distanceToClosest = getDistanceFromCenterToTree(centers.get(0), getTree(i));
+			double distanceToClosest = getDistanceFromCenterToTree(centers.get(closestCenterIndex), getTree(i));
 			
 			for (int j=1; j<centers.size(); j++) {				
 				double distance = getDistanceFromCenterToTree(centers.get(j), getTree(i));

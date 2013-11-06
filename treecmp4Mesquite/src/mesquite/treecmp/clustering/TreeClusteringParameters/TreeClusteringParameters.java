@@ -110,9 +110,9 @@ public final class TreeClusteringParameters extends MesquiteModule {
 			new Row("Separation", formatDouble(parameters.separation), "Minimum distance between two trees belonging to different clusters."),
 			new Row("Average distance between", formatDouble(parameters.avgDistanceBetween), "Average distance between two trees belonging to different clusters."),
 			new Row("K-L distance", formatDouble(parameters.informationLoss.KL), "Kullback-Leibler (KL) distance of cluster's and tree set uniform distributions."),
-			new Row("L1 norm", formatDouble(parameters.informationLoss.L1), "L1 distance of cluster's and tree set uniform distributions"),
-			new Row("L2 norm", formatDouble(parameters.informationLoss.L2), "L2 distance of cluster's and tree set uniform distributions"),
-			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf), "Linf distance of cluster's and tree set uniform distributions")
+			new Row("L1 norm", formatDouble(parameters.informationLoss.L1), "L1 distance of cluster's and tree set uniform distributions."),
+			new Row("L2 norm", formatDouble(parameters.informationLoss.L2), "L2 distance of cluster's and tree set uniform distributions."),
+			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf), "Linf distance of cluster's and tree set uniform distributions.")
 		};
 		
 		return new Table(Arrays.asList(summaryColumn), rows);

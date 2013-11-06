@@ -1,4 +1,4 @@
-package mesquite.treecmp.clustering.KMeansTreeClustering;
+package mesquite.treecmp.clustering.KMeansVecTreeClustering;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,14 +10,19 @@ import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.IterativeClustering;
 
-public class KMeansTreeClustering extends GroupsForTreeVector implements IterativeClustering {
+public class KMeansVecTreeClustering extends GroupsForTreeVector implements IterativeClustering {
 	private int numberOfClusters;
 	private int numberOfIterations;
+
+	public void configure(int numberOfClusters, int numberOfIterations) {
+		this.numberOfClusters = numberOfClusters;
+		this.numberOfIterations = numberOfIterations;
+	}
 
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
-		final KMeans clusteringAlgorithm = new KMeans(trees, distance);
+		final KMeansVec clusteringAlgorithm = new KMeansVec(trees);
 		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}
@@ -30,12 +35,7 @@ public class KMeansTreeClustering extends GroupsForTreeVector implements Iterati
 
 	@Override
 	public String getName() {
-		return "KMeans algorithm.";
-	}
-
-	public void configure(int numberOfClusters, int numberOfIterations) {
-		this.numberOfClusters = numberOfClusters;
-		this.numberOfIterations = numberOfIterations;
+		return "KMeans on biparition vectors algorithm.";
 	}
 
 }
