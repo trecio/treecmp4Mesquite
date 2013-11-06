@@ -4,7 +4,9 @@ import mesquite.lib.MesquiteInteger;
 import mesquite.lib.MesquiteThread;
 import mesquite.lib.MesquiteWindow;
 
-public class Configure {
+public final class Configure {
+	private Configure() {}
+	
 	public static boolean aglomerativeClusteringAlgorithm(AgglomerativeClustering algorithm, MesquiteWindow parentWindow) {
 		if (!MesquiteThread.isScripting()) {
 			final MesquiteInteger buttonPressed = new MesquiteInteger(AgglomerativeClusteringOptionsDialog.defaultCANCEL);

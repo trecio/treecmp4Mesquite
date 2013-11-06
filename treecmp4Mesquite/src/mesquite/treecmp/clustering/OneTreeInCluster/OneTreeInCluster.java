@@ -27,7 +27,7 @@ public class OneTreeInCluster extends GroupsForTreeVector {
 
 	@Override
 	public String getName() {
-		return "";
+		return "One tree in cluster.";
 	}
 
 }
