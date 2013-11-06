@@ -1,43 +1,33 @@
 package mesquite.treecmp.clustering.TreeClusteringParameters;
 
-import java.awt.BorderLayout;
-
+import mesquite.lib.MesquiteModule;
+import mesquite.lib.MesquiteWindow;
 import mesquite.lib.MousePanel;
-import mesquite.lists.lib.ListModule;
-import mesquite.lists.lib.ListWindow;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
+import mesquite.treecmp.clustering.AwtUtils;
 
-class ClusterParametersWindow extends ListWindow {
-	final private ListModule listModule;
-	private TableView summaryTable;
+class ClusterParametersWindow extends MesquiteWindow {
+	public ClusterParametersWindow(MesquiteModule ownerModule, Table mainTable, Table summaryParametersTable) {
+		super(ownerModule, true);		
+		setShowExplanation(true);
 
-	public ClusterParametersWindow(ListModule ownerModule, Table summaryParametersTable) {
-		super(ownerModule);
-		listModule = ownerModule;		
+		final TableView mainTableView = new TableView(mainTable, getWidth(), getHeight(), 100, this);
+		mainTableView.setColumnWidthsUniform(100);
+		AwtUtils.fillComponent(getGraphicsArea(), mainTableView);
 		
-		MousePanel sidePanel = new MousePanel();
-		summaryTable = new TableView(summaryParametersTable, 100, getHeight(), 50, this);
-		sidePanel.setLayout(new BorderLayout());
-		sidePanel.add("Center", summaryTable);
-		addSidePanel(sidePanel , 100);		
-	}
+		final MousePanel sidePanel = new MousePanel();
+		final TableView summaryTableView = new TableView(summaryParametersTable, 200, getHeight(), 50, this);
+		summaryTableView.setColumnWidthsUniform(100);
+		AwtUtils.fillComponent(sidePanel, summaryTableView);
 
+		addSidePanel(sidePanel, 200);
+		
+		ownerModule.makeMenu("TEST").setEnabled(true);
+		
+		toFront();
+	}
+	
 	@Override
 	public void resetTitle() {
 		setTitle("Cluster parameters");
 	}
-
-	@Override
-	public void setRowName(int row, String name) {
-	}
-
-	@Override
-	public String getRowName(int i) {
-		if (listModule != null) {
-			final Row[] rows = (Row[]) listModule.getMainObject();
-			return rows[i].name;
-		} else {
-			return null;
-		}
-	}	
 }

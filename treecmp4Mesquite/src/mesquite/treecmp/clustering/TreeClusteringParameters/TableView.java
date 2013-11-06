@@ -14,8 +14,6 @@ import mesquite.lib.MesquiteWindow;
 import mesquite.lib.Notification;
 import mesquite.lib.StringUtil;
 import mesquite.lib.table.MesquiteTable;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Column;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
 
 public class TableView extends MesquiteTable {
 	private static final long serialVersionUID = 1L;

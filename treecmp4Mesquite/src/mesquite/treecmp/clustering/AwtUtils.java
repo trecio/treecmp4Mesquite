@@ -1,16 +1,21 @@
 package mesquite.treecmp.clustering;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Label;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-class AwtUtils {
+public class AwtUtils {
 	public static Label hyperlinkBehaviour(Label component) {
 		return hyperlinkBehaviour(component, null);
 	}
@@ -70,5 +75,25 @@ class AwtUtils {
 			}
 		});
 		return field;
+	}
+
+	public static void fillComponent(Container container,
+			Component component) {
+		container.setLayout(new BorderLayout());
+		container.addComponentListener(new ComponentListener() {
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			public void componentResized(ComponentEvent e) {
+				e.getComponent().revalidate();
+			}
+			
+			public void componentMoved(ComponentEvent e) {				
+			}
+			
+			public void componentHidden(ComponentEvent e) {				
+			}
+		});
+		container.add(component);
 	}
 }

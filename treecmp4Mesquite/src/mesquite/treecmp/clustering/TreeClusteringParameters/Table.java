@@ -3,8 +3,6 @@ package mesquite.treecmp.clustering.TreeClusteringParameters;
 import java.util.Collections;
 import java.util.List;
 
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Column;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
 
 public class Table {
 	public final Row[] rows;

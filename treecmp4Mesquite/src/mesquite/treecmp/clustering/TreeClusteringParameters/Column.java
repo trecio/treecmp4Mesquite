@@ -1,4 +1,4 @@
-package mesquite.treecmp.clustering.TreeClusteringParametersListAssistant;
+package mesquite.treecmp.clustering.TreeClusteringParameters;
 
 public class Column {
 	public final String title;

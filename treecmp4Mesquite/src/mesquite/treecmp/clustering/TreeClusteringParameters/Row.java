@@ -1,4 +1,4 @@
-package mesquite.treecmp.clustering.TreeClusteringParametersListAssistant;
+package mesquite.treecmp.clustering.TreeClusteringParameters;
 
 import java.util.IdentityHashMap;
 import java.util.Map;

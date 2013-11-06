@@ -4,74 +4,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import mesquite.lib.EmployerEmployee;
+import mesquite.lib.MesquiteModule;
 import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
-import mesquite.lists.lib.ListAssistant;
-import mesquite.lists.lib.ListModule;
-import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.TreeClustering.TreeClustering;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Column;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.Row;
-import mesquite.treecmp.clustering.TreeClusteringParametersListAssistant.TreeClusteringParametersListAssistant;
 
-public final class TreeClusteringParameters extends ListModule {
+public final class TreeClusteringParameters extends MesquiteModule {	
 	private static final String DOUBLE_FORMAT = "%.3G";
-	private Row[] rows;
-	
-	@Override
-	public Class<? extends ListAssistant> getAssistantClass() {
-		return TreeClusteringParametersListAssistant.class;
-	}
-
-	@Override
-	public int getNumberOfRows() {
-		return rows.length;
-	}
-
-	@Override
-	public Object getMainObject() {
-		return rows;
-	}
-
-	@Override
-	public String getItemTypeName() {
-		return "cluster";
-	}
-
-	@Override
-	public String getItemTypeNamePlural() {
-		return "clusters";
-	}
-
-	@Override
-	public String getAnnotation(int row) {
-		return null;
-	}
-
-	@Override
-	public void setAnnotation(int row, String s, boolean notify) {
-	}
-
-	@Override
-	public boolean deleteRow(int row, boolean notify) {
-		return false;
-	}
-
-	@Override
-	public void showListWindow(Object obj) {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public boolean showing(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 	private final Column averageDistanceColumn = new Column("Avg. distance", "avgDistance");
 	private final Column diameterColumn = new Column("Diameter", "diameter");
 	private final Column specificityColumn = new Column("Specificity", "specificity");
@@ -92,17 +34,17 @@ public final class TreeClusteringParameters extends ListModule {
 		final Taxa taxa = treeClustering.getTaxa();
 		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, taxa);
 		
-		rows = buildRows(parameters).rows;
+		final Table mainTable = buildRows(parameters);
 		final Table summaryTable = buildSummaryRows(parameters);		
 
-		final ClusterParametersWindow window = new ClusterParametersWindow(this, summaryTable);		
-		for (final Column column : columnModel) {
-			final TreeClusteringParametersListAssistant assistant = getAssistantForColumn(this, column);
-			window.addListAssistant(assistant);
-		}
-				
-		window.show();
+		final ClusterParametersWindow window = new ClusterParametersWindow(this, mainTable, summaryTable);		
+		window.show();	
 		return true;
+	}
+
+	@Override
+	public Class<?> getDutyClass() {
+		return TreeClusteringParameters.class;
 	}
 
 	@Override
@@ -188,13 +130,5 @@ public final class TreeClusteringParameters extends ListModule {
 	
 	private static String formatDouble(double value) {
 		return String.format(DOUBLE_FORMAT, value);
-	}	
-	
-	private TreeClusteringParametersListAssistant getAssistantForColumn(
-			final EmployerEmployee me,
-			final Column column) {
-		final TreeClusteringParametersListAssistant assistant = Utils.hireExactImplementation(me, TreeClusteringParametersListAssistant.class);
-		assistant.setColumnModel(column);
-		return assistant;
 	}
 }
