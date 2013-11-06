@@ -143,7 +143,7 @@ public final class TreeClusteringParametersCalculator {
 		final double avgDistance = getAverageDistance(cluster, distance);
 		final double diameter = getDiameter(cluster, distance);
 
-		final double specificity = getSpecificity(cluster, strictConsensusTree);
+		final double specificity = getSpecificity(strictConsensusTree);
 		final double density = getDensity(cluster, strictConsensusTree);
 		
 		return new ClusterParameters(cluster.size(), avgDistance, diameter, specificity, density);
@@ -266,7 +266,7 @@ public final class TreeClusteringParametersCalculator {
 		return numberOfTreesOutsideClusters;
 	}
 
-	private static double getSpecificity(Trees cluster, Tree strictConsensusTree) {
+	private static double getSpecificity(Tree strictConsensusTree) {
 		int rootNode = strictConsensusTree.getRoot();
 		return (strictConsensusTree.numberOfInternalsInClade(rootNode) - 1.)
 				/ (strictConsensusTree.numberOfTerminalsInClade(rootNode) - 3);
