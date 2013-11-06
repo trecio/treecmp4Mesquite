@@ -28,11 +28,9 @@ public class TableView extends MesquiteTable {
 		showRowGrabbers=true;
 		showColumnGrabbers=true;
 		cornerIsHeading = true;
-		//setAutoEditable(false, true, false, false);
-		setEditable(true, true, false, false);
-		//setSelectable(false, true, true, true, false, false);
+		setEditable(false, false, false, false);
 		setSelectable(true, true, true, true, true, false);
-		setUserMove(true, false);
+		setUserMove(false, false);
 	}
 	
 	/* ............................................................................................................... */
@@ -161,14 +159,18 @@ public class TableView extends MesquiteTable {
 			final Column columnModel = table.columns.get(column);
 			String ex = columnModel.title + "\n" + columnModel.explanation;
 			window.setExplanation(ex);
-		}
-		else if (row >=0 && column>=0){ //internal cell
+		} else if (row >= 0 && column == -1) {	//row names
+			final Row rowData = table.rows[row];
+			String ex = rowData.name + "\n" + rowData.explanation;
+			window.setExplanation(ex);
+		} else if (row >=0 && column>=0){ //internal cell
 			final Row rowData = table.rows[row];
 			String ex = rowData.explanation;
 			if (StringUtil.blank(ex)) {
 				final Column columnModel = table.columns.get(column);
 				ex = columnModel.title;
 			}
+			window.setExplanation(ex);
 		}
 	}
 	/*...............................................................................................................*/

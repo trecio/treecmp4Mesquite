@@ -14,13 +14,12 @@ import mesquite.treecmp.clustering.TreeClustering.TreeClustering;
 public final class TreeClusteringParameters extends MesquiteModule {	
 	private static final String DOUBLE_FORMAT = "%.3G";
 		
-	private final Column averageDistanceColumn = new Column("Avg. distance", "avgDistance");
-	private final Column diameterColumn = new Column("Diameter", "diameter");
-	private final Column specificityColumn = new Column("Specificity", "specificity");
-	private final Column densityColumn = new Column("Density", "density");
-	private final Column separation = new Column("Separation", "separation");
-	private final Column sizeColumn = new Column("Size", "size");
-	private final List<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn, separation);
+	private final Column averageDistanceColumn = new Column("Avg. distance", "avgDistance", "Average distance between trees in a cluster.");
+	private final Column diameterColumn = new Column("Diameter", "diameter", "Maximum distance between trees in a cluster.");
+	private final Column specificityColumn = new Column("Specificity", "specificity", "Normalized number of internal edges of the cluster's strict consensus tree.");
+	private final Column densityColumn = new Column("Density", "density", "Number of unique tree topologies in the cluster divided by the number of all trees compatible with the cluster's strict consensus.");
+	private final Column sizeColumn = new Column("Size", "size", "Number of trees belonging to a cluster.");
+	private final List<Column> columnModel = Arrays.asList(sizeColumn, averageDistanceColumn, diameterColumn, specificityColumn, densityColumn);
 
 	private Column summaryColumn = new Column("Value");
 
@@ -85,7 +84,6 @@ public final class TreeClusteringParameters extends MesquiteModule {
 		
 		final Row minValuesRow = new Row("Minimum: ");
 		minValuesRow.set(densityColumn.field, formatDouble(minDensity));
-		minValuesRow.set(separation.field, formatDouble(parameters.separation));
 		minValuesRow.set(specificityColumn.field, formatDouble(minSpecificity));
 		rows[i++] = minValuesRow;
 		
@@ -109,10 +107,12 @@ public final class TreeClusteringParameters extends MesquiteModule {
 
 	private Table buildSummaryRows(ClustersParameters parameters) {
 		final Row[] rows = new Row[] {
-			new Row("K-L distance", formatDouble(parameters.informationLoss.KL)),
-			new Row("L1 norm", formatDouble(parameters.informationLoss.L1)),
-			new Row("L2 norm", formatDouble(parameters.informationLoss.L2)),
-			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf))
+			new Row("Separation", formatDouble(parameters.separation), "Minimum distance between two trees belonging to different clusters."),
+			new Row("Average distance between", formatDouble(parameters.avgDistanceBetween), "Average distance between two trees belonging to different clusters."),
+			new Row("K-L distance", formatDouble(parameters.informationLoss.KL), "Kullback-Leibler (KL) distance of cluster's and tree set uniform distributions."),
+			new Row("L1 norm", formatDouble(parameters.informationLoss.L1), "L1 distance of cluster's and tree set uniform distributions"),
+			new Row("L2 norm", formatDouble(parameters.informationLoss.L2), "L2 distance of cluster's and tree set uniform distributions"),
+			new Row("L-inf norm", formatDouble(parameters.informationLoss.Linf), "Linf distance of cluster's and tree set uniform distributions")
 		};
 		
 		return new Table(Arrays.asList(summaryColumn), rows);

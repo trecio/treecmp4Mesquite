@@ -23,6 +23,7 @@ public final class TreeClusteringParametersCalculator {
 	private TreeClusteringParametersCalculator() {}
 
 	public static ClustersParameters getParameters(Trees allTrees, Collection<TreeVector> clusters, DistanceBetween2Trees distance, Taxa taxa) {
+		final double avgDistanceBetween = getAverageDistanceBetweenClusters(clusters, distance);
 		final double minDistanceBetween = getMinDistanceBetweenClusters(clusters, distance);
 	 	final List<ClusterParameters> parameters = new ArrayList<ClusterParameters>(clusters.size());
 	 	final TreeVector consensusTrees = new TreeVector(taxa);
@@ -37,7 +38,7 @@ public final class TreeClusteringParametersCalculator {
 		final Tree allTreesConsensus = consenser.consense(consensusTrees);
 		final ClusterParameters allTreeParameters = getClusterParameters(allTrees, distance, allTreesConsensus);		
 		final InformationLoss informationLoss = getInformationLoss(allTrees, clusters, consensusTrees);
-		return new ClustersParameters(minDistanceBetween, parameters.toArray(new ClusterParameters[0]), allTreeParameters, informationLoss );
+		return new ClustersParameters(avgDistanceBetween, minDistanceBetween, parameters.toArray(new ClusterParameters[0]), allTreeParameters, informationLoss);
 	}
 	
 	private static double getAverageDistance(Trees cluster,
@@ -57,6 +58,32 @@ public final class TreeClusteringParametersCalculator {
 			}
 		}
 		return sumOfDistances * 2 / (numberOfTrees) / (numberOfTrees-1);
+	}
+
+	private static double getAverageDistanceBetweenClusters(
+			Collection<TreeVector> clusters, DistanceBetween2Trees distance) {
+		double sumDistancesBetween = 0;
+		int numberOfPairs = 0;
+		
+		final MesquiteNumber number = new MesquiteNumber();
+		for (final Trees cluster1 : clusters) {
+			for (final Trees cluster2 : clusters) {
+				if (cluster1 != cluster2) {
+					final int cluster1Size = cluster1.size();
+					final int cluster2Size = cluster2.size();
+					numberOfPairs += cluster1Size * cluster2Size;
+					for (int i=0; i<cluster1Size; i++) {
+						for (int j=0; j<cluster2Size; j++) {
+							distance.calculateNumber(cluster1.getTree(i), cluster2.getTree(j), number, null);
+							sumDistancesBetween += number.getDoubleValue();
+						}
+					}
+				}
+			}
+		}
+		return numberOfPairs > 0 
+				? sumDistancesBetween / numberOfPairs
+				: 0;
 	}
 
 	private static double getBoundingBallSize(Tree tree) {

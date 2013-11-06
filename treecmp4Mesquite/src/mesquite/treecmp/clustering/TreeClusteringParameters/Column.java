@@ -6,11 +6,11 @@ public class Column {
 	public final String explanation;
 
 	public Column(String title) {
-		this(title, "");
+		this(title, "", "");
 	}
 
-	public Column(String title, String field) {
-		this.explanation = "";
+	public Column(String title, String field, String explanation) {
+		this.explanation = explanation;
 		this.field = field;
 		this.title = title;
 	}
