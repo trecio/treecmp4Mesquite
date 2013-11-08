@@ -13,18 +13,18 @@ public class IterativeClusteringAlgorithm<TreeType> {
 	}
 	
 	public Collection<Collection<Integer>> computeClusters(List<TreeType> trees, int numberOfClusters, int numberOfIterations) {
-		List<Collection<Integer>> associations = new ArrayList<Collection<Integer>>();
+		final List<Collection<Integer>> associations = new ArrayList<Collection<Integer>>();
 		
 		List<TreeType> means = new ArrayList<TreeType>(numberOfClusters);
 		
-		int[] randomIndices = drawNNumbers(numberOfClusters, trees.size()); 
+		final int[] randomIndices = drawNNumbers(numberOfClusters, trees.size()); 
 		for (int i=0; i<numberOfClusters; i++)
 			means.add(trees.get(randomIndices[i]));
 		double error = computeAssociations(trees, means, associations), newError;
 
 		int iterations_left = numberOfIterations;
 		do {
-			List<TreeType> newCenters = centresCalculation.computeCentres(associations);
+			final List<TreeType> newCenters = centresCalculation.computeCentres(associations);
 			
 			newError = computeAssociations(trees, newCenters, associations);
 			
@@ -57,7 +57,7 @@ public class IterativeClusteringAlgorithm<TreeType> {
 			double distanceToClosest = centresCalculation.getDistanceFromCenterToTree(centers.get(closestCenterIndex), trees.get(i));
 			
 			for (int j=1; j<centers.size(); j++) {				
-				double distance = centresCalculation.getDistanceFromCenterToTree(centers.get(j), trees.get(i));
+				final double distance = centresCalculation.getDistanceFromCenterToTree(centers.get(j), trees.get(i));
 				if (distance < distanceToClosest) {
 					distanceToClosest = distance;
 					closestCenterIndex = j;
@@ -71,10 +71,10 @@ public class IterativeClusteringAlgorithm<TreeType> {
 	}
 
 	private int[] drawNNumbers(int n, int maxValue) {		
-		int[] result = new int[n];
-		Random r = new Random();
+		final int[] result = new int[n];
+		final Random r = new Random();
 		for (int i=0; i<n; i++) {
-			int proposal = r.nextInt(maxValue);
+			final int proposal = r.nextInt(maxValue);
 			if (contains(result, proposal))
 				i--;
 			else
@@ -84,7 +84,7 @@ public class IterativeClusteringAlgorithm<TreeType> {
 	}
 	
 	private boolean contains(int[] array, int value) {
-		for (int item : array)
+		for (final int item : array)
 			if (item == value)
 				return true;
 		return false;
