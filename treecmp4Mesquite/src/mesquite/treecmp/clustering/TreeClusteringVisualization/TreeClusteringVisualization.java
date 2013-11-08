@@ -24,7 +24,7 @@ public class TreeClusteringVisualization extends FileAssistantT {
 		MesquiteWindow window = visualization.getModuleWindow();
 		final String clusterColoringModuleName = "#" + ClusterAssignmentTreeColoring.class.getName();
 		window.doCommand("setTreeScoreColorer", clusterColoringModuleName, new CommandChecker());
-		return false;
+		return true;
 	}
 
 	@Override
