@@ -11,6 +11,7 @@ import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.IterativeClustering;
+import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 
 public class KMeansAvgDistanceTreeClustering extends GroupsForTreeVector implements IterativeClustering {
 
@@ -20,8 +21,9 @@ public class KMeansAvgDistanceTreeClustering extends GroupsForTreeVector impleme
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
-		final KMeansAvg clusteringAlgorithm = new KMeansAvg(trees, distance);
-		List<Collection<Integer>> treeLists = generateLists(trees.size());
+		final KMeansAvg kmeans = new KMeansAvg(trees, distance);
+		final IterativeClusteringAlgorithm<Collection<Integer>> clusteringAlgorithm = new IterativeClusteringAlgorithm<Collection<Integer>>(kmeans);
+		final List<Collection<Integer>> treeLists = generateLists(trees.size());
 		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(treeLists , numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}

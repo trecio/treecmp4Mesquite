@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import mesquite.treecmp.clustering.AbstractKCentroidMeans;
+import mesquite.treecmp.clustering.ClusterCentresCalculation;
 
-class KCentroids extends AbstractKCentroidMeans<Integer> {
+class KCentroids implements ClusterCentresCalculation<Integer> {
 	public KCentroids(double[][] matrix) {
 		this.distances = matrix;
 	}
 	
-	@Override
-	protected List<Integer> computeCentres(List<Collection<Integer>> associations) {
+	public List<Integer> computeCentres(List<Collection<Integer>> associations) {
 		List<Integer> centers = new ArrayList<Integer>(associations.size());
 		
 		for (int i=0; i<associations.size(); i++) {
@@ -39,8 +38,7 @@ class KCentroids extends AbstractKCentroidMeans<Integer> {
 		return centers;
 	}	
 
-	@Override
-	protected double getDistanceFromCenterToTree(Integer centerIndex, Integer treeIndex) {
+	public double getDistanceFromCenterToTree(Integer centerIndex, Integer treeIndex) {
 		return distances[centerIndex][treeIndex];
 	}
 

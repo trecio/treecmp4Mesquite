@@ -9,17 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import mesquite.treecmp.clustering.AbstractKCentroidMeans;
+import mesquite.treecmp.clustering.ClusterCentresCalculation;
 
-class KMeansVec extends AbstractKCentroidMeans<Bipartitions> {
+class KMeansVec implements ClusterCentresCalculation<Bipartitions> {
 	private final List<Bipartitions> bipartitions;
 	
 	public KMeansVec(List<Bipartitions> listOfBipartitions) {
 		this.bipartitions = listOfBipartitions;
 	}
 
-	@Override
-	protected List<Bipartitions> computeCentres(
+	public List<Bipartitions> computeCentres(
 			List<Collection<Integer>> associations) {
 		final List<Bipartitions> centres = new ArrayList<Bipartitions>(associations.size());
 		for (final Collection<Integer> association : associations) {
@@ -46,8 +45,7 @@ class KMeansVec extends AbstractKCentroidMeans<Bipartitions> {
 		return new Bipartitions(centreBipartitions);
 	}
 
-	@Override
-	protected double getDistanceFromCenterToTree(Bipartitions center,
+	public double getDistanceFromCenterToTree(Bipartitions center,
 			Bipartitions tree) {
 		final Map<BitSet, Double> centerBipartitions = center.asMap();
 		final Map<BitSet, Double> treeBipartitions = tree.asMap();

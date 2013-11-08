@@ -8,9 +8,9 @@ import mesquite.lib.MesquiteNumber;
 import mesquite.lib.Tree;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
-import mesquite.treecmp.clustering.AbstractKCentroidMeans;
+import mesquite.treecmp.clustering.ClusterCentresCalculation;
 
-public class KMeansAvg extends AbstractKCentroidMeans<Collection<Integer>> {
+public class KMeansAvg implements ClusterCentresCalculation<Collection<Integer>> {
 
 	private final DistanceBetween2Trees distance;
 	private final Trees trees;
@@ -20,14 +20,12 @@ public class KMeansAvg extends AbstractKCentroidMeans<Collection<Integer>> {
 		this.trees = trees;
 	}
 
-	@Override
-	protected List<Collection<Integer>> computeCentres(
+	public List<Collection<Integer>> computeCentres(
 			List<Collection<Integer>> associations) {
 		return new ArrayList<Collection<Integer>>(associations);
 	}
 
-	@Override
-	protected double getDistanceFromCenterToTree(Collection<Integer> center, Collection<Integer> tree) {
+	public double getDistanceFromCenterToTree(Collection<Integer> center, Collection<Integer> tree) {
 		double sumDistances = 0;
 		MesquiteNumber number = new MesquiteNumber();
 		for (final Integer idxInTree : tree) {

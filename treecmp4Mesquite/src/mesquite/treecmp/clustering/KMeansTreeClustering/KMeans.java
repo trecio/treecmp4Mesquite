@@ -12,9 +12,9 @@ import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.Consenser;
 import mesquite.lib.duties.NumberFor2Trees;
-import mesquite.treecmp.clustering.AbstractKCentroidMeans;
+import mesquite.treecmp.clustering.ClusterCentresCalculation;
 
-class KMeans extends AbstractKCentroidMeans<Tree> {
+class KMeans implements ClusterCentresCalculation<Tree> {
 
 	public KMeans(Trees trees, NumberFor2Trees metric) {
 		this.metric = metric;
@@ -26,8 +26,7 @@ class KMeans extends AbstractKCentroidMeans<Tree> {
 	private final boolean largerIsFurther;
 	private final Trees trees;
 
-	@Override
-	protected List<Tree> computeCentres(List<Collection<Integer>> associations) {
+	public List<Tree> computeCentres(List<Collection<Integer>> associations) {
 		List<Tree> centers = new ArrayList<Tree>(associations.size());
 		
 		for (int i=0; i<associations.size(); i++) {
@@ -40,8 +39,7 @@ class KMeans extends AbstractKCentroidMeans<Tree> {
 	}
 	
 	
-	@Override
-	protected double getDistanceFromCenterToTree(Tree center, Tree tree) {
+	public double getDistanceFromCenterToTree(Tree center, Tree tree) {
 		metric.initialize(center, tree);
 		metric.calculateNumber(center, tree, numberReference, stringReference);
 		double distanceToClosest = largerIsFurther ? numberReference.getDoubleValue() : -numberReference.getDoubleValue();

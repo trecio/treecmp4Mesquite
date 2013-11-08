@@ -10,6 +10,7 @@ import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.IterativeClustering;
+import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 
 public class KMeansVecTreeClustering extends GroupsForTreeVector implements IterativeClustering {
 	private int numberOfClusters;
@@ -24,7 +25,8 @@ public class KMeansVecTreeClustering extends GroupsForTreeVector implements Iter
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
 		final List<Bipartitions> listOfBipartitions = getBipartitions(trees);
-		final KMeansVec clusteringAlgorithm = new KMeansVec(listOfBipartitions);
+		final KMeansVec kmeans = new KMeansVec(listOfBipartitions);
+		final IterativeClusteringAlgorithm<Bipartitions> clusteringAlgorithm = new IterativeClusteringAlgorithm<Bipartitions>(kmeans);
 		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(listOfBipartitions , numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}

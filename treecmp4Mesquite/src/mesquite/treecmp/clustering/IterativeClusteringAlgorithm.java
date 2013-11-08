@@ -5,7 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractKCentroidMeans<TreeType> {	
+public class IterativeClusteringAlgorithm<TreeType> {
+	private final ClusterCentresCalculation<TreeType> centresCalculation;
+	
+	public IterativeClusteringAlgorithm(ClusterCentresCalculation<TreeType> centresCalculation) {
+		this.centresCalculation = centresCalculation;
+	}
+	
 	public Collection<Collection<Integer>> computeClusters(List<TreeType> trees, int numberOfClusters, int numberOfIterations) {
 		List<Collection<Integer>> associations = new ArrayList<Collection<Integer>>();
 		
@@ -18,7 +24,7 @@ public abstract class AbstractKCentroidMeans<TreeType> {
 
 		int iterations_left = numberOfIterations;
 		do {
-			List<TreeType> newCenters = computeCentres(associations);
+			List<TreeType> newCenters = centresCalculation.computeCentres(associations);
 			
 			newError = computeAssociations(trees, newCenters, associations);
 			
@@ -48,10 +54,10 @@ public abstract class AbstractKCentroidMeans<TreeType> {
 		
 		for (int i=0; i<trees.size(); i++) {
 			int closestCenterIndex = 0;
-			double distanceToClosest = getDistanceFromCenterToTree(centers.get(closestCenterIndex), trees.get(i));
+			double distanceToClosest = centresCalculation.getDistanceFromCenterToTree(centers.get(closestCenterIndex), trees.get(i));
 			
 			for (int j=1; j<centers.size(); j++) {				
-				double distance = getDistanceFromCenterToTree(centers.get(j), trees.get(i));
+				double distance = centresCalculation.getDistanceFromCenterToTree(centers.get(j), trees.get(i));
 				if (distance < distanceToClosest) {
 					distanceToClosest = distance;
 					closestCenterIndex = j;
@@ -64,9 +70,6 @@ public abstract class AbstractKCentroidMeans<TreeType> {
 		return error;
 	}
 
-	protected abstract List<TreeType> computeCentres(List<Collection<Integer>> associations);	
-	protected abstract double getDistanceFromCenterToTree(TreeType center, TreeType tree);
-	
 	private int[] drawNNumbers(int n, int maxValue) {		
 		int[] result = new int[n];
 		Random r = new Random();
