@@ -26,8 +26,8 @@ import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParame
 
 public final class TreeClustering extends MesquiteModule {
 	private final Map<Tree, Integer> clusterAssignment = new HashMap<Tree, Integer>();
-	private final MesquiteCommand showClusterMetrics = new MesquiteCommand("showClusterMetrics", this);
 	private final MesquiteCommand createSelectionsFromClusters = new MesquiteCommand("createSelectionsFromClusters", this);
+	private final MesquiteCommand showClusterMetrics = new MesquiteCommand("showClusterMetrics", this);
 	private DistanceBetween2Trees distance;
 	private Taxa taxa;
 	private List<TreeVector> clusters;
