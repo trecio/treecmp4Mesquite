@@ -1,5 +1,7 @@
 package mesquite.treecmp.clustering.KMeansAvgDistanceTreeClustering;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,7 +21,8 @@ public class KMeansAvgDistanceTreeClustering extends GroupsForTreeVector impleme
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
 		final KMeansAvg clusteringAlgorithm = new KMeansAvg(trees, distance);
-		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(numberOfClusters, numberOfIterations);
+		List<Collection<Integer>> treeLists = generateLists(trees.size());
+		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(treeLists , numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}
 
@@ -39,4 +42,11 @@ public class KMeansAvgDistanceTreeClustering extends GroupsForTreeVector impleme
 		this.numberOfIterations = numberOfIterations;
 	}
 
+	private List<Collection<Integer>> generateLists(int size) {
+		List<Collection<Integer>> list = new ArrayList<Collection<Integer>>(size);
+		for (int i=0; i<size; i++) {
+			list.add(Arrays.asList(i));
+		}
+		return list ;
+	}
 }

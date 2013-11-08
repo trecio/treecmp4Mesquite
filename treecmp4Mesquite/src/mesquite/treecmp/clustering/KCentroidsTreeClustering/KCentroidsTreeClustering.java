@@ -1,5 +1,6 @@
 package mesquite.treecmp.clustering.KCentroidsTreeClustering;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class KCentroidsTreeClustering extends GroupsForTreeVector implements Ite
 		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Calculating Tree Differences");
 		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, progressMeter);
 		final KCentroids clusteringAlgorithm = new KCentroids(distances);
-		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(numberOfClusters, numberOfIterations);
+		final List<Integer> treeIndices = range(trees.size());
+		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(treeIndices, numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}
 
@@ -42,4 +44,11 @@ public class KCentroidsTreeClustering extends GroupsForTreeVector implements Ite
 		this.numberOfIterations = numberOfIterations;
 	}
 
+	private List<Integer> range(int size) {
+		final List<Integer> list = new ArrayList<Integer>(size);
+		for (int i=0; i<size; i++) {
+			list.add(i);
+		}
+		return list;
+	}
 }

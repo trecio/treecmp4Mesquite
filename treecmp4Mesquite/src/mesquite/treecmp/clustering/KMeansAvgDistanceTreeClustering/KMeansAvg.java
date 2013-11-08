@@ -1,9 +1,7 @@
 package mesquite.treecmp.clustering.KMeansAvgDistanceTreeClustering;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import mesquite.lib.MesquiteNumber;
@@ -15,23 +13,11 @@ import mesquite.treecmp.clustering.AbstractKCentroidMeans;
 public class KMeansAvg extends AbstractKCentroidMeans<Collection<Integer>> {
 
 	private final DistanceBetween2Trees distance;
-	private final int numberOfTrees;
 	private final Trees trees;
 
 	public KMeansAvg(Trees trees, DistanceBetween2Trees distance) {
 		this.distance = distance;
-		this.numberOfTrees = trees.size();
 		this.trees = trees;
-	}
-
-	@Override
-	protected int getNumberOfTrees() {
-		return numberOfTrees;
-	}
-
-	@Override
-	protected Collection<Integer> getTree(int index) {
-		return Arrays.asList(index);
 	}
 
 	@Override

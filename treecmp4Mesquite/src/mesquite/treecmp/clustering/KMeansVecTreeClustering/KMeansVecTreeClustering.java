@@ -1,5 +1,6 @@
 package mesquite.treecmp.clustering.KMeansVecTreeClustering;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,8 +23,9 @@ public class KMeansVecTreeClustering extends GroupsForTreeVector implements Iter
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
-		final KMeansVec clusteringAlgorithm = new KMeansVec(trees);
-		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(numberOfClusters, numberOfIterations);
+		final List<Bipartitions> listOfBipartitions = getBipartitions(trees);
+		final KMeansVec clusteringAlgorithm = new KMeansVec(listOfBipartitions);
+		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(listOfBipartitions , numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}
 
@@ -38,4 +40,13 @@ public class KMeansVecTreeClustering extends GroupsForTreeVector implements Iter
 		return "KMeans on biparition vectors algorithm.";
 	}
 
+	private List<Bipartitions> getBipartitions(Trees trees) {
+		final int numberOfTrees = trees.size();
+		final List<Bipartitions> bipartitions = new ArrayList<Bipartitions>(numberOfTrees);
+		for (int i=0; i<numberOfTrees; i++) {
+			final Bipartitions bipartition = new Bipartitions(trees.getTree(i));
+			bipartitions.add(bipartition);
+		}
+		return bipartitions;
+	}
 }

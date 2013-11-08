@@ -9,30 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import mesquite.lib.Trees;
 import mesquite.treecmp.clustering.AbstractKCentroidMeans;
 
 class KMeansVec extends AbstractKCentroidMeans<Bipartitions> {
-	private final Bipartitions[] bipartitions;
-	private final int numberOfTrees;
-
-	public KMeansVec(Trees trees) {
-		numberOfTrees = trees.size();
-		bipartitions = new Bipartitions[numberOfTrees];
-		for (int i=0; i<numberOfTrees; i++) {
-			final Bipartitions bipartition = new Bipartitions(trees.getTree(i));
-			bipartitions[i] = bipartition;
-		}
-	}
-
-	@Override
-	protected int getNumberOfTrees() {
-		return numberOfTrees;
-	}
-
-	@Override
-	protected Bipartitions getTree(int index) {
-		return bipartitions[index];
+	private final List<Bipartitions> bipartitions;
+	
+	public KMeansVec(List<Bipartitions> listOfBipartitions) {
+		this.bipartitions = listOfBipartitions;
 	}
 
 	@Override
@@ -49,7 +32,7 @@ class KMeansVec extends AbstractKCentroidMeans<Bipartitions> {
 		final Map<BitSet, Double> centreBipartitions = new HashMap<BitSet, Double>();
 		final double normalizedOne = 1./association.size();
 		for (final Integer index : association) {
-			final Bipartitions tree = bipartitions[index];
+			final Bipartitions tree = bipartitions.get(index);
 			for(final Map.Entry<BitSet, Double> entry : tree.asMap().entrySet()) {
 				final BitSet bipartition = entry.getKey();
 				final Double existingFrequency = centreBipartitions.get(bipartition);

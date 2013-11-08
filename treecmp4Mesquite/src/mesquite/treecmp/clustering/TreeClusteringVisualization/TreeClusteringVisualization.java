@@ -26,7 +26,7 @@ public class TreeClusteringVisualization extends FileAssistantT {
 
 	@Override
 	public String getName() {
-		return "Tree Clustering Visualization";
+		return "Tree Clustering Analysis";
 	}
 
 }

@@ -19,7 +19,7 @@ class KCentroids extends AbstractKCentroidMeans<Integer> {
 			double distance = Double.MAX_VALUE;
 			int bestChoice = 0;
 			
-			for (int centerId=0; centerId<getNumberOfTrees(); centerId++) {
+			for (int centerId=0; centerId<distances.length; centerId++) {
 				double maxDistance = Double.MIN_VALUE;
 				
 				for (int treeId : associations.get(i)) {
@@ -33,7 +33,7 @@ class KCentroids extends AbstractKCentroidMeans<Integer> {
 					bestChoice = centerId;
 				}
 			}			
-			centers.add(getTree(bestChoice));			
+			centers.add(bestChoice);			
 		}
 		
 		return centers;
@@ -42,16 +42,6 @@ class KCentroids extends AbstractKCentroidMeans<Integer> {
 	@Override
 	protected double getDistanceFromCenterToTree(Integer centerIndex, Integer treeIndex) {
 		return distances[centerIndex][treeIndex];
-	}
-
-	@Override
-	protected int getNumberOfTrees() {
-		return distances.length;
-	}
-
-	@Override
-	protected Integer getTree(int index) {
-		return index;
 	}
 
 	private final double[][] distances;

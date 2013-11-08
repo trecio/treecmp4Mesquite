@@ -1,8 +1,10 @@
 package mesquite.treecmp.clustering.KMeansTreeClustering;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import mesquite.lib.Tree;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
@@ -18,7 +20,8 @@ public class KMeansTreeClustering extends GroupsForTreeVector implements Iterati
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
 		final KMeans clusteringAlgorithm = new KMeans(trees, distance);
-		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(numberOfClusters, numberOfIterations);
+		List<Tree> listOfTrees = getTreeList(trees);
+		final Collection<Collection<Integer>> clusterAssignments = clusteringAlgorithm.computeClusters(listOfTrees , numberOfClusters, numberOfIterations);
 		return Utils.convertToAssignments(trees.size(), clusterAssignments);
 	}
 
@@ -37,5 +40,13 @@ public class KMeansTreeClustering extends GroupsForTreeVector implements Iterati
 		this.numberOfClusters = numberOfClusters;
 		this.numberOfIterations = numberOfIterations;
 	}
-
+	
+	private List<Tree> getTreeList(Trees trees) {
+		final int numberOfTrees = trees.size(); 
+		final List<Tree> list = new ArrayList<Tree>(numberOfTrees);
+		for (int i=0; i<numberOfTrees; i++) {
+			list.add(trees.getTree(i));
+		}
+		return list;
+	}
 }

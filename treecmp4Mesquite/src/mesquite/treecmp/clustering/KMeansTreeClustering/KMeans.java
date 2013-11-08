@@ -48,16 +48,6 @@ class KMeans extends AbstractKCentroidMeans<Tree> {
 		return distanceToClosest;
 	}	
 	
-	@Override
-	protected int getNumberOfTrees() {
-		return trees.size();
-	}
-
-	@Override
-	protected Tree getTree(int index) {
-		return trees.getTree(index);
-	}
-
 	private final Consenser consenser = new MajRuleTree();
 
 	private final MesquiteNumber numberReference = new MesquiteNumber();
