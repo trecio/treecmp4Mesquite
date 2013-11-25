@@ -9,6 +9,10 @@ import mesquite.treecmp.metrics.PalFacade.TreeCmpMetric;
 
 public class GeoUnrootedMetric extends BaseForUnrootedTreeCmpMetric {
 	private final TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.weighted.GeoUnrootedMetric");
+	
+	public GeoUnrootedMetric() {
+		super(true);
+	}
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber number,

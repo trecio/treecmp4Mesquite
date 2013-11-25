@@ -9,6 +9,10 @@ import mesquite.treecmp.metrics.PalFacade.TreeCmpMetric;
 
 public class FlowClusterMetric extends BaseForRootedTreeCmpMetric {
 	private final TreeCmpMetric metric = new PalFacade.TreeCmpMetric("treecmp.metric.weighted.FlowClusterMetric");
+	
+	public FlowClusterMetric() {
+		super(true);
+	}
 
 	@Override
 	protected void getDistance(Tree t1, Tree t2, MesquiteNumber number,
