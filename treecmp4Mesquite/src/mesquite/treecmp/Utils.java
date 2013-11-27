@@ -36,31 +36,35 @@ public final class Utils {
 		final double[][] distances = new double[numberOfTrees][];
 		final MesquiteNumber result = new MesquiteNumber();
 		final MesquiteString resultString = new MesquiteString();
-		progressMeter.setTotalValue(numberOfPairs);
 		
 		for (int i=0; i<numberOfTrees; i++) {
 			distances[i] = new double[numberOfTrees];
 		}
 		
-		progressMeter.start();
-		int totalPairsCalculated = 0;
-		for (int i=0; i<numberOfTrees; i++) {
-			final Tree tree1 = trees.getTree(i);
-			for (int j=i+1; j<numberOfTrees; j++, totalPairsCalculated++) {
-				final Tree tree2 = trees.getTree(j);
-				distance.calculateNumber(tree1, tree2, result, resultString);
-				distances[i][j] = distances[j][i] = result.getDoubleValue();
-				
-				if (progressMeter.isAborted()) {
-					progressMeter.goAway();
-					return null;
-				}
-				if (totalPairsCalculated % percentChange == 0) {
-					progressMeter.setCurrentValue(totalPairsCalculated);
+		try {
+		
+			progressMeter.start();
+			progressMeter.setTotalValue(numberOfPairs);
+			int totalPairsCalculated = 0;
+			for (int i=0; i<numberOfTrees; i++) {
+				final Tree tree1 = trees.getTree(i);
+				for (int j=i+1; j<numberOfTrees; j++, totalPairsCalculated++) {
+					final Tree tree2 = trees.getTree(j);
+					distance.calculateNumber(tree1, tree2, result, resultString);
+					distances[i][j] = distances[j][i] = result.getDoubleValue();
+					
+					if (progressMeter.isAborted()) {
+						progressMeter.goAway();
+						return null;
+					}
+					if (totalPairsCalculated % percentChange == 0) {
+						progressMeter.setCurrentValue(totalPairsCalculated);
+					}
 				}
 			}
+		} finally {
+			progressMeter.goAway();
 		}
-		progressMeter.goAway();
 		
 		return distances;
 	}
