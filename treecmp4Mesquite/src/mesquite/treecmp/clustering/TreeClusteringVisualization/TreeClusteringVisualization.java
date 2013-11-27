@@ -9,6 +9,7 @@ import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.ClusterAssignmentTreeColoring.ClusterAssignmentTreeColoring;
 
 public class TreeClusteringVisualization extends FileAssistantT {
+	
 	@Override
 	public boolean startJob(String arguments, Object condition,
 			boolean hiredByName) {
@@ -24,14 +25,15 @@ public class TreeClusteringVisualization extends FileAssistantT {
 		MesquiteWindow window = visualization.getModuleWindow();
 		final String clusterColoringModuleName = "#" + ClusterAssignmentTreeColoring.class.getName();
 		window.doCommand("setTreeScoreColorer", clusterColoringModuleName, new CommandChecker());
+		
 		return true;
 	}
 
 	@Override
 	public String getName() {
-		return "Tree Clustering Analysis";
+		return "Tree Set Cluster Analysis";
 	}
-
+	
 	private boolean isTsvAvailable() {
 		final String TSVClassName = "mesquite.treeSetViz.TreeSetVisualization.TreeSetVisualization";
 		try {
