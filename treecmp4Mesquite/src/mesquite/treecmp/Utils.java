@@ -1,8 +1,11 @@
 package mesquite.treecmp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mesquite.lib.EmployerEmployee;
 import mesquite.lib.MesquiteModule;
@@ -107,5 +110,20 @@ public final class Utils {
 			Class<T> implementationClass) {
 		final String employeeName = '#' + implementationClass.getSimpleName();
 		return (T) me.hireNamedEmployee(implementationClass, employeeName);
+	}
+
+	public static List<TreeVector> inverseClusterAssignments(
+			List<Integer> assignments, Trees trees) {
+		final Map<Integer, TreeVector> clusters = new HashMap<Integer, TreeVector>();
+		for (int i=0; i<assignments.size(); i++) {
+			final int clusterNumber = assignments.get(i);
+			TreeVector cluster = clusters.get(clusterNumber);
+			if (cluster == null) {
+				cluster = new TreeVector(trees.getTaxa());
+				clusters.put(clusterNumber, cluster);
+			}
+			cluster.addElement(trees.getTree(i), false);
+		}
+		return new ArrayList<TreeVector>(clusters.values());
 	}
 }

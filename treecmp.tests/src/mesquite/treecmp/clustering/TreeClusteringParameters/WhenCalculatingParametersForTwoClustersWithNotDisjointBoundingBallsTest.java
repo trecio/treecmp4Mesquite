@@ -30,7 +30,7 @@ public class WhenCalculatingParametersForTwoClustersWithNotDisjointBoundingBalls
 		
 		final Collection<TreeVector> clusters = Arrays.asList(cluster1, cluster2);
 		final DistanceBetween2Trees distance = new MockTreeDistance();
-		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, allTrees.getTaxa());
+		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance);
 	}
 	
 	@Test public void itShouldReturnInformationLossLinfNorm() {

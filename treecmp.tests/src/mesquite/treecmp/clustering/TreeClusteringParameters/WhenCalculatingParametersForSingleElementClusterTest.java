@@ -21,7 +21,7 @@ public class WhenCalculatingParametersForSingleElementClusterTest {
 		final Trees allTrees = cluster;
 		final Collection<TreeVector> clusters = Arrays.asList(cluster);
 		final DistanceBetween2Trees distance = new MockTreeDistance();
-		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, cluster.getTaxa());
+		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance);
 	}
 	
 	@Test public void itShouldSetZeroAverageDistanceBetweenTrees() {

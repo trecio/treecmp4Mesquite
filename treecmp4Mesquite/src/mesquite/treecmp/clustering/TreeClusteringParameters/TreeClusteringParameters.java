@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import mesquite.lib.MesquiteModule;
-import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
@@ -30,8 +29,7 @@ public final class TreeClusteringParameters extends MesquiteModule {
 		final Collection<TreeVector> clusters = treeClustering.getClusters();
 		final Trees allTrees = treeClustering.allTrees(); 
 		final DistanceBetween2Trees distance = treeClustering.getDistance();
-		final Taxa taxa = treeClustering.getTaxa();
-		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, taxa);
+		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance);
 		
 		final Table mainTable = buildRows(parameters);
 		final Table summaryTable = buildSummaryRows(parameters);		

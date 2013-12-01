@@ -22,11 +22,11 @@ import mesquite.lib.duties.DistanceBetween2Trees;
 public final class TreeClusteringParametersCalculator {
 	private TreeClusteringParametersCalculator() {}
 
-	public static ClustersParameters getParameters(Trees allTrees, Collection<TreeVector> clusters, DistanceBetween2Trees distance, Taxa taxa) {
+	public static ClustersParameters getParameters(Trees allTrees, Collection<TreeVector> clusters, DistanceBetween2Trees distance) {
 		final double avgDistanceBetween = getAverageDistanceBetweenClusters(clusters, distance);
 		final double minDistanceBetween = getMinDistanceBetweenClusters(clusters, distance);
 	 	final List<ClusterParameters> parameters = new ArrayList<ClusterParameters>(clusters.size());
-	 	final TreeVector consensusTrees = new TreeVector(taxa);
+	 	final TreeVector consensusTrees = new TreeVector(allTrees.getTaxa());
 		final Consenser consenser = new StrictConsensusTree();
 		for (final TreeVector cluster : clusters) {
 			final Tree strictConsensusTree = consenser.consense(cluster);

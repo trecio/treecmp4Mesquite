@@ -1,6 +1,5 @@
 package mesquite.treecmp.clustering.TreeClustering;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,7 +76,7 @@ public final class TreeClustering extends MesquiteModule {
 		
 		if (groupBuilder != null) {
 			trees = Utils.getTrees(treeSource, taxa);
-			calculateClusters(groupBuilder, taxa, distance);
+			calculateClusters(groupBuilder, distance);
 			initializeMenu();
 			return true;
 		} 
@@ -114,7 +113,7 @@ public final class TreeClustering extends MesquiteModule {
 		return taxa;
 	}
 	
-	private void calculateClusters(GroupsForTreeVector groupBuilder, Taxa taxa,
+	private void calculateClusters(GroupsForTreeVector groupBuilder,
 			DistanceBetween2Trees distance) {
 		final List<Integer> assignments = groupBuilder.calculateClusters(trees, distance);
 		clusterAssignment.clear();
@@ -122,7 +121,7 @@ public final class TreeClustering extends MesquiteModule {
 			final int clusterNumber = assignments.get(i);
 			clusterAssignment.put(trees.getTree(i), clusterNumber);
 		}
-		clusters = inverse(clusterAssignment, taxa);
+		clusters = Utils.inverseClusterAssignments(assignments, trees);
 	}
 	
 	private void initializeMenu() {
@@ -141,20 +140,6 @@ public final class TreeClustering extends MesquiteModule {
 
 	private static String getClusterLabel(int clusterId, final TreeVector cluster) {
 		return "Cluster " + clusterId + " (" + cluster.size() + " elements)";
-	}
-	
-	private static List<TreeVector> inverse(
-			Map<Tree, Integer> clusterAssignment, Taxa taxa) {
-		final Map<Integer, TreeVector> assignments = new HashMap<Integer, TreeVector>();
-		for (final Map.Entry<Tree, Integer> entry : clusterAssignment.entrySet()) {
-			TreeVector cluster = assignments.get(entry.getValue());
-			if (cluster == null) {
-				cluster = new TreeVector(taxa);
-				assignments.put(entry.getValue(), cluster);
-			}
-			cluster.addElement(entry.getKey(), false);
-		}
-		return new ArrayList<TreeVector>(assignments.values());
 	}
 	
 	private void updateMesquiteSelection(int clusterNumber) {
