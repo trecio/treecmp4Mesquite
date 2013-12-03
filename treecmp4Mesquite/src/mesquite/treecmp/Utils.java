@@ -19,6 +19,7 @@ import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.TreeSourceDefinite;
+import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParameters;
 
 public final class Utils {
 	private Utils() {}
@@ -125,5 +126,9 @@ public final class Utils {
 			cluster.addElement(trees.getTree(i), false);
 		}
 		return new ArrayList<TreeVector>(clusters.values());
+	}
+
+	public static String formatDouble(double value) {
+		return String.format(TreeClusteringParameters.DOUBLE_FORMAT, value);
 	}
 }
