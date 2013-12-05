@@ -33,7 +33,9 @@ public final class Utils {
 	}
 
 	public static double[][] calculateDistanceMatrix(DistanceBetween2Trees distance,
-			final Trees trees, ProgressIndicator progressMeter) {
+			final Trees trees, MesquiteProject project) {
+		final ProgressIndicator progressMeter = new ProgressIndicator(project, "Calculating Tree Differences");
+
 		final int numberOfTrees = trees.size();
 		final int numberOfPairs = (numberOfTrees * numberOfTrees - numberOfTrees) / 2;
 		final int percentChange = numberOfPairs / 100;
@@ -58,7 +60,6 @@ public final class Utils {
 					distances[i][j] = distances[j][i] = result.getDoubleValue();
 					
 					if (progressMeter.isAborted()) {
-						progressMeter.goAway();
 						return null;
 					}
 					if (totalPairsCalculated % percentChange == 0) {

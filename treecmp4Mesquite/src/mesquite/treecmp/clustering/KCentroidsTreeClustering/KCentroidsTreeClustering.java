@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
-import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 import mesquite.treecmp.clustering.Configure;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.IterativeClustering;
+import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 
 public class KCentroidsTreeClustering extends GroupsForTreeVector implements IterativeClustering  {
 
@@ -21,8 +20,7 @@ public class KCentroidsTreeClustering extends GroupsForTreeVector implements Ite
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
-		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Calculating Tree Differences");
-		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, progressMeter);
+		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, getProject());
 		final KCentroids kCentroids = new KCentroids(distances);
 		final IterativeClusteringAlgorithm<Integer> clusteringAlgorithm = new IterativeClusteringAlgorithm<Integer>(kCentroids);
 		final List<Integer> treeIndices = range(trees.size());

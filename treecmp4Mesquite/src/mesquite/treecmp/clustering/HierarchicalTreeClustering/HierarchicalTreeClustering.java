@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.treecmp.Utils;
@@ -27,8 +26,7 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector implements A
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
 			DistanceBetween2Trees distance) {
-		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Calculating Tree Differences");
-		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, progressMeter);
+		final double[][] distances = Utils.calculateDistanceMatrix(distance, trees, getProject());
 		
 		final Hierarchical clusteringAlgorithm = new Hierarchical(distances, linkageCriterion);
 		clusteringAlgorithm.partition();

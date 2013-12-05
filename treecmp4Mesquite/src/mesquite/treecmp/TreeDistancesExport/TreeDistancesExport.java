@@ -6,7 +6,6 @@ import mesquite.lib.ColorTheme;
 import mesquite.lib.MesquiteFile;
 import mesquite.lib.MesquiteFileDialog;
 import mesquite.lib.MesquiteProject;
-import mesquite.lib.ProgressIndicator;
 import mesquite.lib.StringUtil;
 import mesquite.lib.Taxa;
 import mesquite.lib.Trees;
@@ -65,9 +64,8 @@ public class TreeDistancesExport extends FileAssistantT {
 	private double[][] calculateTreeDistances(MesquiteProject project, TreeSourceDefinite treeSource,
 			Taxa taxa, DistanceBetween2Trees distance) {
 		final Trees trees = Utils.getTrees(treeSource, taxa);
-		ProgressIndicator progressMeter = new ProgressIndicator(project, "Calculating Tree Differences");
 
-		return Utils.calculateDistanceMatrix(distance, trees, progressMeter);
+		return Utils.calculateDistanceMatrix(distance, trees, project);
 	}
 
 	private MesquiteFile chooseFile() {
