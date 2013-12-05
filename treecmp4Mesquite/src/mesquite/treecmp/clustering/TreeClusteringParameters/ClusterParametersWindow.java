@@ -21,8 +21,6 @@ public class ClusterParametersWindow extends MesquiteWindow {
 
 		addSidePanel(sidePanel, 200);
 		
-		ownerModule.makeMenu("TEST").setEnabled(true);
-		
 		toFront();
 	}
 	
