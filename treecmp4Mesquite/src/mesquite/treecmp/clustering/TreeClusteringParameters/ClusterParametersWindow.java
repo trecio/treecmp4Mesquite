@@ -5,7 +5,7 @@ import mesquite.lib.MesquiteWindow;
 import mesquite.lib.MousePanel;
 import mesquite.treecmp.clustering.AwtUtils;
 
-class ClusterParametersWindow extends MesquiteWindow {
+public class ClusterParametersWindow extends MesquiteWindow {
 	public ClusterParametersWindow(MesquiteModule ownerModule, Table mainTable, Table summaryParametersTable) {
 		super(ownerModule, true);		
 		setShowExplanation(true);

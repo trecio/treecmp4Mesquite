@@ -3,7 +3,6 @@ package mesquite.treecmp.clustering.TreeClusteringBootstrapAnalysis;
 import java.util.Collection;
 import java.util.List;
 
-import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Taxa;
 import mesquite.lib.TreeVector;
 import mesquite.lib.Trees;
@@ -15,9 +14,11 @@ import mesquite.treecmp.ProgressReporter;
 import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.TreeClustering.CachedDistanceBetween2Trees;
+import mesquite.treecmp.clustering.TreeClusteringParameters.ClusterParametersWindow;
 import mesquite.treecmp.clustering.TreeClusteringParameters.ClustersParameters;
 import mesquite.treecmp.clustering.TreeClusteringParameters.MainTableBuilder;
 import mesquite.treecmp.clustering.TreeClusteringParameters.SummaryTableBuilder;
+import mesquite.treecmp.clustering.TreeClusteringParameters.Table;
 import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParametersCalculator;
 
 public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
@@ -58,6 +59,13 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		} finally {
 			ProgressIndicatorContext.exit();
 		}
+		
+		final Table mainTable = mainTableBuilder.getTable();
+		final Table summaryTable = summaryTableBuilder.getTable();
+		
+		final ClusterParametersWindow window = new ClusterParametersWindow(this, mainTable, summaryTable);		
+		window.show();
+		
 		return true;
 	}
 
