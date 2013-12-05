@@ -14,6 +14,8 @@ import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.TreeClustering.CachedDistanceBetween2Trees;
 import mesquite.treecmp.clustering.TreeClusteringParameters.ClustersParameters;
+import mesquite.treecmp.clustering.TreeClusteringParameters.MainTableBuilder;
+import mesquite.treecmp.clustering.TreeClusteringParameters.SummaryTableBuilder;
 import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParametersCalculator;
 
 public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
@@ -33,16 +35,22 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Analyzing clusters");
 		final int totalProgress = configuration.iterations * (configuration.maxClusters - configuration.minClusters + 1);
 		int currentProgress = 0;
+		boolean continueCalculations = true;
+		final MainTableBuilder mainTableBuilder = new MainTableBuilder();
+		final SummaryTableBuilder summaryTableBuilder = new SummaryTableBuilder();
 		try {
 			progressMeter.start();
 			progressMeter.setTotalValue(totalProgress);
-			for (int numberOfClusters = configuration.minClusters; numberOfClusters <= configuration.maxClusters; numberOfClusters++) {
-				for (int iteration=0; iteration<configuration.iterations; iteration++) {
+			for (int numberOfClusters = configuration.minClusters; numberOfClusters <= configuration.maxClusters && continueCalculations; numberOfClusters++) {
+				for (int iteration=0; iteration<configuration.iterations && continueCalculations; iteration++) {
 					final List<Integer> clusterAssignment = groupsBuilder.calculateClusters(trees, cacheDistance);
 					final Collection<TreeVector> clusters = Utils.inverseClusterAssignments(clusterAssignment, trees);
 					final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(trees, clusters, cacheDistance);
 					
+					mainTableBuilder.add(parameters);
+					summaryTableBuilder.add(parameters);
 					
+					continueCalculations = !progressMeter.isAborted();
 					progressMeter.setCurrentValue(++currentProgress);
 				}
 			}
