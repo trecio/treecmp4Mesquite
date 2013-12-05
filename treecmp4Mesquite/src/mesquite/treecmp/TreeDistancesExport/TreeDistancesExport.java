@@ -1,12 +1,10 @@
 package mesquite.treecmp.TreeDistancesExport;
 
+
 import java.awt.FileDialog;
 
-import mesquite.lib.ColorTheme;
 import mesquite.lib.MesquiteFile;
-import mesquite.lib.MesquiteFileDialog;
 import mesquite.lib.MesquiteProject;
-import mesquite.lib.StringUtil;
 import mesquite.lib.Taxa;
 import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
@@ -26,12 +24,12 @@ public class TreeDistancesExport extends FileAssistantT {
 			return sorry("No trees has been chosen.");
 		}
 			
-		final DistanceBetween2Trees distance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
+		final DistanceBetween2Trees distance = (DistanceBetween2Trees) hireEmployee(DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
 		if (distance == null) {
 			return sorry("No tree distance measure has been chosen.");
 		}
 		
-		final MesquiteFile outputFile = chooseFile();
+		final MesquiteFile outputFile = Utils.chooseFile(containerOfModule(), "Export to CSV file", FileDialog.SAVE);
 		if (outputFile == null) {
 			return sorry("No output file was selected.");
 		}
@@ -68,21 +66,6 @@ public class TreeDistancesExport extends FileAssistantT {
 		return Utils.calculateDistanceMatrix(distance, trees, project);
 	}
 
-	private MesquiteFile chooseFile() {
-		final MesquiteFileDialog dialog = new MesquiteFileDialog(containerOfModule(), "Export to CSV file", FileDialog.SAVE);
-		dialog.setBackground(ColorTheme.getInterfaceBackground());
-		dialog.setVisible(true);
-		final String fileName = dialog.getFile();
-		String directoryName = dialog.getDirectory();
-		
-		if (StringUtil.blank(directoryName)) {
-			directoryName = "";
-		}
-		return StringUtil.blank(fileName)
-				? null
-				: MesquiteFile.newFile(directoryName, fileName);
-	}
-	
 	private void exportToFile(double[][] distanceMatrix, MesquiteFile outputFile) {
 		final String separator = "\t";
 		final StringBuilder lineBuilder = new StringBuilder();

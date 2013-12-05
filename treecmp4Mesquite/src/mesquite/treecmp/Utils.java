@@ -7,11 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mesquite.lib.ColorTheme;
 import mesquite.lib.EmployerEmployee;
+import mesquite.lib.MesquiteFile;
+import mesquite.lib.MesquiteFileDialog;
 import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteProject;
 import mesquite.lib.MesquiteString;
+import mesquite.lib.MesquiteWindow;
+import mesquite.lib.StringUtil;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
 import mesquite.lib.TreeVector;
@@ -128,5 +133,20 @@ public final class Utils {
 
 	public static String formatDouble(double value) {
 		return String.format(TreeClusteringParameters.DOUBLE_FORMAT, value);
+	}
+
+	public static MesquiteFile chooseFile(MesquiteWindow parentWindow, String title, int dialogType) {
+		final MesquiteFileDialog dialog = new MesquiteFileDialog(parentWindow, title, dialogType);
+		dialog.setBackground(ColorTheme.getInterfaceBackground());
+		dialog.setVisible(true);
+		final String fileName = dialog.getFile();
+		String directoryName = dialog.getDirectory();
+		
+		if (StringUtil.blank(directoryName)) {
+			directoryName = "";
+		}
+		return StringUtil.blank(fileName)
+				? null
+				: MesquiteFile.newFile(directoryName, fileName);
 	}
 }
