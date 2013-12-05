@@ -31,7 +31,7 @@ public class WhenCalculatingParametersForSingleClusterTest {
 		DistanceBetween2Trees distance = new MockTreeDistance()
 			.between(cluster1.getTree(0), cluster1.getTree(1), FURTHERST_DISTANCE_BETWEEN_TREES);
 		
-		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance, cluster1.getTaxa());
+		parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance);
 	}
 	
 	@Test public void itShouldReturnCorrectAverageDistanceBetweenTrees() {

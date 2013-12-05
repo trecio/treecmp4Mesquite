@@ -10,6 +10,8 @@ import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 import mesquite.lib.duties.FileAssistantA;
 import mesquite.lib.duties.TreeSourceDefinite;
+import mesquite.treecmp.ProgressIndicatorContext;
+import mesquite.treecmp.ProgressReporter;
 import mesquite.treecmp.Utils;
 import mesquite.treecmp.clustering.GroupsForTreeVector;
 import mesquite.treecmp.clustering.TreeClustering.CachedDistanceBetween2Trees;
@@ -32,15 +34,14 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		final DistanceBetween2Trees cacheDistance = new CachedDistanceBetween2Trees(distance);
 		final GroupsForTreeVector groupsBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		
-		final ProgressIndicator progressMeter = new ProgressIndicator(getProject(), "Analyzing clusters");
 		final int totalProgress = configuration.iterations * (configuration.maxClusters - configuration.minClusters + 1);
+		final ProgressReporter progressMeter = ProgressIndicatorContext.enterFor(getProject(), "Analyzing clusters", totalProgress);
 		int currentProgress = 0;
 		boolean continueCalculations = true;
 		final MainTableBuilder mainTableBuilder = new MainTableBuilder();
 		final SummaryTableBuilder summaryTableBuilder = new SummaryTableBuilder();
 		try {
 			progressMeter.start();
-			progressMeter.setTotalValue(totalProgress);
 			for (int numberOfClusters = configuration.minClusters; numberOfClusters <= configuration.maxClusters && continueCalculations; numberOfClusters++) {
 				for (int iteration=0; iteration<configuration.iterations && continueCalculations; iteration++) {
 					final List<Integer> clusterAssignment = groupsBuilder.calculateClusters(trees, cacheDistance);
@@ -55,7 +56,7 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 				}
 			}
 		} finally {
-			progressMeter.goAway();
+			ProgressIndicatorContext.exit();
 		}
 		return true;
 	}

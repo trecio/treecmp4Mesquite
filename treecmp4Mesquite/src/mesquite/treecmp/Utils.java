@@ -12,7 +12,6 @@ import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteProject;
 import mesquite.lib.MesquiteString;
-import mesquite.lib.ProgressIndicator;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
 import mesquite.lib.TreeVector;
@@ -34,7 +33,6 @@ public final class Utils {
 
 	public static double[][] calculateDistanceMatrix(DistanceBetween2Trees distance,
 			final Trees trees, MesquiteProject project) {
-		final ProgressIndicator progressMeter = new ProgressIndicator(project, "Calculating Tree Differences");
 
 		final int numberOfTrees = trees.size();
 		final int numberOfPairs = (numberOfTrees * numberOfTrees - numberOfTrees) / 2;
@@ -47,10 +45,9 @@ public final class Utils {
 			distances[i] = new double[numberOfTrees];
 		}
 		
-		try {
-		
+		final ProgressReporter progressMeter = ProgressIndicatorContext.enterFor(project, "Calculating Tree Differences", numberOfPairs);
+		try {		
 			progressMeter.start();
-			progressMeter.setTotalValue(numberOfPairs);
 			int totalPairsCalculated = 0;
 			for (int i=0; i<numberOfTrees; i++) {
 				final Tree tree1 = trees.getTree(i);
@@ -68,7 +65,7 @@ public final class Utils {
 				}
 			}
 		} finally {
-			progressMeter.goAway();
+			ProgressIndicatorContext.exit();
 		}
 		
 		return distances;
