@@ -29,11 +29,20 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		final Configuration configuration = new Configuration(10, 1, 10);
 		
 		final TreeSourceDefinite treeSource = (TreeSourceDefinite) hireEmployee(TreeSourceDefinite.class, "Choose the source trees:");
+		if (treeSource == null) {
+			return sorry("No trees has been chosen.");
+		}
 		final Taxa taxa = Utils.getOrChooseTaxa(this);
 		final Trees trees = Utils.getTrees(treeSource, taxa);
-		final DistanceBetween2Trees distance = (DistanceBetween2Trees) hireEmployee(DistanceBetween2Trees.class, "");
+		final DistanceBetween2Trees distance = (DistanceBetween2Trees) hireEmployee(DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
+		if (distance == null) {
+			return sorry("No tree distance measure has been chosen.");
+		}
 		final DistanceBetween2Trees cacheDistance = new CachedDistanceBetween2Trees(distance);
 		final GroupsForTreeVector groupsBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
+		if (groupsBuilder == null) {
+			return sorry("No tree clustering algorithm has been chosen.");
+		}
 		
 		final int totalProgress = configuration.iterations * (configuration.maxClusters - configuration.minClusters + 1);
 		final ProgressReporter progressMeter = ProgressIndicatorContext.enterFor(getProject(), "Analyzing clusters", totalProgress);
