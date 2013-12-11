@@ -68,6 +68,12 @@ public class ClusterParametersWindow extends MesquiteWindow {
 
 		public void run() {
 			currentTable = target;
+			if (currentTable != mainTableView) {
+				mainTableView.deselectAllNotify(true);
+			}
+			if (currentTable != summaryTableView) {
+				summaryTableView.deselectAllNotify(true);
+			}
 		}
 
 	}
