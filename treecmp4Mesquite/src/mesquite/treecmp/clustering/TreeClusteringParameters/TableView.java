@@ -191,4 +191,33 @@ public class TableView extends MesquiteTable {
 		final Row rowData = table.rows[row];
 		return rowData.name;
 	}
+
+	@Override
+	public void cellTouched(int column, int row, int regionInCellH,
+			int regionInCellV, int modifiers, int clickCount) {
+		super.cellTouched(column, row, regionInCellH, regionInCellV, modifiers,
+				clickCount);
+		tableTouchedEvent.fire();
+	}
+
+	@Override
+	public void columnTouched(boolean isArrowEquivalent, int column,
+			int regionInCellH, int regionInCellV, int modifiers) {
+		super.columnTouched(isArrowEquivalent, column, regionInCellH, regionInCellV,
+				modifiers);
+		tableTouchedEvent.fire();
+	}
+
+	@Override
+	public void rowTouched(boolean asArrow, int row, int regionInCellH,
+			int regionInCellV, int modifiers) {
+		super.rowTouched(asArrow, row, regionInCellH, regionInCellV, modifiers);
+		tableTouchedEvent.fire();
+	}
+	
+	public void onTableTouched(Runnable listener) {
+		tableTouchedEvent.subscribe(listener);
+	}
+	
+	private final Event tableTouchedEvent = new Event();
 }
