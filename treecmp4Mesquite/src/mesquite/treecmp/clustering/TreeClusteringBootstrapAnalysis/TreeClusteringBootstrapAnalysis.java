@@ -48,8 +48,8 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		final ProgressReporter progressMeter = ProgressIndicatorContext.enterFor(getProject(), "Analyzing clusters", totalProgress);
 		int currentProgress = 0;
 		boolean continueCalculations = true;
-		final MainTableBuilder mainTableBuilder = new MainTableBuilder();
-		final SummaryTableBuilder summaryTableBuilder = new SummaryTableBuilder();
+		final MainTableBuilder mainTableBuilder = new MainTableBuilder(false, true);
+		final SummaryTableBuilder summaryTableBuilder = new SummaryTableBuilder(true);
 		try {
 			progressMeter.start();
 			for (int numberOfClusters = configuration.minClusters; numberOfClusters <= configuration.maxClusters && continueCalculations; numberOfClusters++) {

@@ -13,9 +13,8 @@ public class Row {
 		this.explanation = "";
 	}
 	
-	public Row(String name, String value, String explanation) {
+	public Row(String name, String explanation) {
 		this.name = name;
-		values.put("", value);
 		this.explanation = explanation;
 	}
 
