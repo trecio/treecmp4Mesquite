@@ -7,8 +7,8 @@ import java.util.Map;
 
 import mesquite.consensus.lib.Bipartition;
 import mesquite.consensus.lib.BipartitionVector;
-import mesquite.lib.Bits;
 import mesquite.lib.Tree;
+import mesquite.treecmp.Utils;
 
 public class Bipartitions {
 	private Map<BitSet, Double> bipartitions;
@@ -20,7 +20,7 @@ public class Bipartitions {
 		bipartitions = new HashMap<BitSet, Double>(2*numberOfBipartitions);
 		for (int i=0; i<numberOfBipartitions; i++) {
 			final Bipartition bipartition = bipartitionVector.getBipart(i);
-			final BitSet bitSet = convertToBitSet(bipartition.getBits());
+			final BitSet bitSet = Utils.convertToBitSet(bipartition.getBits());
 			bipartitions.put(bitSet, 1.);
 		}
 	}
@@ -31,13 +31,5 @@ public class Bipartitions {
 
 	public Map<BitSet, Double> asMap() {
 		return Collections.unmodifiableMap(bipartitions);
-	}
-	
-	private BitSet convertToBitSet(Bits bits) {
-		final BitSet bitSet = new BitSet(bits.getSize());
-		for (int i = bits.firstBitOn(); i>=0; i = bits.nextBit(i+1, true)) {
-			bitSet.set(i, true);
-		}		
-		return bitSet;
 	}
 }

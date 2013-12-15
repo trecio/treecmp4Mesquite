@@ -2,11 +2,13 @@ package mesquite.treecmp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mesquite.lib.Bits;
 import mesquite.lib.ColorTheme;
 import mesquite.lib.EmployerEmployee;
 import mesquite.lib.MesquiteFile;
@@ -15,6 +17,7 @@ import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteNumber;
 import mesquite.lib.MesquiteProject;
 import mesquite.lib.MesquiteString;
+import mesquite.lib.MesquiteTree;
 import mesquite.lib.MesquiteWindow;
 import mesquite.lib.StringUtil;
 import mesquite.lib.Taxa;
@@ -148,5 +151,21 @@ public final class Utils {
 		return StringUtil.blank(fileName)
 				? null
 				: MesquiteFile.newFile(directoryName, fileName);
+	}
+
+	public static BitSet convertToBitSet(Bits bits) {
+		final BitSet bitSet = new BitSet(bits.getSize());
+		for (int i = bits.firstBitOn(); i>=0; i = bits.nextBit(i+1, true)) {
+			bitSet.set(i, true);
+		}		
+		return bitSet;
+	}
+
+	public static MesquiteTree setUnassignedBranchLengthsToOne(
+			Tree tree) {
+		final double DEFAULT_BRANCH_LENGTH = 1.0;
+		final MesquiteTree clonedTree = tree.cloneTree();
+		clonedTree.setAllUnassignedBranchLengths(DEFAULT_BRANCH_LENGTH, false);		
+		return clonedTree;
 	}
 }

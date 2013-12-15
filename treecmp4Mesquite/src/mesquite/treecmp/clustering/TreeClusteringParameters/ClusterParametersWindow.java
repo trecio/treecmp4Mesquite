@@ -1,13 +1,10 @@
 package mesquite.treecmp.clustering.TreeClusteringParameters;
 
-import java.awt.Dimension;
-
 import mesquite.lib.MesquiteCommand;
 import mesquite.lib.MesquiteModule;
 import mesquite.lib.MesquiteTool;
 import mesquite.lib.MesquiteWindow;
 import mesquite.lib.MousePanel;
-import mesquite.lib.table.MesquiteTable;
 import mesquite.lib.table.TableTool;
 import mesquite.treecmp.clustering.AwtUtils;
 

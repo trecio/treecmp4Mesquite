@@ -5,6 +5,7 @@ import java.io.IOException;
 import mesquite.lib.MesquiteTree;
 import mesquite.lib.Taxa;
 import mesquite.lib.Tree;
+import mesquite.treecmp.Utils;
 
 public class TreeConverter {
 	private interface ITreeCreator<TreeType> {
@@ -56,12 +57,8 @@ public class TreeConverter {
 	}
 	
 	public static String getStringFrom(mesquite.lib.Tree tree, boolean requiresBranchLengths) {
-		final double DEFAULT_BRANCH_LENGTH = 1.0;
-		
 		if (requiresBranchLengths) {
-			final MesquiteTree clonedTree = tree.cloneTree();
-			clonedTree.setAllUnassignedBranchLengths(DEFAULT_BRANCH_LENGTH, false);
-			tree = clonedTree;
+			tree = Utils.setUnassignedBranchLengthsToOne(tree);
 		}
 		return tree.writeTreeSimpleByNames();
 	}
