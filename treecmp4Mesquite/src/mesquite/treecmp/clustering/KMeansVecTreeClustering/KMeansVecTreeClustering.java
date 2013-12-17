@@ -13,7 +13,6 @@ import mesquite.treecmp.clustering.IterativeClustering;
 import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 
 public class KMeansVecTreeClustering extends GroupsForTreeVector implements IterativeClustering {
-	private int numberOfClusters;
 	private int numberOfIterations;
 
 	public void configure(int numberOfClusters, int numberOfIterations) {

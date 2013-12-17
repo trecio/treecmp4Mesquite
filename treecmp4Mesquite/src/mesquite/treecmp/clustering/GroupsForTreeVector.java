@@ -7,9 +7,15 @@ import mesquite.lib.Trees;
 import mesquite.lib.duties.DistanceBetween2Trees;
 
 public abstract class GroupsForTreeVector extends MesquiteModule {
+	protected int numberOfClusters;
+	
 	@Override
 	public Class<?> getDutyClass() {
 		return GroupsForTreeVector.class;
+	}
+	
+	public void setNumberOfClusters(int numberOfClusters) {
+		this.numberOfClusters = numberOfClusters;
 	}
 
 	public abstract List<Integer> calculateClusters(Trees trees,

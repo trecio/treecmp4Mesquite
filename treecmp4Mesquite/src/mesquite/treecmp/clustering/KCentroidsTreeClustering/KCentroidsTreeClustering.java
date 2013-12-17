@@ -14,7 +14,6 @@ import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 
 public class KCentroidsTreeClustering extends GroupsForTreeVector implements IterativeClustering  {
 
-	private int numberOfClusters;
 	private int numberOfIterations;
 
 	@Override

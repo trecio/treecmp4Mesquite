@@ -17,7 +17,8 @@ import mesquite.treecmp.clustering.TreeClustering.CachedDistanceBetween2Trees;
 import mesquite.treecmp.clustering.TreeClusteringParameters.ClusterParametersWindow;
 import mesquite.treecmp.clustering.TreeClusteringParameters.ClustersParameters;
 import mesquite.treecmp.clustering.TreeClusteringParameters.MainTableBuilder;
-import mesquite.treecmp.clustering.TreeClusteringParameters.SummaryTableBuilder;
+import mesquite.treecmp.clustering.TreeClusteringParameters.SummaryHorizontalTableBuilder;
+import mesquite.treecmp.clustering.TreeClusteringParameters.SummaryVerticalTableBuilder;
 import mesquite.treecmp.clustering.TreeClusteringParameters.Table;
 import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParametersCalculator;
 
@@ -48,11 +49,12 @@ public class TreeClusteringBootstrapAnalysis extends FileAssistantA {
 		final ProgressReporter progressMeter = ProgressIndicatorContext.enterFor(getProject(), "Analyzing clusters", totalProgress);
 		int currentProgress = 0;
 		boolean continueCalculations = true;
-		final MainTableBuilder mainTableBuilder = new MainTableBuilder(false, true);
-		final SummaryTableBuilder summaryTableBuilder = new SummaryTableBuilder(true);
+		final MainTableBuilder mainTableBuilder = new MainTableBuilder(false, true, false, false);
+		final SummaryVerticalTableBuilder summaryTableBuilder = new SummaryVerticalTableBuilder();
 		try {
 			progressMeter.start();
 			for (int numberOfClusters = configuration.minClusters; numberOfClusters <= configuration.maxClusters && continueCalculations; numberOfClusters++) {
+				groupsBuilder.setNumberOfClusters(numberOfClusters);
 				for (int iteration=0; iteration<configuration.iterations && continueCalculations; iteration++) {
 					final List<Integer> clusterAssignment = groupsBuilder.calculateClusters(trees, cacheDistance);
 					final Collection<TreeVector> clusters = Utils.inverseClusterAssignments(clusterAssignment, trees);

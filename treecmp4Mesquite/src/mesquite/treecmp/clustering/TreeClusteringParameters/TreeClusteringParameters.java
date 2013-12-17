@@ -21,7 +21,7 @@ public final class TreeClusteringParameters extends MesquiteModule {
 		final ClustersParameters parameters = TreeClusteringParametersCalculator.getParameters(allTrees, clusters, distance);
 		
 		final Table mainTable = new MainTableBuilder().add(parameters).getTable();
-		final Table summaryTable = new SummaryTableBuilder().add(parameters).getTable();		
+		final Table summaryTable = new SummaryHorizontalTableBuilder().add(parameters).getTable();		
 
 		final ClusterParametersWindow window = new ClusterParametersWindow(this, mainTable, summaryTable);		
 		window.show();	

@@ -16,7 +16,6 @@ import mesquite.treecmp.clustering.IterativeClusteringAlgorithm;
 public class KMeansAvgDistanceTreeClustering extends GroupsForTreeVector implements IterativeClustering {
 
 	private int numberOfIterations;
-	private int numberOfClusters;
 
 	@Override
 	public List<Integer> calculateClusters(Trees trees,

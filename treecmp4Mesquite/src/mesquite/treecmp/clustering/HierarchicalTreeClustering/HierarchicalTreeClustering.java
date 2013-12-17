@@ -21,7 +21,6 @@ import org.pr.clustering.hierarchical.LinkageCriterion;
 
 public class HierarchicalTreeClustering extends GroupsForTreeVector implements AgglomerativeClustering {
 	private LinkageCriterion linkageCriterion;
-	private int numberOfClusters;
 
 	@Override
 	public List<Integer> calculateClusters(Trees trees,
