@@ -18,11 +18,11 @@ public class Row {
 		this.explanation = explanation;
 	}
 
-	public String get(String column) {
-		return values.get(column);
+	public String get(Column column) {
+		return values.get(column.field);
 	}
 	
-	public void set(String column, String value) {
-		values.put(column, value);
+	public void set(Column column, String value) {
+		values.put(column.field, value);
 	}
 }

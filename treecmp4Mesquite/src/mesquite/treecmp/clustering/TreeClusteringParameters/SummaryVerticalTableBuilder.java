@@ -12,12 +12,12 @@ public class SummaryVerticalTableBuilder {
 
 	public void add(ClustersParameters parameters) {
 		final Row row = new Row("");
-		row.set(SummaryTableColumns.separation.field, Utils.formatDouble(parameters.separation));
-		row.set(SummaryTableColumns.avgDistanceBetween.field, Utils.formatDouble(parameters.avgDistanceBetween));
-		row.set(SummaryTableColumns.klDistance.field, Utils.formatDouble(parameters.informationLoss.KL));
-		row.set(SummaryTableColumns.l1Norm.field, Utils.formatDouble(parameters.informationLoss.L1));
-		row.set(SummaryTableColumns.l2Norm.field, Utils.formatDouble(parameters.informationLoss.L2));
-		row.set(SummaryTableColumns.lInfNorm.field, Utils.formatDouble(parameters.informationLoss.Linf));
+		row.set(SummaryTableColumns.separation, Utils.formatDouble(parameters.separation));
+		row.set(SummaryTableColumns.avgDistanceBetween, Utils.formatDouble(parameters.avgDistanceBetween));
+		row.set(SummaryTableColumns.klDistance, Utils.formatDouble(parameters.informationLoss.KL));
+		row.set(SummaryTableColumns.l1Norm, Utils.formatDouble(parameters.informationLoss.L1));
+		row.set(SummaryTableColumns.l2Norm, Utils.formatDouble(parameters.informationLoss.L2));
+		row.set(SummaryTableColumns.lInfNorm, Utils.formatDouble(parameters.informationLoss.Linf));
 		
 		rows.add(row);
 	}

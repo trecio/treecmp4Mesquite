@@ -67,15 +67,15 @@ public class MainTableBuilder {
 			}
 		}
 		
-		if (showExtremeValuesRow) {		
+		if (showExtremeValuesRow) {
 			final Row minValuesRow = new Row("Minimum: ");
-			minValuesRow.set(densityColumn.field, Utils.formatDouble(minDensity));
-			minValuesRow.set(specificityColumn.field, Utils.formatDouble(minSpecificity));
+			minValuesRow.set(densityColumn, Utils.formatDouble(minDensity));
+			minValuesRow.set(specificityColumn, Utils.formatDouble(minSpecificity));
 			rows.add(minValuesRow);
 			
 			final Row maxValuesRow = new Row("Maximum: ");
-			maxValuesRow.set(averageDistanceColumn.field, Utils.formatDouble(maxAvgDistance));
-			maxValuesRow.set(diameterColumn.field, Utils.formatDouble(maxDiameter));
+			maxValuesRow.set(averageDistanceColumn, Utils.formatDouble(maxAvgDistance));
+			maxValuesRow.set(diameterColumn, Utils.formatDouble(maxDiameter));
 			rows.add(maxValuesRow);
 		}
 		
@@ -102,11 +102,11 @@ public class MainTableBuilder {
 
 	private Row createRow(String name, final ClusterParameters clusterParameters) {
 		final Row row = new Row(name);
-		row.set(averageDistanceColumn.field, Utils.formatDouble(clusterParameters.avgDistance));
-		row.set(densityColumn.field, Utils.formatDouble(clusterParameters.density));
-		row.set(diameterColumn.field, Utils.formatDouble(clusterParameters.diameter));
-		row.set(sizeColumn.field, Integer.toString(clusterParameters.size));
-		row.set(specificityColumn.field, Utils.formatDouble(clusterParameters.specificity));
+		row.set(averageDistanceColumn, Utils.formatDouble(clusterParameters.avgDistance));
+		row.set(densityColumn, Utils.formatDouble(clusterParameters.density));
+		row.set(diameterColumn, Utils.formatDouble(clusterParameters.diameter));
+		row.set(sizeColumn, Integer.toString(clusterParameters.size));
+		row.set(specificityColumn, Utils.formatDouble(clusterParameters.specificity));
 		return row;
 	}
 }

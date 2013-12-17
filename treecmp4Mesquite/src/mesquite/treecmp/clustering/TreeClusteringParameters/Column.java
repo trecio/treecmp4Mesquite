@@ -16,6 +16,6 @@ public class Column {
 	}
 
 	public String getString(Row row) {		
-		return row.get(field); 
+		return row.get(this); 
 	}
 }

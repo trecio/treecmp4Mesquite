@@ -25,7 +25,7 @@ public class SummaryHorizontalTableBuilder {
 	private Row createRow(Column field, double value) {
 		final Row row = new Row(field.title, field.explanation);
 		final String valueCaption = Utils.formatDouble(value);
-		row.set(summaryColumn.field, valueCaption);
+		row.set(summaryColumn, valueCaption);
 		return row;
 	}
 
