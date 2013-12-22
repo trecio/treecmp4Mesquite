@@ -41,7 +41,7 @@ public class TreeDistancesExport extends FileAssistantT {
 			if (distanceMatrix == null) {
 				return false;
 			}
-			exportToFile(distanceMatrix, outputFile);
+			Utils.exportToFile(distanceMatrix, outputFile);
 		} finally {
 			outputFile.closeWriting();
 		}
@@ -64,20 +64,5 @@ public class TreeDistancesExport extends FileAssistantT {
 		final Trees trees = Utils.getTrees(treeSource, taxa);
 
 		return Utils.calculateDistanceMatrix(distance, trees, project);
-	}
-
-	private void exportToFile(double[][] distanceMatrix, MesquiteFile outputFile) {
-		final String separator = "\t";
-		final StringBuilder lineBuilder = new StringBuilder();
-		for (int i=0; i<distanceMatrix.length; i++) {
-			lineBuilder.append(distanceMatrix[i][0]);
-			for (int j=1; j<distanceMatrix[i].length; j++) {
-				lineBuilder
-					.append(separator)
-					.append(distanceMatrix[i][j]);
-			}
-			outputFile.writeLine(lineBuilder.toString());
-			lineBuilder.setLength(0);
-		}
 	}
 }

@@ -27,11 +27,11 @@ public final class TreeClustering extends MesquiteModule {
 	private final Map<Tree, Integer> clusterAssignment = new HashMap<Tree, Integer>();
 	private final MesquiteCommand createSelectionsFromClusters = new MesquiteCommand("createSelectionsFromClusters", this);
 	private final MesquiteCommand showClusterMetrics = new MesquiteCommand("showClusterMetrics", this);
-	private DistanceBetween2Trees distance;
+	private PrecomputedDistanceBetween2Trees distance;
 	private Taxa taxa;
 	private List<TreeVector> clusters;
 	private TreeSourceDefinite treeSource;
-	private Trees trees;
+	private TreeVector trees;
 
 	@Override
 	public boolean canHireMoreThanOnce() {
@@ -65,17 +65,18 @@ public final class TreeClustering extends MesquiteModule {
 			return sorry("No trees has been chosen.");
 		}
 
-		final DistanceBetween2Trees hiredDistance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
-		if (hiredDistance == null) {
-			return sorry("No tree distance measure has been chosen.");
-		}
-		distance = new CachedDistanceBetween2Trees(hiredDistance);
-
-		taxa = Utils.getOrChooseTaxa(this);		
 		final GroupsForTreeVector groupBuilder = (GroupsForTreeVector) hireEmployee(GroupsForTreeVector.class, "Choose clustering algorithm.");
 		
 		if (groupBuilder != null) {
+			final DistanceBetween2Trees hiredDistance = Utils.findColleagueOrHireNew(this, DistanceBetween2Trees.class, "Choose the tree distance measure you want to use:");
+			if (hiredDistance == null) {
+				return sorry("No tree distance measure has been chosen.");
+			}
+			taxa = Utils.getOrChooseTaxa(this);		
 			trees = Utils.getTrees(treeSource, taxa);
+			distance = new PrecomputedDistanceBetween2Trees();
+			distance.prepare(getProject(), hiredDistance, trees);
+
 			calculateClusters(groupBuilder, distance);
 			initializeMenu();
 			return true;

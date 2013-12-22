@@ -31,7 +31,7 @@ import mesquite.treecmp.clustering.TreeClusteringParameters.TreeClusteringParame
 public final class Utils {
 	private Utils() {}
 
-	public static Trees getTrees(TreeSourceDefinite treeSource, Taxa taxa) {
+	public static TreeVector getTrees(TreeSourceDefinite treeSource, Taxa taxa) {
 		final TreeVector trees = new TreeVector(taxa);
 		for (int i=0; i<treeSource.getNumberOfTrees(taxa); i++) {
 			trees.addElement(treeSource.getTree(taxa, i), false);
@@ -167,5 +167,20 @@ public final class Utils {
 		final MesquiteTree clonedTree = tree.cloneTree();
 		clonedTree.setAllUnassignedBranchLengths(DEFAULT_BRANCH_LENGTH, false);		
 		return clonedTree;
+	}
+
+	public static void exportToFile(double[][] distanceMatrix, MesquiteFile outputFile) {
+		final String separator = "\t";
+		final StringBuilder lineBuilder = new StringBuilder();
+		for (int i=0; i<distanceMatrix.length; i++) {
+			lineBuilder.append(distanceMatrix[i][0]);
+			for (int j=1; j<distanceMatrix[i].length; j++) {
+				lineBuilder
+					.append(separator)
+					.append(distanceMatrix[i][j]);
+			}
+			outputFile.writeLine(lineBuilder.toString());
+			lineBuilder.setLength(0);
+		}
 	}
 }
