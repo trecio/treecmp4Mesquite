@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import mesquite.consensus.StrictConsensusTree.StrictConsensusTree;
 import mesquite.consensus.lib.Bipartition;
@@ -124,7 +125,7 @@ public final class TreeClusteringParametersCalculator {
 					final Tree newIntersectionTree = getConsensusTreeIntersection(intersectionTree, consensusTrees.getTree(i), consensusTrees.getTaxa());
 					if (newIntersectionTree != null) {
 						final BitSet treesInNewIntersection = (BitSet) treesInIntersection.clone();
-						treesInIntersection.set(i);
+						treesInNewIntersection.set(i);
 						newIntersections.put(treesInNewIntersection, newIntersectionTree);
 						
 						boundingBallsUnionSize += sign * getBoundingBallSize(newIntersectionTree);
@@ -169,20 +170,7 @@ public final class TreeClusteringParametersCalculator {
 	}
 
 	private static double getDensity(Trees cluster, Tree strictConsensusTree) {
-		final List<Tree> uniqueTopologies = new ArrayList<Tree>();
-		for (int i=0; i<cluster.size(); i++) {
-			final Tree tree = cluster.getTree(i);
-			boolean otherTreeHasEqualTopology = false;
-			for (final Tree otherTree : uniqueTopologies) {
-				if (tree.equalsTopology(otherTree, false)) {
-					otherTreeHasEqualTopology = true;
-					break;
-				}
-			}
-			if (!otherTreeHasEqualTopology) {
-				uniqueTopologies.add(tree);
-			}
-		}
+		final Collection<Integer> uniqueTopologies = getTreeDistribution(cluster);
 		
 		final double boundingBallSize = getBoundingBallSize(strictConsensusTree);
 		return uniqueTopologies.size() / boundingBallSize;
@@ -205,28 +193,112 @@ public final class TreeClusteringParametersCalculator {
 
 	private static InformationLoss getInformationLoss(
 			Trees allTrees, Collection<TreeVector> clusters, TreeVector consensusTrees) {
-		final int numberOfTreesOutsideClusters = getNumberOfTreesOutsideClusters(allTrees, clusters);
-		final int numberOfTrees = allTrees.size();
-		final int numberOfTreesWithinClusters = numberOfTrees - numberOfTreesOutsideClusters;
-		final double boundingBallUnionSize = getBoundingBallsUnionSize(consensusTrees);
-		final double numberOfAdditionalTreesInBoundingBall = boundingBallUnionSize - numberOfTreesWithinClusters;
+		final TreeVector treesOutsideBoundingBalls = getTreesNotMatchingTo(allTrees, consensusTrees);
+		final Collection<Integer> treesOutsideBoundingBallsDistribution = getTreeDistribution(treesOutsideBoundingBalls);
+		final int numberOfTreeTopologiesOutsideBoundingBalls = treesOutsideBoundingBallsDistribution.size();
 		
-		final double f = 1./numberOfTrees;
+		final TreeVector treesInsideBoundingBalls = except(allTrees, treesOutsideBoundingBalls);
+		final Collection<Integer> treeDistribution = getTreeDistribution(treesInsideBoundingBalls);
+		final int numberOfTreeTopologiesInsideBoundingBalls = treeDistribution.size();
+		
+		final double boundingBallUnionSize = getBoundingBallsUnionSize(consensusTrees);
+		final double numberOfAdditionalTreesInBoundingBall = boundingBallUnionSize - numberOfTreeTopologiesInsideBoundingBalls;
+		
 		final double g = 1./boundingBallUnionSize;
 		
-		final double Linf = Linf(f, 0, numberOfTreesOutsideClusters, 
-				f, g, numberOfTreesWithinClusters, 
-				0, g, numberOfAdditionalTreesInBoundingBall);
-		final double L1 = L1(f, 0, numberOfTreesOutsideClusters, 
-				f, g, numberOfTreesWithinClusters, 
-				0, g, numberOfAdditionalTreesInBoundingBall);
-		final double L2 = L2(f, 0, numberOfTreesOutsideClusters, 
-				f, g, numberOfTreesWithinClusters, 
-				0, g, numberOfAdditionalTreesInBoundingBall);
-		final double KL = KL(f, 0, numberOfTreesOutsideClusters, 
-				f, g, numberOfTreesWithinClusters, 
-				0, g, numberOfAdditionalTreesInBoundingBall);
+		final int numberOfDescriptionItems = numberOfTreeTopologiesOutsideBoundingBalls + numberOfTreeTopologiesInsideBoundingBalls +1;		
+		final double[] fValues = new double[numberOfDescriptionItems];
+		final double[] gValues  = new double[numberOfDescriptionItems];
+		final double[] counts = new double[numberOfDescriptionItems];
+		final double numberOfAllTrees = allTrees.size();
+		//trees in set but outside bounding balls
+		int i=0;
+		for (final Integer numberOfDuplicates : treesOutsideBoundingBallsDistribution) {
+			fValues[i] = numberOfDuplicates / numberOfAllTrees;
+			gValues[i] = 0;
+			counts[i] = 1;
+			i+=1;
+		}
+		//trees in both set and bounding balls
+		for (final Integer numberOfDuplicates : treeDistribution) {
+			fValues[i] = numberOfDuplicates / numberOfAllTrees;
+			gValues[i] = g;
+			counts[i] = 1;
+			i+=1;
+		}
+		//trees not in set but in bounding balls
+		fValues[i] = 0;
+		gValues[i] = g;
+		counts[i] = numberOfAdditionalTreesInBoundingBall;
+		
+		final double Linf = Linf(fValues, gValues, counts);
+		final double L1 = L1(fValues, gValues, counts);
+		final double L2 = L2(fValues, gValues, counts);
+		final double KL = KL(fValues, gValues, counts);
 		return new InformationLoss(Linf, L1, L2, KL);
+	}
+
+	private static TreeVector getTreesNotMatchingTo(Trees trees,
+			TreeVector consensusTrees) {
+		final int numberOfTrees = trees.size();
+		final int numberOfConsensusTrees = consensusTrees.getNumberOfTrees();
+
+		final Taxa taxa = trees.getTaxa();
+		final TreeVector notMatching = new TreeVector(taxa);
+		
+		for (int i=0; i<numberOfTrees; i++) {
+			final Tree tree = trees.getTree(i);
+			boolean foundCompatibleConsensusTree = false;
+			for (int j=0; j<numberOfConsensusTrees && !foundCompatibleConsensusTree; j++) {
+				final Tree consensusTree = consensusTrees.getTree(j);
+				final Tree intersection = getConsensusTreeIntersection(tree, consensusTree, taxa);
+				if (intersection != null) {
+					foundCompatibleConsensusTree = true;
+				}
+			}
+			if (!foundCompatibleConsensusTree) {
+				notMatching.addElement(tree, false);
+			}
+		}
+		
+		return notMatching;
+	}
+
+	private static TreeVector except(Trees set,
+			TreeVector excluded) {
+		final Set<Tree> excludedSet = new HashSet<Tree>();
+		for (int i=0; i<excluded.size(); i++) {
+			final Tree excludedTree = excluded.getTree(i);
+			excludedSet.add(excludedTree);
+		}
+		final TreeVector result = new TreeVector(set.getTaxa());
+		for (int i=0; i<set.size(); i++) {
+			final Tree tree = set.getTree(i);
+			if (!excludedSet.contains(tree)) {
+				result.addElement(tree, false);
+			}
+		}
+		return result;
+	}
+
+	private static Collection<Integer> getTreeDistribution(Trees allTrees) {
+		final Map<Tree, Integer> uniqueTopologyTreeCounts = new IdentityHashMap<Tree, Integer>();
+		final int numberOfTrees = allTrees.size();
+		for (int i=0; i<numberOfTrees; i++) {
+			final Tree tree = allTrees.getTree(i);
+			boolean foundMatch = false;
+			for (final Map.Entry<Tree, Integer> treeTopology : uniqueTopologyTreeCounts.entrySet()) {
+				if (tree.equalsTopology(treeTopology.getKey(), false)) {
+					uniqueTopologyTreeCounts.put(treeTopology.getKey(), treeTopology.getValue()+1);
+					foundMatch = true;
+					break;
+				}
+			}
+			if (!foundMatch) {
+				uniqueTopologyTreeCounts.put(tree, 1);
+			}
+		}
+		return uniqueTopologyTreeCounts.values();
 	}
 
 	private static double getMinDistanceBetweenClusters(
@@ -248,78 +320,50 @@ public final class TreeClusteringParametersCalculator {
 		return minDistanceBetween;
 	}
 
-	private static int getNumberOfTreesOutsideClusters(Trees allTrees,
-			Collection<TreeVector> clusters) {
-		final HashSet<Tree> allClusteredTrees = new HashSet<Tree>();
-		for (final TreeVector cluster : clusters) {
-			for (int i=0; i<cluster.size(); i++) {
-				allClusteredTrees.add(cluster.getTree(i));
-			}
-		}
-		
-		int numberOfTreesOutsideClusters = 0;
-		for (int i=0; i<allTrees.size(); i++) {
-			if (!allClusteredTrees.contains(allTrees.getTree(i))) {
-				numberOfTreesOutsideClusters++;
-			}
-		}
-		return numberOfTreesOutsideClusters;
-	}
-
 	private static double getSpecificity(Tree strictConsensusTree) {
 		int rootNode = strictConsensusTree.getRoot();
 		return (strictConsensusTree.numberOfInternalsInClade(rootNode) - 1.)
 				/ (strictConsensusTree.numberOfTerminalsInClade(rootNode) - 3);
 	}
 	
-	private static double KL(double... valuesAndCounts) {
+	private static double KL(double[] left, double[] right, double[] counts) {
 		double result = 0;
-		for (int i=0; i<valuesAndCounts.length; i+=3) {
-			final double val1 = valuesAndCounts[i];
-			final double val2 = valuesAndCounts[i+1];
-			final double count = valuesAndCounts[i+2];
+		for (int i=0; i<left.length; i++) {
+			final double val1 = left[i];
+			final double val2 = right[i];
 			
 			if (val1 > 0 && val2 > 0) {
-				result += val1 * Math.log(val1 / val2) * count;
+				result += val1 * Math.log(val1 / val2) * counts[i];
 			}
 		}
 		return result;
 	}
 	
-	private static double Linf(double... valuesAndCounts) {
-		double result = Double.MIN_VALUE;
-		for (int i=0; i<valuesAndCounts.length; i+=3) {
-			final double val1 = valuesAndCounts[i];
-			final double val2 = valuesAndCounts[i+1];
-			final double count = valuesAndCounts[i+2];
-			if (count >= 0.5) {
-				result = Math.max(result, Math.abs(val1-val2));
+	private static double Linf(double[] left, double[] right, double[] counts) {
+		double result = 0;
+		for (int i=0; i<left.length; i++) {
+			if (counts[i] >= 0.5) {
+				result = Math.max(result, Math.abs(left[i]-right[i]));
 			}
 		}
 		return result;
 	}
 	
-	private static double L1(double... valuesAndCounts) {
+	private static double L1(double[] left, double[] right, double[] counts) {
 		double result = 0;
-		for (int i=0; i<valuesAndCounts.length; i+=3) {
-			final double val1 = valuesAndCounts[i];
-			final double val2 = valuesAndCounts[i+1];
-			final double count = valuesAndCounts[i+2];
+		for (int i=0; i<left.length; i++) {
 			
-			result += Math.abs(val1-val2) * count;
+			result += Math.abs(left[i]-right[i]) * counts[i];
 		}
 		return result;
 	}
 	
-	private static double L2(double... valuesAndCounts) {
+	private static double L2(double[] left, double[] right, double[] counts) {
 		double result = 0;
-		for (int i=0; i<valuesAndCounts.length; i+=3) {
-			final double val1 = valuesAndCounts[i];
-			final double val2 = valuesAndCounts[i+1];
-			final double count = valuesAndCounts[i+2];
-			final double difference = Math.abs(val1-val2);
+		for (int i=0; i<left.length; i++) {
+			final double difference = Math.abs(left[i]-right[i]);
 			
-			result += difference * difference * count;
+			result += difference * difference * counts[i];
 		}
 		return Math.sqrt(result);
 	}
