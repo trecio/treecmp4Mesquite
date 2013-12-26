@@ -10,7 +10,7 @@ public class TablePrinter {
 		for (int i=0; i<table.rows.length; i++) {
 			final Row row = table.rows[i];
 			lineBuilder.append(row.name);
-			for (int j=1; j<table.columns.size(); j++) {
+			for (int j=0; j<table.columns.size(); j++) {
 				lineBuilder
 					.append(separator)
 					.append(row.get(table.columns.get(j)));
