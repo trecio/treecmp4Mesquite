@@ -193,7 +193,11 @@ public final class TreeClusteringParametersCalculator {
 
 	private static InformationLoss getInformationLoss(
 			Trees allTrees, Collection<TreeVector> clusters, TreeVector consensusTrees) {
-		final TreeVector treesOutsideBoundingBalls = getTreesNotMatchingTo(allTrees, consensusTrees);
+		Trees treesOutsideClusters = allTrees;
+		for (final TreeVector cluster : clusters) {
+			treesOutsideClusters = except(treesOutsideClusters, cluster);
+		}
+		final TreeVector treesOutsideBoundingBalls = getTreesNotMatchingTo(treesOutsideClusters, consensusTrees);
 		final Collection<Integer> treesOutsideBoundingBallsDistribution = getTreeDistribution(treesOutsideBoundingBalls);
 		final int numberOfTreeTopologiesOutsideBoundingBalls = treesOutsideBoundingBallsDistribution.size();
 		
