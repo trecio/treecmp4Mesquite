@@ -62,7 +62,7 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector implements A
 		
 		double maxDistance = root.distanceBetweenLeftAndRightClusters;
 		
-		while (resultClusters.size() < numberOfClusters || numberOfClusters == -1) {
+		while ((resultClusters.size() < numberOfClusters || numberOfClusters == -1) && !queue.isEmpty()) {
 			Cluster widest = queue.poll();
 			Cluster left = widest.left;
 			Cluster right = widest.right;
@@ -70,12 +70,14 @@ public class HierarchicalTreeClustering extends GroupsForTreeVector implements A
 			if (numberOfClusters == -1 && 2*widest.distanceBetweenLeftAndRightClusters < maxDistance)
 				break;
 			
-			queue.add(left);
-			queue.add(right);
-			
-			resultClusters.remove(widest);
-			resultClusters.add(left);
-			resultClusters.add(right);
+			if (left != null && right != null) {	//make sure it is not a leaf
+				queue.add(left);
+				queue.add(right);
+				
+				resultClusters.remove(widest);
+				resultClusters.add(left);
+				resultClusters.add(right);
+			}
 		}
 		
 		Collection<Collection<Integer>> result = new ArrayList<Collection<Integer>>(resultClusters.size());
