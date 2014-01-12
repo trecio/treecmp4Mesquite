@@ -67,6 +67,11 @@ public class IterativeClusteringAlgorithm<TreeType> {
 			if (distanceToClosest > error)
 				error = distanceToClosest;
 		}
+		for (int i=associations.size()-1; i>=0; i-=1) {
+			if (associations.get(i).isEmpty()) {
+				associations.remove(i);
+			}
+		}
 		return error;
 	}
 
