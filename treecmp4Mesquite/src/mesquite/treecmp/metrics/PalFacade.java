@@ -132,7 +132,7 @@ public class PalFacade {
 				return (Double)getDistanceMethod.invoke(metricObject, t1.treeObj, t2.treeObj);
 			} catch (Exception e) {
 				//this should not happen
-				throw new RuntimeException(e);
+				throw new RuntimeException("There was a problem when computing distance between trees: " + t1.toString() + " " + t2.toString(), e);
 			}			 
 		}
 		
