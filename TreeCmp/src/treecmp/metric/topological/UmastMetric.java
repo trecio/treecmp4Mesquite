@@ -18,12 +18,17 @@
  */
 package treecmp.metric.topological;
 
+import pal.tree.SimpleTree;
 import pal.tree.Tree;
 import treecmp.metric.BaseMetric;
 import treecmp.metric.Metric;
 
-//TODO to be implemented!!!
-public class UmastMetric extends BaseMetric implements Metric {
+/**
+ * UMAST metric.
+ * Implementation of Procedure 1
+ * Farach, Martin and Thorup, Mikkel; Fast comparison of evolutionary trees.
+ */
+public class UMASTMetric extends BaseMetric implements Metric {
 
     @Override
     public boolean isRooted() {
@@ -32,6 +37,19 @@ public class UmastMetric extends BaseMetric implements Metric {
 
     @Override
     public double getDistance(Tree t1, Tree t2) {
-        throw new UnsupportedOperationException("This metric has not been implemented yet!");
+    	RMASTMetric rmast = new RMASTMetric();
+    	final SimpleTree tree1 = new SimpleTree(t1);
+    	final SimpleTree tree2 = new SimpleTree(t2);
+    	
+    	double umast = Double.MAX_VALUE;
+    	for (int i=0; i<tree1.getInternalNodeCount(); i++) {
+    		tree1.reroot(tree1.getInternalNode(i));
+    		for (int j=0; j<tree2.getInternalNodeCount(); j++) {
+    			tree2.reroot(tree2.getInternalNode(j));
+    			umast = Math.min(umast, rmast.getDistance(tree1, tree2));
+    		}
+    	}
+    	
+    	return umast;
     }
 }

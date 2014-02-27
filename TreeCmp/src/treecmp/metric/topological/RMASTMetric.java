@@ -9,7 +9,7 @@ import treecmp.metric.Metric;
 /**
  * RMAST metric.
  * Implementation of Procedure 3
- * Farach, Martin and Thorup, Mikkel, Fast comparison of evolutionary trees. 
+ * Farach, Martin and Thorup, Mikkel; Fast comparison of evolutionary trees. 
  */
 public class RMASTMetric extends BaseMetric implements Metric {
 
@@ -70,7 +70,7 @@ public class RMASTMetric extends BaseMetric implements Metric {
 
 		final int t1RootIdx = getInternalNodeIdx(t1.getRoot(), t1);
 		final int t2RootIdx = getInternalNodeIdx(t2.getRoot(), t2);
-		return Math.max(t1.getExternalNodeCount(), t2.getExternalNodeCount())
+		return Math.max(t1Leafs, t2Leafs)
 				- mast[t1RootIdx][t2RootIdx];
 	}
 
