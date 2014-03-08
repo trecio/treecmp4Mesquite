@@ -13,6 +13,13 @@ public class RMASTTests extends MetricTest<RMAST> {
 		assertEquals(0., getMetricValue(t, t), 1e-6);
 	}
 	
+	@Test public void itShouldReturnZeroForTreesWithTwoLeafs() {
+		final String t1 = "(A, B);";
+		final String t2 = "(B, A);";
+		
+		assertEquals(0., getMetricValue(t1, t2), 1e-6);
+	}
+	
 	@Test public void itShouldReturnZeroForIsomorphicTrees() {
 		final String t1 = "((A, B), (C, D));";
 		final String t2 = "((C, D), (A, B));";

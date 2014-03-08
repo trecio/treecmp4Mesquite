@@ -18,7 +18,6 @@
 package treecmp.common;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -257,6 +256,23 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
 
         return resultMatrix;
     }
+    
+	public static Node[] getNodesInPreOrder(Tree tree) {
+		final int externalNodes = tree.getExternalNodeCount();
+		final int internalNodes = tree.getInternalNodeCount();
+		final int totalNodes = externalNodes + internalNodes;
+
+		final Node[] nodes = new Node[totalNodes];		
+		int i=0;
+		Node node = tree.getRoot();
+		do {
+			nodes[i++] = node;
+			node = NodeUtils.preorderSuccessor(node);
+		} while (node != tree.getRoot());
+		
+		return nodes;
+	}
+
     
     public static Node[] getNodesInPostOrder(Tree t){
         
@@ -661,6 +677,21 @@ public static int[][] calcNodalSplittedMatrix(Tree tree, IdGroup idGroup) {
             }
         }
         return true;
+    }
+    
+    public static Node[] getNeighboringNodes(Node node) {
+    	final int numberOfChildren = node.getChildCount();
+    	final int numberOfNeighboringNodes = node.isRoot()
+    			? numberOfChildren
+				: numberOfChildren + 1;
+		final Node[] neighbors = new Node[numberOfNeighboringNodes];
+		for (int i=0; i<numberOfChildren; i++) {
+			neighbors[i] = node.getChild(i);
+		}
+		if (!node.isRoot()) {
+			neighbors[numberOfChildren] = node.getParent();
+		}
+		return neighbors;
     }
 
     public static int getNodeDepth(Node node){

@@ -1,12 +1,18 @@
 package mesquite.treecmp.metrics.UMAST;
 
 import static org.junit.Assert.assertEquals;
+import mesquite.treecmp.metrics.MetricTest;
 
 import org.junit.Test;
 
-import mesquite.treecmp.metrics.MetricTest;
-
 public class UMASTTests extends MetricTest<UMAST> {
+	@Test public void itShouldReturn0ForTwoTreesWithThreeLeafs() {
+		final String t1 = "(A,B,C);";
+		final String t2 = "(B,A,C);";
+		
+		assertEquals(0., getMetricValue(t1, t2), 1e-6);
+	}
+	
 	@Test public void itShouldReturn0ForEqualTrees() {
 		final String t = "((A,B),C,D);";
 		

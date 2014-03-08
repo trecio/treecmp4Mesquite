@@ -20,17 +20,17 @@ public class RMASTMetric extends BaseMetric implements Metric {
 
 	@Override
 	public double getDistance(Tree t1, Tree t2) {
+		return Math.max(t1.getExternalNodeCount(), t2.getExternalNodeCount())
+				- crmast(t1, t2).getRMAST();
+	}
+	
+	public static CRMAST crmast(Tree t1, Tree t2) {
 		final int t1Leafs = t1.getExternalNodeCount();
 		final int t2Leafs = t2.getExternalNodeCount();
-		final int t1Nodes = t1Leafs + t1.getInternalNodeCount();
-		final int t2Nodes = t2Leafs + t2.getInternalNodeCount();
 		
 		//dynamic programming array: first dimension are nodes from t1, second from t2
-		//nodes are ordered according to their numbers: leafs first then internal nodes 
-		final int mast[][] = new int[t1Nodes][];
-		for (int i=0; i<t1Nodes; i++) {
-			mast[i] = new int[t2Nodes];
-		}
+		//nodes are ordered according to their numbers: leafs first then internal nodes
+		final CRMAST mast = new CRMAST(t1, t2);
 
 		//fill values for pairs where at least one of nodes is a leaf 
 		for (int i=0; i<t1Leafs; i++) {
@@ -39,18 +39,18 @@ public class RMASTMetric extends BaseMetric implements Metric {
 				final Node leaf2 = t2.getExternalNode(j);
 				
 				if (leaf1.getIdentifier().equals(leaf2.getIdentifier())) {
-					mast[i][j] = 1;
+					mast.set(i, j, 1);
 					
 					Node v1 = leaf1;
 					do {
 						v1 = v1.getParent();
-						mast[getInternalNodeIdx(v1, t1)][j] = 1;
+						mast.set(v1, leaf2, 1);
 					} while (v1 != t1.getRoot());
 					
 					Node v2 = leaf2;
 					do {
 						v2 = v2.getParent();
-						mast[i][getInternalNodeIdx(v2, t2)] = 1;
+						mast.set(leaf1, v2, 1);
 					} while (v2 != t2.getRoot());
 				}
 			}
@@ -63,34 +63,28 @@ public class RMASTMetric extends BaseMetric implements Metric {
 			final Node v1 = t1.getInternalNode(internalNodeOrder1[i]);
 			for (int j=0; j<internalNodeOrder2.length; j++) {
 				final Node v2 = t2.getInternalNode(internalNodeOrder2[j]);
-				mast[getInternalNodeIdx(v1, t1)][getInternalNodeIdx(v2, t2)]
-						= Math.max(diag(v1, t1, v2, t2, mast), match(v1, t1, v2, t2, mast));
+				mast.set(v1, v2, Math.max(diag(v1, t1, v2, t2, mast), match(v1, t1, v2, t2, mast)));
 			}
-		}		
-
-		final int t1RootIdx = getInternalNodeIdx(t1.getRoot(), t1);
-		final int t2RootIdx = getInternalNodeIdx(t2.getRoot(), t2);
-		return Math.max(t1Leafs, t2Leafs)
-				- mast[t1RootIdx][t2RootIdx];
+		}
+		
+		return mast;
 	}
 
-	private static int diag(Node v1, Tree t1, Node v2, Tree t2, int[][] mast) {
+	private static int diag(Node v1, Tree t1, Node v2, Tree t2, CRMAST mast) {
 		int result = 0;
-		final int v1Idx = getInternalNodeIdx(v1, t1);
 		for (int i=0; i<v2.getChildCount(); i++) {
 			final Node child2 = v2.getChild(i);
-			result = Math.max(result, mast[v1Idx][getNodeIdx(child2, t2)]);
+			result = Math.max(result, mast.getRMAST(v1, child2));
 		}
-		final int v2Idx = getInternalNodeIdx(v2, t2);
 		for (int i=0; i<v1.getChildCount(); i++) {
 			final Node child1 = v1.getChild(i);
-			result = Math.max(result, mast[getNodeIdx(child1, t1)][v2Idx]);		
+			result = Math.max(result, mast.getRMAST(child1, v2));		
 		}
 		return result;
 	}
 
 	//TODO verify proper complexity of match. For two trees all matchings should take O(n^2). 
-	private static int match(Node v1, Tree t1, Node v2, Tree t2, int[][] mast) {
+	private static int match(Node v1, Tree t1, Node v2, Tree t2, CRMAST mast) {
 		final int v1Children = v1.getChildCount();
 		final int v2Children = v2.getChildCount();
 		final int size = Math.max(v1Children, v2Children);
@@ -103,7 +97,7 @@ public class RMASTMetric extends BaseMetric implements Metric {
 			final Node child1 = v1.getChild(i);
 			for (int j=0; j<v2Children; j++) {
 				final Node child2 = v2.getChild(j);
-				w[i][j] = -mast[getNodeIdx(child1, t1)][getNodeIdx(child2, t2)];
+				w[i][j] = -mast.getRMAST(child1, child2);
 			}
 		}
 
@@ -114,16 +108,6 @@ public class RMASTMetric extends BaseMetric implements Metric {
 		return -LapSolver.lap(size, w, rowSol, colSol, u, v);
 	}
 	
-	private static int getInternalNodeIdx(Node v, Tree t) {
-		return t.getExternalNodeCount() + v.getNumber();
-	}
-
-	private static int getNodeIdx(Node v, Tree t) {
-		return v.isLeaf()
-				? v.getNumber()
-				: getInternalNodeIdx(v, t);
-	}
-
 	private static int[] getInternalNodeOrder(Tree t) {
 		final int[] order = new int[t.getInternalNodeCount()];
 		int qFront = order.length;
@@ -144,4 +128,51 @@ public class RMASTMetric extends BaseMetric implements Metric {
 		return order;
 	}
 
+}
+
+final class CRMAST {
+	private final int[][] mast;
+	private final int t1RootIdx;
+	private final int t2RootIdx;
+	private final int t1ExternalNodeCount;
+	private final int t2ExternalNodeCount;
+
+	public CRMAST(Tree t1, Tree t2) {
+		t1ExternalNodeCount = t1.getExternalNodeCount();
+		t2ExternalNodeCount = t2.getExternalNodeCount();
+		final int t1Nodes = t1ExternalNodeCount + t1.getInternalNodeCount();
+		final int t2Nodes = t2ExternalNodeCount + t2.getInternalNodeCount();
+		mast = new int[t1Nodes][];
+		for (int i=0; i<t1Nodes; i++) {
+			mast[i] = new int[t2Nodes];
+		}
+		t1RootIdx = getInternalNodeIdx(t1.getRoot(), t1ExternalNodeCount);
+		t2RootIdx = getInternalNodeIdx(t2.getRoot(), t2ExternalNodeCount);
+	}
+
+	public int getRMAST() {
+		return mast[t1RootIdx][t2RootIdx];
+	}
+
+	public int getRMAST(Node v1, Node v2) {
+		return mast[getNodeIdx(v1, t1ExternalNodeCount)][getNodeIdx(v2, t2ExternalNodeCount)];
+	}
+
+	public void set(int i, int j, int value) {
+		mast[i][j] = value;
+	}
+
+	public void set(Node v1, Node v2, int value) {
+		mast[getNodeIdx(v1, t1ExternalNodeCount)][getNodeIdx(v2, t2ExternalNodeCount)] = value;
+	}
+
+	private static int getInternalNodeIdx(Node v, int externalNodeCount) {
+		return externalNodeCount + v.getNumber();
+	}
+
+	private static int getNodeIdx(Node v, int externalNodeCount) {
+		return v.isLeaf()
+				? v.getNumber()
+				: getInternalNodeIdx(v, externalNodeCount);
+	}
 }
