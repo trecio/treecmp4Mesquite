@@ -39,6 +39,20 @@ public class UMASTTests extends MetricTest<UMAST> {
 		
 		assertEquals(9, getMetricValue(t1, t2), 1e-6);
 	}
+	
+	@Test public void itShouldReturn0ForTwoIsomorphicRootedTrees() {
+		final String t1 = "((A,B),(C,D));";
+		final String t2 = "((D,C),(B,A));";
+		
+		assertEquals(0, getMetricValue(t1, t2), 1e-6);
+	}
+	
+	@Test public void itShouldReturnCorrectValueForSomeTwoTrees() {
+		final String t1 = "(Crad,Crud1,((Tcat1,(Tvit,(Tcan,Tcfc))),(Asuu,(Alum,(Pcra,(Azip,(Aphy1,Apeg1)))))));";
+		final String t2 = "(Crad,(Crud1,(Asuu,(Tcat1,(Tvit,(Tcan,Tcfc))))),(Aphy1,(Apeg1,(Azip,(Pcra,Alum)))));";
+		
+		assertEquals(5, getMetricValue(t1, t2), 1e-6);
+	}
 
 	@Override
 	protected UMAST createMetric() {

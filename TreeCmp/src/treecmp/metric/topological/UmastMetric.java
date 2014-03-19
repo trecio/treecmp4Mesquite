@@ -49,7 +49,7 @@ public class UMASTMetric extends BaseMetric implements Metric {
 
     @Override
     public double getDistance(Tree t1, Tree t2) {
-    	int result = umast(new SimpleTreePreservingNodeNumbers(t1), new SimpleTreePreservingNodeNumbers(t2));
+    	int result = umast(new SimpleUnrootedTreePreservingNodeNumbers(t1.getRoot()), new SimpleUnrootedTreePreservingNodeNumbers(t2.getRoot()));
     
     	return Math.max(t1.getExternalNodeCount(), t2.getExternalNodeCount()) - result;
     }
@@ -81,7 +81,7 @@ public class UMASTMetric extends BaseMetric implements Metric {
     			union.addAll(sideForest2);
     			
     			final SimpleTree t1Restricted = r1.getRestrictedTo(union);
-    			final SimpleTree t2Restricted = r2.getRestrictedTo(union);
+    			final SimpleTree t2Restricted = r2.getRestrictedTo(union);    			
     			
     			result = Math.max(result, umast(t1Restricted, t2Restricted));
     		}
@@ -129,17 +129,16 @@ public class UMASTMetric extends BaseMetric implements Metric {
 
 	private static List<List<String>> getBalancedSideForests(CoreTree core, int minSize, int maxSize) {
 		final List<List<String>> forests = new ArrayList<List<String>>();
-		List<String> smallForest = new ArrayList<>();
+		List<String> smallForest = new ArrayList<String>();
 		for (int i=0; i<core.getSideTreeCount(); i++) {
 			final List<String> sideTree = core.getSideTreeLeafLabels(i);
 			if (sideTree.size() >= minSize) {
 				forests.add(sideTree);
 			} else {
-				if (smallForest.size() + sideTree.size() < minSize) {
-					smallForest.addAll(sideTree);
-				} else {
+				smallForest.addAll(sideTree);
+				if (smallForest.size() >= minSize) {
 					forests.add(smallForest);
-					smallForest = sideTree;
+					smallForest = new ArrayList<String>();
 				}
 			}
 		}
@@ -368,12 +367,12 @@ public class UMASTMetric extends BaseMetric implements Metric {
 		}		
 	}
 	
-	private static final class SimpleTreePreservingNodeNumbers extends SimpleTree {
+	private static final class SimpleUnrootedTreePreservingNodeNumbers extends SimpleTree {
 		private static final long serialVersionUID = -4057750013155408632L;
 		private boolean initialized = false;
 
-		public SimpleTreePreservingNodeNumbers(Tree tree) {
-			super(tree);
+		public SimpleUnrootedTreePreservingNodeNumbers(Node root) {
+			super(contractDegree2Root(root));
 			initialized = true;
 		}
 
@@ -382,6 +381,31 @@ public class UMASTMetric extends BaseMetric implements Metric {
 			if (!initialized) {
 				super.createNodeList();
 			}
+		}
+		
+		private static Node contractDegree2Root(Node root) {
+			if (!root.isRoot()) {
+				throw new IllegalArgumentException("Node has to be root.");
+			}
+			final int rootChildCount = root.getChildCount();
+			if (rootChildCount >= 3 || rootChildCount == 0) {
+				return root;
+			}
+			Node biggestChild = root.getChild(0);
+			for (int i=1; i<rootChildCount; i++) {
+				final Node child = root.getChild(i);
+				if (biggestChild.getChildCount() < child.getChildCount()) {
+					biggestChild = child;
+				}
+			}
+			for (int i=0; i<rootChildCount; i++) {
+				final Node child = root.getChild(i);
+				if (child != biggestChild) {
+					biggestChild.addChild(child);
+				}
+			}
+			biggestChild.setParent(null);
+			return biggestChild;
 		}
 	}
 	
@@ -415,8 +439,8 @@ public class UMASTMetric extends BaseMetric implements Metric {
 				lcaDepths[i-1] = internalNodeDepths[u.getNumber()];
 			}
 			
-			final Node root = construct(leafs, lcaDepths, 0, leafs.length, 0);
-			return new SimpleTree(root);
+			final Node root = construct(leafs, lcaDepths, 0, leafs.length, 0);			
+			return new SimpleUnrootedTreePreservingNodeNumbers(root);
 		}
 
 		private Node construct(Node[] leafs, int[] lcaDepths, int l, int r, int minDepth) {
@@ -431,7 +455,7 @@ public class UMASTMetric extends BaseMetric implements Metric {
 					parent = NodeFactory.createNode();
 					parent.addChild(u);
 				}
-				final Node subTree = construct(leafs, lcaDepths, l+1, i, lcaDepths[l]);
+				final Node subTree = construct(leafs, lcaDepths, l+1, i+1, lcaDepths[l]);
 				parent.addChild(subTree);
 				l = i;
 			}

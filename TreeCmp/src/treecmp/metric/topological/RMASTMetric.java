@@ -45,13 +45,13 @@ public class RMASTMetric extends BaseMetric implements Metric {
 					do {
 						v1 = v1.getParent();
 						mast.set(v1, leaf2, 1);
-					} while (v1 != t1.getRoot());
+					} while (!v1.isRoot());
 					
 					Node v2 = leaf2;
 					do {
 						v2 = v2.getParent();
 						mast.set(leaf1, v2, 1);
-					} while (v2 != t2.getRoot());
+					} while (!v2.isRoot());
 				}
 			}
 		}
