@@ -44,7 +44,7 @@ public final class Utils {
 
 		final int numberOfTrees = trees.size();
 		final int numberOfPairs = (numberOfTrees * numberOfTrees - numberOfTrees) / 2;
-		final int percentChange = numberOfPairs / 100;
+		final int percentChange = Math.max(numberOfPairs / 100, 1);
 		final double[][] distances = new double[numberOfTrees][];
 		final MesquiteNumber result = new MesquiteNumber();
 		final MesquiteString resultString = new MesquiteString();
