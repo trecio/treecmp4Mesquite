@@ -1,0 +1,3 @@
+[submodule "Mesquite Project"]
+	path = Mesquite Project
+	url = https://github.com/MesquiteProject/MesquiteCore.git
