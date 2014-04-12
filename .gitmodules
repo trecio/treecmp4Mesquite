@@ -1,3 +1,6 @@
 [submodule "Mesquite Project"]
 	path = Mesquite Project
 	url = https://github.com/MesquiteProject/MesquiteCore.git
+[submodule "treesetviz"]
+	path = treesetviz
+	url = https://github.com/trecio/treesetviz.git
