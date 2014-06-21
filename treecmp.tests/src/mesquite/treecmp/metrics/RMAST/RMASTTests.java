@@ -47,6 +47,20 @@ public class RMASTTests extends MetricTest<RMAST> {
 		
 		assertEquals(8., getMetricValue(t1, t2), 1e-6);
 	}
+	
+	@Test public void itShouldReturnNumberOfLeafsForTwoTreesWithNoCommonLeafs() {
+		final String t1 = "((A,B),(C,D));";
+		final String t2 = "(W,(X,(Y,Z)));";
+		
+		assertEquals(4., getMetricValue(t1, t2), 1e-6);
+	}
+	
+	@Test public void itShouldReturnCorrectValueForSomeTwoTrees() {
+		final String t1 = "(tex9,((((((tex10,(tex2,tex0)),tex8),(tex5,(tex1,tex11))),(tex12,tex6)),(tex3,tex4)),tex7));";
+		final String t2 = "(tex9,((tex10,((tex2,tex0),(tex8,((tex5,(tex1,tex11)),(tex12,tex6))))),((tex3,tex4),tex7)));";
+		
+		assertEquals(5, getMetricValue(t1, t2), 1e-6);
+	}
 
 	@Override
 	protected RMAST createMetric() {

@@ -28,7 +28,6 @@ import java.util.Stack;
 
 import pal.tree.Node;
 import pal.tree.NodeFactory;
-import pal.tree.NodeUtils;
 import pal.tree.SimpleTree;
 import pal.tree.Tree;
 import treecmp.common.LapSolver;
@@ -355,16 +354,163 @@ public class UMASTMetric extends BaseMetric implements Metric {
 					: t2Leafs + v.getNumber();
 		}
 	}
-	
-	//TODO implement Harel, D. and Tarjan, R.E.; Fast algorithms for finding nearest common ancestor.  
+
+	/**
+	 * Computes LCA of two leafs in time O(1) after O(n log n) preprocessing. 
+	 * Bender, A. and Farach-Colton M.; The LCA Problem Revisited 
+	 */  
 	private static final class LCACalculator {
+		private final Node[] order;
+		private final int[] representatives;
+		private final RangeMinQuery rmqSolver;
+
 		public LCACalculator(Tree tree) {
-			// TODO Auto-generated constructor stub
+			order = getEulerPathVisitOrder(tree);
+			int[] depths = getDepths(order, tree);
+			rmqSolver = new RangeMinQuery(depths);
+			representatives = getRepresentatives(order, tree.getExternalNodeCount());
 		}
 
 		public Node forLeafs(Node u, Node v) {
-			return NodeUtils.getFirstCommonAncestor(u, v);
-		}		
+			final int uIdx = representatives[getLeafIndex(u)];
+			final int vIdx = representatives[getLeafIndex(v)];
+			final int minIdx = uIdx < vIdx
+					? rmqSolver.getMinElementIndex(uIdx, vIdx)
+					: rmqSolver.getMinElementIndex(vIdx, uIdx);
+			return order[minIdx];
+		}
+		
+		private static Node[] getEulerPathVisitOrder(Tree tree) {
+			final int nodes = tree.getInternalNodeCount() + tree.getExternalNodeCount();
+			final int edges = nodes-1;
+			final Node[] order = new Node[2*edges+1];
+			int orderIdx=0;
+			
+			final Stack<Node> s = new Stack<Node>();
+			final Stack<Node> pathToRoot = new Stack<Node>();
+			
+			final Node root = tree.getRoot();
+			pathToRoot.push(root);
+			order[orderIdx++] = root;
+			pushChildren(s, root);
+			while (!s.empty()) {
+				final Node node = s.pop();
+				final Node parent = node.getParent();
+				if (pathToRoot.peek() != parent) {
+					pathToRoot.pop();
+					//return towards the root until finding parent of the node
+					Node returnToNode;
+					do {
+						returnToNode = pathToRoot.pop();
+						order[orderIdx++] = returnToNode; 
+					} while (returnToNode != parent);
+					pathToRoot.push(returnToNode);
+				}
+				//go down to the next node
+				order[orderIdx++] = node;
+				pathToRoot.push(node);
+				pushChildren(s, node);
+			}
+			pathToRoot.pop();
+			while (!pathToRoot.isEmpty()) {
+				order[orderIdx++] = pathToRoot.pop();
+			}
+			return order;
+		}
+
+		private static void pushChildren(final Stack<Node> s, final Node root) {
+			for (int i=root.getChildCount()-1; i>=0; --i) {
+				s.push(root.getChild(i));
+			}
+		}
+
+		private static int[] getDepths(Node[] nodes, Tree tree) {
+			final int[] leafDepths = new int[tree.getExternalNodeCount()];
+			final int[] internalDepths = new int[tree.getInternalNodeCount()];
+			final Node root = tree.getRoot();
+			final Stack<Node> s = new Stack<Node>();
+			if (!root.isLeaf()) {
+				s.push(root);
+			}
+			while (!s.empty()) {
+				final Node node = s.pop();
+				final int childDepth = internalDepths[node.getNumber()] + 1;
+				for (int i=node.getChildCount()-1; i>=0; --i) {
+					final Node child = node.getChild(i);
+					if (child.isLeaf()) {
+						leafDepths[child.getNumber()] = childDepth;
+					} else {
+						internalDepths[child.getNumber()] = childDepth;
+						s.push(child);
+					}
+				}
+			}
+			
+			final int[] depths = new int[nodes.length];
+			for (int i=nodes.length-1; i>=0; --i) {
+				final Node node = nodes[i];
+				if (node.isLeaf()) {
+					depths[i] = leafDepths[node.getNumber()];
+				} else {
+					depths[i] = internalDepths[node.getNumber()]; 
+				}
+			}
+			return depths;
+		}
+
+		private static int[] getRepresentatives(Node[] order, int numberOfLeafs) {
+			final int[] representatives = new int[numberOfLeafs];
+			for (int i=order.length-1; i>=0; --i) {
+				final Node node = order[i];
+				if (node.isLeaf()) {
+					representatives[getLeafIndex(node)] = i;
+				}
+			}
+			return representatives;
+		}
+
+		private static int getLeafIndex(Node u) {
+			return u.getNumber();
+		}
+	}
+	
+	private static class RangeMinQuery {
+		final int[] a; 
+		final int[][] m;
+		public RangeMinQuery(int[] a) {
+			this.a = a;
+			
+			//logN = ceil(lg(a.length))
+			final int logN = Integer.SIZE-Integer.numberOfLeadingZeros(a.length-1);
+			m = new int[logN+1][];
+			m[0] = new int[a.length];
+			for (int i=0; i<a.length; i++) {
+				m[0][i] = i;
+			}
+			for (int i=1, step=1; i<=logN; i++, step+=step) {
+				m[i] = new int[a.length];
+				for (int j=0; j<a.length; j++) {
+					int leftMinIdx = m[i-1][j];
+					int rightMinIdx = j+step < a.length
+							? m[i-1][j+step]
+							: leftMinIdx; 
+					m[i][j] = a[rightMinIdx] < a[leftMinIdx]
+							? rightMinIdx
+							: leftMinIdx;
+				}
+			}
+		}
+
+		public int getMinElementIndex(int l, int r) {
+			//k = floor(lg(r-l))
+			final int k = Integer.SIZE - Integer.numberOfLeadingZeros(r-l) - 1;
+			final int twoToK = 1<<k;
+			int leftMinIdx = m[k][l];
+			int rightMinIdx = m[k][r-twoToK+1];
+			return a[leftMinIdx] < a[rightMinIdx]
+					? leftMinIdx
+					: rightMinIdx;
+		}
 	}
 	
 	private static final class SimpleUnrootedTreePreservingNodeNumbers extends SimpleTree {
