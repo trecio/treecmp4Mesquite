@@ -86,7 +86,7 @@ public class CommandLineParser {
 
     public Command run(String args[]) {
         Command cmd = null;
-        DefinedMetricsSet DMSet = DefinedMetricsSet.getDefinedMetricsSet();
+        DefinedMetricsSet DMSet = DefinedMetricsSet.getInstance();
         List<Metric> DMetrics = DMSet.getDefinedMetrics();
 
         Option oS = new Option("s", S_DESC);
@@ -217,7 +217,7 @@ public class CommandLineParser {
 
                 //set active metrics
                 ActiveMetricsSet AMSet = ActiveMetricsSet.getActiveMetricsSet();
-                DMSet = DefinedMetricsSet.getDefinedMetricsSet();
+                DMSet = DefinedMetricsSet.getInstance();
                 DMetrics = DMSet.getDefinedMetrics();
 
                 final String[] metrics= commandLine.getOptionValues(oD.getOpt());

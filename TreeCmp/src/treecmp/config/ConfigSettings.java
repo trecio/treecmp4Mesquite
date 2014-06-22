@@ -81,7 +81,7 @@ public class ConfigSettings {
              * Update defined metric set
              * 
              */
-            DefinedMetricsSet DMset = DefinedMetricsSet.getDefinedMetricsSet();
+            DefinedMetricsSet DMset = DefinedMetricsSet.getInstance();
 
             NodeList list = doc.getElementsByTagName("metric");
             for (int i = 0; i < list.getLength(); i++) {

@@ -22,38 +22,28 @@ import java.util.ArrayList;
 import treecmp.metric.Metric;
 
 public class DefinedMetricsSet {
-
-    private static DefinedMetricsSet DMset;
+    private static DefinedMetricsSet instance;
     private ArrayList<Metric> metricList;
     
-    protected DefinedMetricsSet()
+    private DefinedMetricsSet()
     {
-        DMset=null;
         metricList=new ArrayList<Metric>();
-        metricList.clear();
-
     }
     
-    public static DefinedMetricsSet getDefinedMetricsSet()
+    public static synchronized DefinedMetricsSet getInstance()
     {
-        if(DMset==null)
+        if(instance==null)
         {
-            DMset=new DefinedMetricsSet(); 
+            instance=new DefinedMetricsSet(); 
         }
-        return DMset;
+        return instance;
     }
          
     public void addMetric(Metric m)
     {
-
-        /**
-         *
-         * Here can be added a protection against adding the same metric more than onec
-         */
-
-        this.metricList.add(m);
-
+    	metricList.add(m);
     }
+    
     public List<Metric> getDefinedMetrics()
     {
 

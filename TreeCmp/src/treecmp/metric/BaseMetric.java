@@ -63,16 +63,8 @@ public abstract class BaseMetric implements Metric {
         this.alnFileSuffix = alnFileSuffix;
     }
 
-    public String getUnifomFileName() {
-        return unifomFileName;
-    }
-
     public void setUnifomFileName(String unifomFileName) {
         this.unifomFileName = unifomFileName;
-    }
-
-    public String getYuleFileName() {
-        return yuleFileName;
     }
 
     public void setYuleFileName(String yuleFileName) {
