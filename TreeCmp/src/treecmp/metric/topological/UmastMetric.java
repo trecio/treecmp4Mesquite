@@ -475,8 +475,8 @@ public class UMASTMetric extends BaseMetric implements Metric {
 	}
 	
 	private static class RangeMinQuery {
-		final int[] a; 
-		final int[][] m;
+		private final int[] a; 
+		private final int[][] m;
 		public RangeMinQuery(int[] a) {
 			this.a = a;
 			

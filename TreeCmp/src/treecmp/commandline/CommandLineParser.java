@@ -23,6 +23,9 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -51,7 +54,6 @@ public class CommandLineParser {
     private final static String II_DESC = "- Include summary section in the output file.";
     private final static String A_DESC = "- Generate alignment files (only for MS and MC metrics). Cannot be used with -O option.";
     private final static String OO_DESC = "- Use MS/MC metrics optimized for similar trees. Cannot be used with -A option.";
-   // private final static String F_DESC = "- Use MS/MC metrics for trees with free leaf set. ";
     private final static String CMD_ERROR = "Error. There is a problem with parsing the command line. See the usage below.\n";
 
 
@@ -77,13 +79,12 @@ public class CommandLineParser {
     private final static String OPTS_CUSTOM = "Additional options:\n";
 
 
-    //private final static String HEADER = "";
-    //private final static String FOOTER = "ssd";
     private final static String CMD_LINE_SYNTAX = "java -jar TreeCmp.jar -s|-w <size>|-m|-r <refTreeFile>"
             +" -d <metrics> -i <inputFile> -o <outputFile> [-N] [-P] [-I] [-A|-O]\n"
             + "Options order is important.";
+	private final Logger log = Logger.getLogger(CommandLineParser.class.getName());
 
-    public static Command run(String args[]) {
+    public Command run(String args[]) {
         Command cmd = null;
         DefinedMetricsSet DMSet = DefinedMetricsSet.getDefinedMetricsSet();
         List<Metric> DMetrics = DMSet.getDefinedMetrics();
@@ -126,12 +127,10 @@ public class CommandLineParser {
         Option oII = new Option("I", II_DESC);
 
         Option oOO = new Option("O", OO_DESC);
-      //  Option oF = new Option("F", F_DESC);
         Option oA = new Option("A", A_DESC);
         OptionGroup customMOpts = new OptionGroup();
         customMOpts.addOption(oOO);
         customMOpts.addOption(oA);
-      //  customMOpts.addOption(oF);
         
         Options opts = new Options();
 
@@ -150,8 +149,6 @@ public class CommandLineParser {
         if (version == null) {
             version = "";
         }
-        //String HEADER="TreeCmp version "+version;
-        //String FOOTER = "TreeCmp version "+version;
         String FOOTER = "";
         String HEADER=" ";
         String APP_NAME="TreeCmp version "+version+"\n";
@@ -168,16 +165,12 @@ public class CommandLineParser {
 
 
         try {
-            //parser.checkRequiredOptions();
-
             CommandLine commandLine = parser.parse(opts, args);
             if (commandLine != null) {
                 // process these values
                 //set IO settings
                 String inputFileName = (String) commandLine.getOptionValue(oI.getOpt());
                 String outputFileName = (String) commandLine.getOptionValue(oO.getOpt());
-                String [] metrics= commandLine.getOptionValues(oD.getOpt());
-
 
                 if(inputFileName == null){
                     System.out.println("Error: input file not specified!");
@@ -220,28 +213,14 @@ public class CommandLineParser {
                     IOset.setGenSummary(true);
                     custOpts.add(oII);
                 }
-                /*
-                if (commandLine.hasOption(oF.getOpt())) {
-                    IOset.setUseMsMcFreeLeafSet(true);
-                    //additioanly set prune trees
-                    IOset.setPruneTrees(true);
-                    custOpts.add(oF);
-                }
-                */
                 Collections.sort(custOpts, new OptOrder());
-                /*
-                if(commandLine.hasOption(oStep))
-                {
-                String sStep=(String)commandLine.getValue(oStep);
-                int iStep=Integer.parseInt(sStep);
-                IOset.setIStep(iStep);
-                }
-                 */
+
                 //set active metrics
                 ActiveMetricsSet AMSet = ActiveMetricsSet.getActiveMetricsSet();
                 DMSet = DefinedMetricsSet.getDefinedMetricsSet();
                 DMetrics = DMSet.getDefinedMetrics();
 
+                final String[] metrics= commandLine.getOptionValues(oD.getOpt());
                 for(int i=0;i<metrics.length;i++){
 
                     ListIterator<Metric> itDM = DMetrics.listIterator();
@@ -268,7 +247,6 @@ public class CommandLineParser {
 
                 if (commandLine.hasOption(oW.getOpt())) {
                     String sWindowSize = (String) commandLine.getOptionValue(oW.getOpt());
-                    //String sWindowSize2 = (String) commandLine.getOptionValue();
                     int iWindowSize = Integer.parseInt(sWindowSize);
                     cmd = new RunWCommand(1, "-w", iWindowSize);
                     analysisType="window comparison mode (-w) with window size: "+iWindowSize;
@@ -296,8 +274,8 @@ public class CommandLineParser {
                 return null;
             }
         } catch (ParseException ex) {
+        	log.log(Level.WARNING, "Could not parse command line arguments.", ex);
             System.out.println(CMD_ERROR);
-            //System.out.println(ex.getMessage());
            
             formatter.printHelp(CMD_LINE_SYNTAX, HEADER,opts,FOOTER, false);
 
@@ -338,7 +316,7 @@ public class CommandLineParser {
     }
 }
 
-class OptOrder implements Comparator {
+class OptOrder implements Comparator<Option> {
 
     private LinkedHashMap<String, Integer> order = new LinkedHashMap<String, Integer>();
 
@@ -355,14 +333,11 @@ class OptOrder implements Comparator {
         order.put("I", new Integer(10));
         order.put("A", new Integer(11));
         order.put("O", new Integer(12));
-       // order.put("F", new Integer(13));
     }
 
-    public int compare(Object o1, Object o2) {
-        Option opt1 = (Option) o1;
-        Option opt2 = (Option) o2;
-        Integer n1 = (Integer) order.get(opt1.getOpt());
-        Integer n2 = (Integer) order.get(opt2.getOpt());
+    public int compare(Option o1, Option o2) {
+        Integer n1 = (Integer) order.get(o1.getOpt());
+        Integer n2 = (Integer) order.get(o2.getOpt());
         if (n1 != null || n2 != null) {
             return n1 - n2;
         } else {

@@ -72,7 +72,8 @@ public class Main {
        }
 
         ConfigSettings.initConfig(conf, dataDir);
-        Command cmd=CommandLineParser.run(args);
+        final CommandLineParser parser = new CommandLineParser();
+        final Command cmd=parser.run(args);
 
         if(cmd!=null)
         {
