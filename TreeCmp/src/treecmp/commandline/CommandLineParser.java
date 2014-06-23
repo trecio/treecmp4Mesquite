@@ -87,7 +87,6 @@ public class CommandLineParser {
     public Command run(String args[]) {
         Command cmd = null;
         DefinedMetricsSet DMSet = DefinedMetricsSet.getInstance();
-        List<Metric> DMetrics = DMSet.getDefinedMetrics();
 
         Option oS = new Option("s", S_DESC);
         Option oW = new Option("w", W_DESC);
@@ -109,7 +108,7 @@ public class CommandLineParser {
         Option oD = new Option("d", D_DESC);
         oD.setArgName(D_ARG);
         oD.setValueSeparator(' ');
-        oD.setArgs(DMetrics.size());
+        oD.setArgs(DMSet.size());
         oD.setRequired(true);
         
         Option oI = new Option("i", I_DESC);
@@ -216,23 +215,14 @@ public class CommandLineParser {
                 Collections.sort(custOpts, new OptOrder());
 
                 //set active metrics
-                ActiveMetricsSet AMSet = ActiveMetricsSet.getActiveMetricsSet();
-                DMSet = DefinedMetricsSet.getInstance();
-                DMetrics = DMSet.getDefinedMetrics();
+                ActiveMetricsSet AMSet = ActiveMetricsSet.getInstance();
 
                 final String[] metrics= commandLine.getOptionValues(oD.getOpt());
                 for(int i=0;i<metrics.length;i++){
 
-                    ListIterator<Metric> itDM = DMetrics.listIterator();
-                    Metric found=null;
-                    while (itDM.hasNext()) {
-                        Metric m = itDM.next();
-                        if(m.getCommandLineName().equals(metrics[i])){
-                            found = m;
-                        }
-                    }
-                    if (found != null){
-                        AMSet.addMetric(found);
+                	final DefinedMetric definedMetric = DMSet.getDefinedMetric(metrics[i]);
+                    if (definedMetric != null){
+                        AMSet.addMetric(definedMetric);
                     }else{
                         System.out.print("Error: ");
                         System.out.println("Metric: "+metrics[i]+" is unknown\n.");

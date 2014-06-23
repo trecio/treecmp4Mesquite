@@ -63,7 +63,7 @@ public class RunRCommand extends Command {
 
     public void refTreeCompareExecute(TreeReader reader, ResultWriter out) throws TreeCmpException {
 
-        Metric[] metrics = ActiveMetricsSet.getActiveMetricsSet().getActiveMetricsTable();
+        Metric[] metrics = ActiveMetricsSet.getInstance().getActiveMetricsTable();
         StatCalculator[] statsMetrics = new StatCalculator[metrics.length];
 
         for (int i = 0; i < metrics.length; i++) {

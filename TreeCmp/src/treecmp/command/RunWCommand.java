@@ -144,7 +144,7 @@ public class RunWCommand extends Command {
 
     public void windowCompareExecute(TreeReader reader, int winSize, ResultWriter out) throws TreeCmpException{
 
-        Metric[] metrics=ActiveMetricsSet.getActiveMetricsSet().getActiveMetricsTable();
+        Metric[] metrics=ActiveMetricsSet.getInstance().getActiveMetricsTable();
         StatCalculator[] statsMetrics=new StatCalculator[metrics.length];
 
         for(int i = 0; i < metrics.length;i++){

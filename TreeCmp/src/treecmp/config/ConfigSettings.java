@@ -24,8 +24,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-import treecmp.metric.BaseMetric;
-
 
 public class ConfigSettings {
 
@@ -67,61 +65,25 @@ public class ConfigSettings {
             // Use the factory to create a builder
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlFile);
-            String className = "";
             String metricName = "";
-            String commandLineName = "";
-            String metricDesc="";
 
-            String uniformFileName = "";
-            String yuleFileName = "";
-            String alnFileSuffix = "";
-            String rooted = "";
-            String diff_leaves = "";
             /**
              * Update defined metric set
-             * 
              */
             DefinedMetricsSet DMset = DefinedMetricsSet.getInstance();
 
             NodeList list = doc.getElementsByTagName("metric");
             for (int i = 0; i < list.getLength(); i++) {
                 // Get element
-                Element element = (Element) list.item(i);
-                //System.out.println(getTextValue(element, "class"));
-                className = getTextValue(element, "class");
+                final Element element = (Element) list.item(i);
                 metricName = getTextValue(element, "name");
-                commandLineName = getTextValue(element, "command_name");
-                metricDesc=getTextValue(element, "description");
-                uniformFileName = getTextValue(element, "unif_data");
-                yuleFileName = getTextValue(element, "yule_data");
-                alnFileSuffix = getTextValue(element, "aln_file_suffix");
-                rooted = getTextValue(element, "rooted");
-                diff_leaves = getTextValue(element, "diff_leaves");
-
-                if(className!=null) {
-                    Class cl = Class.forName(className);
-                    //Metric m=(Metric) cl.newInstance();
-                    BaseMetric m=(BaseMetric) cl.newInstance();
-
-                    m.setName(metricName);
-                    m.setCommandLineName(commandLineName);
-                    m.setDescription(metricDesc);
-                    m.setUnifomFileName(uniformFileName);
-                    m.setYuleFileName(yuleFileName);
-                    m.setAlnFileSuffix(alnFileSuffix);
-                    if (rooted !=null )
-                        if (rooted.equals("true")){     
-                            // m.setRooted(true); - not used
-                            //whether metric is designe for rootes tree or not
-                            //should be specified in the particual metric definition itself
-                        }
-                    if (diff_leaves != null) {
-                        if (diff_leaves.equals("true")) {
-                            m.setDiffLeafSets(true);
-                        }
-                    }
-
-                    DMset.addMetric(m);
+                final DefinedMetric metric = DMset.getDefinedMetric(metricName);
+                
+                if (metric != null) {
+                	metric.uniformFileName = getTextValue(element, "unif_data");
+                	metric.yuleFileName = getTextValue(element, "yule_data");
+                	metric.alnFileSuffix = getTextValue(element, "aln_file_suffix");
+                	metric.diffLeaves = getBooleanValue(element, "diff_leaves");                	
                 }
             }
 
@@ -163,6 +125,11 @@ public class ConfigSettings {
             textVal=textVal.trim();
         }
         return textVal;
+    }
+    
+    private boolean getBooleanValue(Element ele, String tagName) {
+    	final String textValue = getTextValue(ele, tagName);
+    	return "true".equalsIgnoreCase(textValue);
     }
 
 }

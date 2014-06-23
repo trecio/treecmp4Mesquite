@@ -17,19 +17,34 @@
 
 package treecmp.config;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
-import treecmp.metric.Metric;
+import treecmp.metric.topological.MatchingClusterMetric;
+import treecmp.metric.topological.MatchingSplitMetric;
+import treecmp.metric.topological.NodalL2Metric;
+import treecmp.metric.topological.NodalL2SplittedMetric;
+import treecmp.metric.topological.QuartetMetricLong;
+import treecmp.metric.topological.RFClusterMetric;
+import treecmp.metric.topological.RFMetric;
+import treecmp.metric.topological.RMASTMetric;
+import treecmp.metric.topological.TripletMetric;
+import treecmp.metric.topological.UMASTMetric;
 
 public class DefinedMetricsSet {
     private static DefinedMetricsSet instance;
-    private ArrayList<Metric> metricList;
-    
-    private DefinedMetricsSet()
-    {
-        metricList=new ArrayList<Metric>();
-    }
-    
+    private final List<DefinedMetric> metrics = Arrays.asList(
+    		new DefinedMetric(MatchingSplitMetric.class, "MatchingSplit", "ms", "-Matching Split metric"),
+    		new DefinedMetric(RFMetric.class, "R-F", "rf", "-Robinson-Foulds metric"),
+    		new DefinedMetric(QuartetMetricLong.class, "Quartet", "qt", "-Quartet metric"),
+    		new DefinedMetric(NodalL2Metric.class, "PathDiffernce", "pd", "-Path Difference metric"),
+    		new DefinedMetric(NodalL2SplittedMetric.class, "NodalSplitted", "ns", "-Nodal Splitted metric"),
+    		new DefinedMetric(MatchingClusterMetric.class, "MatchingCluster", "mc", "-Matching Cluster metric"),
+    		new DefinedMetric(RFClusterMetric.class, "R-F_Cluster", "rc", "-Robinson-Foulds Cluster metric"),
+    		new DefinedMetric(TripletMetric.class, "Triples", "tt", "-Triplet metric"),
+    		new DefinedMetric(UMASTMetric.class, "UMAST", "umast", "-Unrooted MAST metric"),
+    		new DefinedMetric(RMASTMetric.class, "RMAST", "rmast", "-Rooted MAST Metric")
+	);
+        
     public static synchronized DefinedMetricsSet getInstance()
     {
         if(instance==null)
@@ -38,17 +53,17 @@ public class DefinedMetricsSet {
         }
         return instance;
     }
-         
-    public void addMetric(Metric m)
-    {
-    	metricList.add(m);
-    }
     
-    public List<Metric> getDefinedMetrics()
-    {
+	public DefinedMetric getDefinedMetric(String metricName) {
+		for (final DefinedMetric metric : metrics) {
+			if (metric.commandName.equals(metricName)) {
+				return metric;
+			}
+		}
+		return null;
+	}
 
-        return this.metricList;
-    }
-
-
+	public int size() {
+		return metrics.size();
+	}
 }

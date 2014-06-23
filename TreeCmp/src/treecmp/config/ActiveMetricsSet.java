@@ -18,40 +18,49 @@
 package treecmp.config;
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import treecmp.metric.BaseMetric;
 import treecmp.metric.Metric;
 
 public class ActiveMetricsSet {
 
-    private static ActiveMetricsSet AMset;
-    private ArrayList<Metric> metricList;
+    private static ActiveMetricsSet instance;
+    private final ArrayList<Metric> metricList;
+    private final Logger log = Logger.getLogger(ActiveMetricsSet.class.getName()); 
 
-    protected ActiveMetricsSet()
+    private ActiveMetricsSet()
     {
-        AMset=null;
         metricList=new ArrayList<Metric>();
-        metricList.clear();
-
     }
 
-    public static ActiveMetricsSet getActiveMetricsSet()
+    public static synchronized ActiveMetricsSet getInstance()
     {
-        if(AMset==null)
+        if(instance==null)
         {
-            AMset=new ActiveMetricsSet();
+        	instance=new ActiveMetricsSet();
         }
-        return AMset;
+        return instance;
     }
 
-    public void addMetric(Metric m)
+    public void addMetric(DefinedMetric definedMetric)
     {
-
-        /**
-         *
-         * Here can be added a protection against adding the same metric more than onec
-         */
-
-        this.metricList.add(m);
+    	final BaseMetric metric;
+		try {
+			metric = definedMetric.implementation.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			log.log(Level.SEVERE, "Could not create metric object.", e);
+			return;
+		}
+		metric.setName(definedMetric.name);
+		metric.setCommandLineName(definedMetric.commandName);
+		metric.setDescription(definedMetric.description);
+		metric.setUnifomFileName(definedMetric.uniformFileName);
+		metric.setYuleFileName(definedMetric.yuleFileName);
+		metric.setAlnFileSuffix(definedMetric.alnFileSuffix);
+		metric.setDiffLeafSets(definedMetric.diffLeaves);
+        this.metricList.add(metric);
 
     }
     public ArrayList<Metric> getActiveMetrics()

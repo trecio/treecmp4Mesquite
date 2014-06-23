@@ -81,7 +81,7 @@ public class Main {
             //init data if needed
             if (settings.isRandomComparison()){
                 System.out.println(TimeDate.now()+": Start of reading random statistics.");
-                for (Metric m: ActiveMetricsSet.getActiveMetricsSet().getActiveMetrics()){
+                for (Metric m: ActiveMetricsSet.getInstance().getActiveMetrics()){
                     m.initData();
                 }
                 System.out.println(TimeDate.now()+": End of reading random statistics.");
