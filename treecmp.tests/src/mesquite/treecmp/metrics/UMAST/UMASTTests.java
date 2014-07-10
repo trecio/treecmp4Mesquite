@@ -61,6 +61,13 @@ public class UMASTTests extends MetricTest<UMAST> {
 		assertEquals(4, getMetricValue(t1, t2), 1e-6);
 	}
 	
+	@Test public void itShouldReturnCorrectValueForSomeTwoBiggerTrees() {
+		final String t1 = "(1,((((2,3),(4,5)),6),(((((7,8),(9,(10,11))),(12,13)),((14,(15,((16,17),18))),19)),20)));";
+		final String t2 = "((((8,(16,18)),17),(12,20)),(((1,13),((4,7),((((((2,6),19),(3,15)),14),10),5))),(11,9)));";
+		
+		assertEquals(12, getMetricValue(t1,  t2), 1e-6);
+	}
+	
 	@Test public void itShouldReturnNumberOfLeafsForTwoTreesWithNoCommonLeafs() {
 		final String t1 = "(A,B,(C,D));";
 		final String t2 = "(W,X,(Y,Z));";

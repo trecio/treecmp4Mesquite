@@ -20,9 +20,11 @@ package treecmp.metric.topological;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -58,7 +60,8 @@ public class UMASTMetric extends BaseMetric implements Metric {
 			return getLeafLabelsIntersectionSize(tree1, tree2);
 		}
 		
-		final int k = 3;
+		final int n = tree1.getExternalNodeCount() + tree2.getExternalNodeCount();
+		final int k = Math.max((int)Math.pow(2.8, Math.sqrt(Math.log(n))), 2);
     	final int t1MaxPartSize = tree1.getExternalNodeCount() / k;
     	final int t2MaxPartSize = tree2.getExternalNodeCount() / k;
     	final CoreTree core1 = new CoreTree(tree1, t1MaxPartSize);
@@ -356,7 +359,7 @@ public class UMASTMetric extends BaseMetric implements Metric {
 	}
 
 	/**
-	 * Computes LCA of two leafs in time O(1) after O(n log n) preprocessing. 
+	 * Computes LCA of two leafs in time O(1) after O(n) preprocessing. 
 	 * Bender, A. and Farach-Colton M.; The LCA Problem Revisited 
 	 */  
 	private static final class LCACalculator {
@@ -473,43 +476,142 @@ public class UMASTMetric extends BaseMetric implements Metric {
 			return u.getNumber();
 		}
 	}
-	
-	private static class RangeMinQuery {
-		private final int[] a; 
+		
+	private final static class RangeMinQuery {
+		private final int[] minimumInBlock; 
+		private final int[] minimumIndexInBlock;
+		private final int[] blockHashes;
+		private final Map<Integer, int[][]> blockResultCache = new HashMap<Integer, int[][]>();
 		private final int[][] m;
-		public RangeMinQuery(int[] a) {
-			this.a = a;
-			
+		private final int blockSize;
+		private int[] t;
+		
+		public RangeMinQuery(int[] t) {			
 			//logN = ceil(lg(a.length))
-			final int logN = Integer.SIZE-Integer.numberOfLeadingZeros(a.length-1);
-			m = new int[logN+1][];
-			m[0] = new int[a.length];
-			for (int i=0; i<a.length; i++) {
+			this.t = t;
+			final int logN = Integer.SIZE-Integer.numberOfLeadingZeros(t.length-1);
+			blockSize = (1+logN)/2;
+			final int numberOfBlocks = (t.length + blockSize - 1) / blockSize;
+			
+			this.blockHashes = new int[numberOfBlocks];
+			this.minimumInBlock = new int[numberOfBlocks];
+			this.minimumIndexInBlock = new int[numberOfBlocks];
+			for (int i=0, j=0; i<t.length; i+=blockSize, j++) {
+				//init block minima
+				minimumInBlock[j] = t[i];
+				minimumIndexInBlock[j] = i;
+				for (int k=Math.min(i+blockSize, t.length)-1; k>=i; --k) {
+					if (t[k] < minimumInBlock[j]) {
+						minimumInBlock[j] = t[k];
+						minimumIndexInBlock[j] = k;
+					}
+				}
+				//calculate block hash
+				blockHashes[j] = hash(j);
+			}
+			
+			//init sparse table m
+			final int logSize = Integer.SIZE - Integer.numberOfLeadingZeros(numberOfBlocks-1);
+			m = new int[logSize+1][];
+			m[0] = new int[minimumInBlock.length];
+			for (int i=0; i<minimumInBlock.length; ++i) {
 				m[0][i] = i;
 			}
-			for (int i=1, step=1; i<=logN; i++, step+=step) {
-				m[i] = new int[a.length];
-				for (int j=0; j<a.length; j++) {
+			for (int i=1, step=1; i<=logSize; i++, step+=step) {
+				m[i] = new int[minimumInBlock.length];
+				for (int j=0; j<minimumInBlock.length; ++j) {
 					int leftMinIdx = m[i-1][j];
-					int rightMinIdx = j+step < a.length
+					int rightMinIdx = j+step < minimumInBlock.length
 							? m[i-1][j+step]
 							: leftMinIdx; 
-					m[i][j] = a[rightMinIdx] < a[leftMinIdx]
+					m[i][j] = minimumInBlock[rightMinIdx] < minimumInBlock[leftMinIdx]
 							? rightMinIdx
 							: leftMinIdx;
 				}
 			}
 		}
 
+		private int hash(int blockNum) {
+			int hash = 0;
+			final int blockStart = blockNum * blockSize;
+			final int hashLength = Math.min(blockSize, t.length - blockStart)-1;
+			for (int i=0; i<hashLength; ++i) {
+				hash |= (t[blockStart+i+1] > t[blockStart+i] ? 0 : 1) << i;
+			}
+			return hash;
+		}
+		
+		private int[] expand(int blockHash) {
+			final int[] block = new int[blockSize];
+			for (int i=1; i<blockSize; i++) {
+				final boolean isAscending = (blockHash & (1<<(i-1))) == 0;
+				block[i] = block[i-1] + (isAscending ? 1 : -1); 
+			}
+			return block;
+		}
+
 		public int getMinElementIndex(int l, int r) {
+			final int lBlock = l/blockSize;
+			final int rBlock = r/blockSize;
+			
+			if (rBlock - lBlock > 0) {
+				final int minElementInL = minElementIndexInBlock(lBlock, l%blockSize, blockSize-1) + lBlock * blockSize;
+				final int minElementInR = minElementIndexInBlock(rBlock, 0, r%blockSize) + rBlock * blockSize;
+				final int minInSideBlocks = t[minElementInR] < t[minElementInL]
+						? minElementInR
+						: minElementInL;
+				if (rBlock - lBlock > 1) {
+					final int minInInternalBlocks = minElementIndex(lBlock, rBlock);
+					return t[minInSideBlocks] < t[minInInternalBlocks]
+							? minInSideBlocks
+							: minInInternalBlocks;
+				} else {
+					return minInSideBlocks;
+				}
+			} else {
+				return minElementIndexInBlock(lBlock, l%blockSize, r%blockSize) + lBlock * blockSize;
+			}
+		}
+
+		private int minElementIndex(int lBlock, int rBlock) {
 			//k = floor(lg(r-l))
-			final int k = Integer.SIZE - Integer.numberOfLeadingZeros(r-l) - 1;
+			final int k = Integer.SIZE - Integer.numberOfLeadingZeros(rBlock-lBlock) - 1;
 			final int twoToK = 1<<k;
-			int leftMinIdx = m[k][l];
-			int rightMinIdx = m[k][r-twoToK+1];
-			return a[leftMinIdx] < a[rightMinIdx]
-					? leftMinIdx
-					: rightMinIdx;
+			int leftMinIdx = m[k][lBlock];
+			int rightMinIdx = m[k][rBlock-twoToK+1];
+			return minimumInBlock[leftMinIdx] < minimumInBlock[rightMinIdx]
+					? minimumIndexInBlock[leftMinIdx]
+					: minimumIndexInBlock[rightMinIdx];
+		}
+
+		private int minElementIndexInBlock(int blockNum, int l, int r) {
+			final int blockHash = blockHashes[blockNum];
+			int[][] resultsForBlock = blockResultCache.get(blockHash);
+			if (resultsForBlock == null) {
+				resultsForBlock = calculateBlock(blockHash);
+				blockResultCache.put(blockHash, resultsForBlock);
+			}
+			return resultsForBlock[r][l];
+		}
+
+		private int[][] calculateBlock(int blockHash) {
+			final int[][] blockResults = new int[blockSize][];
+			final int[] block = expand(blockHash);
+			for (int r=0; r<blockSize; ++r) {
+				blockResults[r] = new int[r+1];
+				blockResults[r][r] = r;
+				int minValue = block[r];
+				for (int l=r-1; l>=0; --l) {
+					final int currentValue = block[l];
+					if (currentValue < minValue) {
+						minValue = currentValue;
+						blockResults[r][l] = l;
+					} else {
+						blockResults[r][l] = blockResults[r][l+1];
+					}
+				}
+			}
+			return blockResults;
 		}
 	}
 	
@@ -581,7 +683,7 @@ public class UMASTMetric extends BaseMetric implements Metric {
 			final Node[] leafs = getOrderedLeafs(leafNames);
 			final int[] lcaDepths = new int[leafs.length - 1];
 			for (int i=1; i<leafs.length; i++) {
-				final Node u = lca.forLeafs(leafs[i-1], leafs[i]); 
+				final Node u = lca.forLeafs(leafs[i-1], leafs[i]);			
 				lcaDepths[i-1] = internalNodeDepths[u.getNumber()];
 			}
 			
