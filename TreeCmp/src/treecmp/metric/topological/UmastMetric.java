@@ -50,7 +50,9 @@ public class UMASTMetric extends BaseMetric implements Metric {
 
     @Override
     public double getDistance(Tree t1, Tree t2) {
-    	int result = umast(new SimpleUnrootedTreePreservingNodeNumbers(t1.getRoot()), new SimpleUnrootedTreePreservingNodeNumbers(t2.getRoot()));
+    	final SimpleTree tree1 = new SimpleTree(t1);
+    	final SimpleTree tree2 = new SimpleTree(t2);
+    	final int result = umast(new SimpleUnrootedTreePreservingNodeNumbers(tree1.getRoot()), new SimpleUnrootedTreePreservingNodeNumbers(tree2.getRoot()));
     
     	return Math.max(t1.getExternalNodeCount(), t2.getExternalNodeCount()) - result;
     }

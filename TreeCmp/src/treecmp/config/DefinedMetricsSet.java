@@ -29,6 +29,7 @@ import treecmp.metric.topological.RFMetric;
 import treecmp.metric.topological.RMASTMetric;
 import treecmp.metric.topological.TripletMetric;
 import treecmp.metric.topological.UMASTMetric;
+import treecmp.metric.topological.UMASTMetricO4;
 
 public class DefinedMetricsSet {
     private static DefinedMetricsSet instance;
@@ -42,7 +43,8 @@ public class DefinedMetricsSet {
     		new DefinedMetric(RFClusterMetric.class, "R-F_Cluster", "rc", "-Robinson-Foulds Cluster metric"),
     		new DefinedMetric(TripletMetric.class, "Triples", "tt", "-Triplet metric"),
     		new DefinedMetric(UMASTMetric.class, "UMAST", "umast", "-Unrooted MAST metric"),
-    		new DefinedMetric(RMASTMetric.class, "RMAST", "rmast", "-Rooted MAST Metric")
+    		new DefinedMetric(RMASTMetric.class, "RMAST", "rmast", "-Rooted MAST Metric"),
+    		new DefinedMetric(UMASTMetricO4.class, "UMAST O(n^4)", "umasto4", "-Unrooted MAST metric O(n^4)")
 	);
         
     public static synchronized DefinedMetricsSet getInstance()
